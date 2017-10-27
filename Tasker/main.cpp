@@ -56,16 +56,18 @@ void setMainArgs(cm::ArgvParser *cmd, bool *run_init, bool *enable_debug) {
 int main(int argc, char** argv) {
 
 	//Define args and project settings:
-	int exitCode = 0;
+	int exitCodeError = 1;
+	int exitCodeOk = 0;
+	int exitCode = exitCodeOk;
+
 	std::string filepath = "";
 	cm::ArgvParser cmd;
 	bool enable_debug = TASKER_DEBUG;
 	bool use_colors = true;
 	bool run_init = false;
-	int  execution_result = 0;
 
-	cmd.addErrorCode(0, "Success");
-	cmd.addErrorCode(1, "Error");
+	cmd.addErrorCode(exitCodeOk, "Success");
+	cmd.addErrorCode(exitCodeError, "Error");
 	cmd.setIntroductoryDescription("Tasker Manager - version: " + std::string(TASKER_VERSION) + " - By: " + std::string(TASKER_AUTHOR));
 	
 	cmd.setHelpOption("h", "help", "Print this help page");
@@ -77,6 +79,8 @@ int main(int argc, char** argv) {
 	
 	cmd.defineOption("users", "Show all users defined", cm::ArgvParser::NoOptionAttribute);
 	cmd.defineOption("adduser", "Add a new user -> will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("deluser", "Delete a user -> will remove the user from tasks also.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("updateuser", "Update a user credentials -> will ask for more options interactivly.", cm::ArgvParser::OptionRequiresValue);
 
 	cmd.defineOption("listall", "List all tasks -> expect integer for display level", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("listdone", "List all closed / finished tasks -> expect integer for display level", cm::ArgvParser::OptionRequiresValue);
@@ -137,7 +141,7 @@ int main(int argc, char** argv) {
 		} else {
 			Task->printTaskerNotify("No can do! Allready initialized");
 			Task->printTaskerInfo("Advice", "You can run '--destroy' to completely remove the instance.");
-			exit(exitCode);
+			exit(exitCodeOk);
 		}
 	} else
 	//Handle Operations:
@@ -146,7 +150,7 @@ int main(int argc, char** argv) {
 		if (!Task->loadObj()) {
 			Task->printTaskerNotify("Oups!");
 			Task->printTaskerInfo("Error", "Can't load Tasker object make sure you ran `--init` in this directory before.");
-			exit(exitCode);
+			exit(exitCodeError);
 		}
 		//Handle set tasks:
 		if (cmd.foundOption("task")) {
@@ -155,8 +159,8 @@ int main(int argc, char** argv) {
 			Task->setNewTask(taskAdd);
 			if (!Task->writeObj(true)) {
 				Task->printTaskerNotify("Oups!");
-				Task->printTaskerInfo("Error", "Could not write to object.");
-				exit(exitCode);
+				Task->printTaskerInfo("Error", "Could not write to Tasker object.");
+				exit(exitCodeError);
 			}
 		}
 		//Handle report to task:
@@ -164,15 +168,14 @@ int main(int argc, char** argv) {
 			// Write new task report:
 			std::string report = cmd.optionValue("report");
 			if (!Task->reportToTask(report)) {
-				std::cout << " * Tasker said Oups!" << std::endl << "     Error -> Task could not be found or input is invalid." << std::endl;
-				exit(exitCode);
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Task could not be found or input is invalid.");
+				exit(exitCodeError);
 			}
 			if (!Task->writeObj(true)) {
 				Task->printTaskerNotify("Oups!");
-				Task->printTaskerInfo("Error", "Could not write to object.");
-				exit(exitCode);
-			} else {
-
+				Task->printTaskerInfo("Error", "Could not write to Tasker object.");
+				exit(exitCodeError);
 			}
 		}
 		//Handle users show:
@@ -180,10 +183,51 @@ int main(int argc, char** argv) {
 			// Expose the users list:
 			Task->showusers();
 		}
-		//Handle user add:
+		//Handle add user:
 		if (cmd.foundOption("adduser")) {
-			// Expose the users list:
-			
+			// Add new user:
+			std::string user = cmd.optionValue("adduser");
+			if (!Task->adduser(user)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "User name must be at least 2 chars long without spaces.");
+				exit(exitCodeError);
+			}
+			if (!Task->writeObj(true)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Could not write to Tasker object.");
+				exit(exitCodeError);
+			}
+		}
+		//Handle delete user:
+		if (cmd.foundOption("deluser")) {
+			// Delete user:
+			std::string user = cmd.optionValue("deluser");
+			if (!Task->deluser(user)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "You can't delete all users - must be at least 1 user defined.");
+				exit(exitCodeError);
+			}
+			if (!Task->writeObj(true)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Could not write to Tasker object.");
+				exit(exitCodeError);
+			}
+		}
+		//Handle update user:
+		if (cmd.foundOption("updateuser")) {
+			// Delete user:
+			std::string user = cmd.optionValue("updateuser");
+			if (!Task->updateuser(user)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Can't find user: " + user);
+				Task->printTaskerInfo("Advice", "You can use `users` to list all users defined.");
+				exit(exitCodeError);
+			}
+			if (!Task->writeObj(true)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Could not write to Tasker object.");
+				exit(exitCodeError);
+			}
 		}
 		//Handle lists:
 		if (cmd.foundOption("listall") ||
@@ -219,14 +263,14 @@ int main(int argc, char** argv) {
 			if (!Task->list(listlevel, which, filter)) {
 				Task->printTaskerNotify("Oups!");
 				Task->printTaskerInfo("Error", "Some error occured can't expose the requested task list.");
-				exit(exitCode);
+				exit(exitCodeError);
 			}
 
 		}
 	} else {
 		Task->printTaskerNotify("Oups!");
 		Task->printTaskerInfo("Error", "Can't find Tasker object make sure you ran `--init` in this directory before.");
-		exit(exitCode);
+		exit(exitCodeError);
 	}
 
 	if (enable_debug) {
@@ -234,5 +278,5 @@ int main(int argc, char** argv) {
 	}
 
 	delete Task;
-	return execution_result;
+	return exitCodeOk;
 }

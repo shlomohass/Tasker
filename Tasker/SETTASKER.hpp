@@ -21,7 +21,7 @@
 
 #ifndef TASKER_OBJNAME
 /**
-* Set Defaul obj name
+* Set Default obj name
 */
 #define TASKER_OBJNAME ".tasker"
 #endif

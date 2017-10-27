@@ -218,7 +218,11 @@ bool TaskerMain::loadObj()
 void TaskerMain::printTaskerNotify(const std::string& mes)
 {
 	std::cout 
-		<< " * Tasker said : " 
+		<< " * "
+		<< this->usecolor() << this->getcolor("notify")
+		<< "Tasker said"
+		<< this->usecolor() << this->getcolor("reset")
+		<< " : " 
 		<< trim_copy(mes) 
 		<< std::endl;
 }
@@ -328,6 +332,9 @@ std::string TaskerMain::getcolor(const std::string& which, float value, const st
 	if (which == "status") {
 		return (value > 0.99 ? TASKER_COLOR_GREEN : TASKER_COLOR_YELLOW);
 	}
+	if (which == "notify") {
+		return TASKER_COLOR_YELLOW;
+	}
 	if (which == "hour") {
 		return TASKER_COLOR_GREY;
 	}
@@ -362,7 +369,7 @@ float TaskerMain::normalizeStatus(std::string str) {
 							 str == "true" ||
 							 str == "done" ||
 							 str == "finish"
-							) ? 1 : 0;
+							) ? (float)1 : (float)0;
 	if (task_status_num != 1 && this->isFloat(str)) {
 		return this->getFloat(str);
 	}
@@ -492,7 +499,7 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 	if (theTask < 0) return false;
 
 	//Does the task exists:
-	if (this->thestruct["tasks"].size() <= theTask) { return false; }
+	if ((int)this->thestruct["tasks"].size() <= theTask) { return false; }
 
 	std::string rep_date = this->getcurdatetime();
 	std::string rep_user = "";
@@ -572,6 +579,192 @@ void TaskerMain::showusers()
 		this->printTaskerInfo("Advice", "You can use `adduser {username}` to define a user name.");
 	}
 }
+bool TaskerMain::adduser(const std::string& _user)
+{
+	std::string user = trim_copy(_user);
+	std::string desc;
+	std::string mail;
+
+	//Remove spaces:
+	std::string::iterator end_pos = std::remove(user.begin(), user.end(), ' ');
+	user.erase(end_pos, user.end());
+
+	//Early validate:
+	if (user.length() < 2) {
+		return false;
+	}
+
+	//Print main:
+	std::cout << std::endl 
+			  << " > Define user: " 
+			  << this->usecolor() << this->getcolor("user")
+			  << user 
+			  << this->usecolor() << this->getcolor("reset")
+			  << std::endl;
+
+	//Check not allready set:
+	bool check = 0;
+	for (json::iterator it = this->thestruct["users"].begin(); it != this->thestruct["users"].end(); ++it) {
+		for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
+			if (ite.key() == user) {
+				check = true;
+			}
+		}
+	}
+	if (!check) {
+
+		//Interactively get all needed:
+		std::cout << std::endl << "  1. Set user description (enter for none): ";
+		std::getline(std::cin, desc);
+		std::cout << "  2. Set user e-mail address (enter for none): ";
+		std::getline(std::cin, mail);
+
+		//Save to Object:
+		this->thestruct["users"].push_back({
+			{ user, {
+				{"desc", desc },
+				{"mail", mail }
+			}}
+		});
+
+		//print results:
+		this->printTaskerNotify("New user defined!");
+		this->printTaskerInfo("Info", "User ID is: " + std::to_string(this->thestruct["users"].size()));
+
+	} else {
+		this->printTaskerNotify("User `" + user + "` is allready defined!");
+		this->printTaskerInfo("Advice", "You can use `users` to list all users defined.");
+		this->printTaskerInfo("Advice", "You can use `updateuser {username}` to change user credentials.");
+	}
+	return true;
+}
+bool TaskerMain::deluser(const std::string& _user)
+{
+
+	std::string user = trim_copy(_user);
+
+	//Print main:
+	std::cout << std::endl
+		<< " > Deleting user: "
+		<< this->usecolor() << this->getcolor("user")
+		<< user
+		<< this->usecolor() << this->getcolor("reset")
+		<< std::endl;
+
+	//validate first:
+	if (this->thestruct["users"].size() < 2) {
+		return false;
+	}
+
+	//Check if set & delete:
+	bool check = 0;
+	int  index = 0;
+	int  counter_tasks = 0;
+
+	for (json::iterator it = this->thestruct["users"].begin(); it != this->thestruct["users"].end(); ++it) {
+		for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
+			if (ite.key() == user)
+				check = true;
+		}
+		if (check) {
+			//Delete:
+			this->thestruct["users"].erase(index);
+			break;
+		} else {
+			index++;
+		}
+	}
+	if (check) {
+
+		//Remove from assignments:
+		for (unsigned i = 0; i < this->thestruct["tasks"].size(); i++) {
+			for (unsigned j = 0; j < this->thestruct["tasks"].at(i).at("plan").size(); j++) {
+				if (this->thestruct["tasks"].at(i).at("plan").at(j).at("user") == user) {
+					this->thestruct["tasks"].at(i).at("plan").at(j).at("user") = "";
+					counter_tasks++;
+				}
+			}
+		}
+
+		//print results:
+		this->printTaskerNotify("User deleted!");
+		this->printTaskerInfo("Info", "Affected: " + std::to_string(counter_tasks) + " Tasks.");
+
+	} else {
+		this->printTaskerNotify("User `" + user + "` is not defined.");
+		this->printTaskerInfo("Advice", "You can use `users` to list all users defined.");
+	}
+	return true;
+}
+bool TaskerMain::updateuser(const std::string& _user)
+{
+
+	std::string user = trim_copy(_user);
+	std::string desc;
+	std::string mail;
+	//Print main:
+	std::cout << std::endl
+		<< " > Updating user: "
+		<< this->usecolor() << this->getcolor("user")
+		<< user
+		<< this->usecolor() << this->getcolor("reset")
+		<< std::endl
+		<< "   - "
+		<< this->usecolor() << this->getcolor("hour")
+		<<"Press ENTER for skip, type `empty` to truncate."
+		<< this->usecolor() << this->getcolor("reset")
+		<< std::endl;
+
+	//Check if set & delete:
+	bool check = 0;
+	int  index = 0;
+
+	for (json::iterator it = this->thestruct["users"].begin(); it != this->thestruct["users"].end(); ++it) {
+		for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
+			if (ite.key() == user)
+				check = true;
+		}
+		if (check) {
+			//Update:
+			std::cout << std::endl << "  1. Set user description: ";
+			std::getline(std::cin, desc);
+			std::cout << "  2. Set user e-mail address: ";
+			std::getline(std::cin, mail);
+			//Trim
+			desc = trim_copy(desc);
+			mail = trim_copy(mail);
+			//Save to Object:
+			if (desc == "empty") {
+				this->thestruct["users"].at(index).at(user).at("desc") = "";
+			} else if (desc == "" || desc == "\"\"") {
+				//Do nothing
+			} else {
+				this->thestruct["users"].at(index).at(user).at("desc") = desc;
+			}
+			if (mail == "empty") {
+				this->thestruct["users"].at(index).at(user).at("mail") = "";
+			}
+			else if (mail == "" || mail == "\"\"") {
+				//Do nothing
+			}
+			else {
+				this->thestruct["users"].at(index).at(user).at("mail") = mail;
+			}
+			break;
+		} else {
+			index++;
+		}
+	}
+	if (check) {
+		//print results:
+		this->printTaskerNotify("User updated successfully!");
+		std::cout << std::endl;
+	}
+	else {
+		return false;
+	}
+	return true;
+}
 bool TaskerMain::list(const std::string& level, const std::string& which) {
 	return this->list(level, which, "");
 }
@@ -580,6 +773,7 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 	int theLevel = -1;
 	std::vector<std::string> users;
 	std::string filter = trim_copy(_filter);
+	int counter_found = 0;
 
 	//Validate the index: 
 	try { theLevel = stoi(level); }
@@ -607,7 +801,6 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 	for (unsigned i = 0; i < this->thestruct["tasks"].size(); i++) {
 
 		//Selective print:
-		//all done user open today
 		if (which == "done" && (float)this->thestruct["tasks"].at(i).at("status") < 1.00) {
 			continue;
 		}
@@ -635,6 +828,7 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 			}
 		}
 		//Print main row:
+		counter_found++;
 		std::string user = this->thestruct["tasks"].at(i).at("plan").back().at("user");
 		std::string target = this->thestruct["tasks"].at(i).at("plan").back().at("date");
 		std::string created = this->thestruct["tasks"].at(i).at("created");
@@ -708,7 +902,14 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 			std::cout << std::endl;
 		}
 	}
-
+	//In case nothing was found:
+	if (counter_found == 0) {
+		this->printTaskerNotify("No matching tasks found!");
+		if (which == "user") {
+			this->printTaskerInfo("Advice", "Make sure the user name is correct. run `users` to see all defined users.");
+		}
+		std::cout << std::endl;
+	}
 	return true;
 }
 

@@ -141,7 +141,7 @@
             "plan": [
                 {
                     "date": "27-10-2017 23:59:00",
-                    "user": "shira",
+                    "user": "",
                     "v": "1.0.1"
                 }
             ],
@@ -245,6 +245,24 @@
             "shlomi": {
                 "desc": "",
                 "mail": "shlomi@gmail.com"
+            }
+        },
+        {
+            "aa": {
+                "desc": "love this tasker stuff",
+                "mail": "aa.mail@gmail.com"
+            }
+        },
+        {
+            "shira": {
+                "desc": "the lead designer",
+                "mail": "shira@gmail.com"
+            }
+        },
+        {
+            "dan": {
+                "desc": "",
+                "mail": ""
             }
         }
     ],
