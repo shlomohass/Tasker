@@ -178,18 +178,12 @@ int main(int argc, char** argv) {
 		//Handle users show:
 		if (cmd.foundOption("users")) {
 			// Expose the users list:
-			if (!Task->showusers()) {
-				Task->printTaskerNotify("Oups!");
-				Task->printTaskerInfo("Error", "Could not list defined users.");
-				exit(exitCode);
-			}
-			if (!Task->writeObj(true)) {
-				std::cout << " * Tasker said Oups!" << std::endl << "     Error -> Could not write to object." << std::endl;
-				exit(exitCode);
-			}
-			else {
-
-			}
+			Task->showusers();
+		}
+		//Handle user add:
+		if (cmd.foundOption("adduser")) {
+			// Expose the users list:
+			
 		}
 		//Handle lists:
 		if (cmd.foundOption("listall") ||

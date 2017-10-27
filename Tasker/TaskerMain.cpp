@@ -538,7 +538,40 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 
 	return true;
 }
+void TaskerMain::showusers()
+{
+	//Print main
+	std::cout << std::endl << " > Defined users: " << std::endl << std::endl;
 
+	int counter = 0;
+	//Iterate:
+	for (json::iterator it = this->thestruct["users"].begin(); it != this->thestruct["users"].end(); ++it) {
+		for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
+			counter++;
+			std::string desc = ite.value().at("desc");
+			std::string mail = ite.value().at("mail");
+			std::cout
+				<< "   (" << counter << ") "
+				<< this->usecolor() << this->getcolor("user")
+				<< ite.key()
+				<< " -> "
+				<< this->usecolor() << this->getcolor("hour")
+				<< (desc == "" ? "Description not set" : desc)
+				<< " - "
+				<< (mail == "" ? "E-mail not set" : mail)
+				<< this->usecolor() << this->getcolor("reset")
+				<< std::endl;
+		}
+	}
+	if (counter > 0) {
+		std::cout << std::endl;
+		this->printTaskerInfo("Info", "Total users defined : " + std::to_string(counter));
+		std::cout << std::endl;
+	} else {
+		this->printTaskerNotify("No users were defined");
+		this->printTaskerInfo("Advice", "You can use `adduser {username}` to define a user name.");
+	}
+}
 bool TaskerMain::list(const std::string& level, const std::string& which) {
 	return this->list(level, which, "");
 }

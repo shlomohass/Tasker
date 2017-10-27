@@ -65,8 +65,12 @@ namespace tasker {
 		float normalizeStatus(std::string str);
 		std::time_t getEpochTime(const std::wstring& dateTime);
 
+		//Task Operations:
 		bool setNewTask(const std::string& strTask);
 		bool reportToTask(const std::string& strTask);
+		
+		//General Operations:
+		void showusers();
 		bool list(const std::string& level, const std::string& which);
 		bool list(const std::string& level, const std::string& which, const std::string& filter);
 
