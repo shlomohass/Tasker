@@ -62,8 +62,11 @@ namespace tasker {
 		std::string getcolor(const std::string& which, float fvalue, const std::string& svalue);
 		char usecolor();
 
+		//Helpers
 		float normalizeStatus(std::string str);
 		std::time_t getEpochTime(const std::wstring& dateTime);
+		int findDefinedUser(const std::string& user);
+		std::string getDefindUserName(int index);
 
 		//Task Operations:
 		bool setNewTask(const std::string& strTask);

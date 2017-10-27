@@ -230,7 +230,7 @@ int main(int argc, char** argv) {
 			}
 		}
 		//Handle lists:
-		if (cmd.foundOption("listall") ||
+		if (cmd.foundOption("listall")  ||
 			cmd.foundOption("listdone") ||
 			cmd.foundOption("listuser") ||
 			cmd.foundOption("listopen") ||

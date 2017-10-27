@@ -232,6 +232,71 @@
             "report": [],
             "status": 0.0,
             "task": "Trying to improve speed"
+        },
+        {
+            "created": "28-10-2017 01:18:41",
+            "plan": [
+                {
+                    "date": "28-10-2017 23:59:00",
+                    "user": "shlomi",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.5,
+            "task": "new protected task"
+        },
+        {
+            "created": "28-10-2017 01:22:36",
+            "plan": [
+                {
+                    "date": "",
+                    "user": "shlomix",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.310000002384186,
+            "task": "new protected task 33444"
+        },
+        {
+            "created": "28-10-2017 01:26:12",
+            "plan": [
+                {
+                    "date": "",
+                    "user": "",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "task": "new protected task lkjasd 87612386 871276 762762672 767"
+        },
+        {
+            "created": "28-10-2017 01:26:38",
+            "plan": [
+                {
+                    "date": "",
+                    "user": "shlomi",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "task": "new protected task lkjasd"
+        },
+        {
+            "created": "28-10-2017 01:26:54",
+            "plan": [
+                {
+                    "date": "",
+                    "user": "shira",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "task": "new protected task lkjasd 7873"
         }
     ],
     "types": {
@@ -261,6 +326,12 @@
         },
         {
             "dan": {
+                "desc": "",
+                "mail": ""
+            }
+        },
+        {
+            "shlomix": {
                 "desc": "",
                 "mail": ""
             }
