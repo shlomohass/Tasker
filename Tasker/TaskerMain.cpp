@@ -487,9 +487,12 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 	std::string plan_duedate = "";
 	std::string task_created = this->getcurdatetime();
 	std::string task_status  = "";
+	std::string task_load	 = "1";
 	float		task_status_num;
+	int			loadint      = 1;
 	bool        reloop_user	 = true;
 	bool        reloop_date  = true;
+	bool        reloop_load  = true;
 	bool        show_advice_user = true;
 
 	//Interactively get all needed:
@@ -567,6 +570,22 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 	std::cout << "  4. Set current status (1|0, true|false): ";
 	std::getline(std::cin, task_status);
 
+	if (this->load) {
+		std::cout << "  4. Set load units of this task (use an integer): ";
+		while (reloop_date) {
+			std::getline(std::cin, task_load);
+			int scan_value = std::sscanf(task_load.c_str(), "%d", &loadint);
+			if (scan_value == 0) {
+				// does not start with integer
+				this->printTaskerInfo("Error", "Bad input - Please enter a positive integer only.");
+				std::cout << "\tType: ";
+			} else {
+				// starts with integer
+				reloop_date = false;
+			}
+		}
+	}
+
 	//Normalize:
 	plan_version = plan_version != "" ? plan_version : plan_currentversion;
 	task_status_num = this->normalizeStatus(task_status);
@@ -578,6 +597,7 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 		{ "task",		trim_copy(strTask)	},
 		{ "status",		task_status_num		},
 		{ "cancel",		false				},
+		{ "load",		loadint				},
 		{ "report",		""					} 
 	};
 	taskObj["plan"] = json::array(); 

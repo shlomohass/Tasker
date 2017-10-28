@@ -4,7 +4,7 @@
     "note": {},
     "tasker": {
         "allowdelete": true,
-        "enableloads": false,
+        "enableloads": true,
         "usecolors": true,
         "version": "1.0.0"
     },
@@ -12,6 +12,7 @@
         {
             "cancel": false,
             "created": "28-10-2017 18:36:54",
+            "load": 1,
             "plan": [
                 {
                     "date": "28-10-2017 23:59:00",
@@ -33,6 +34,7 @@
         {
             "cancel": false,
             "created": "28-10-2017 18:49:33",
+            "load": 1,
             "plan": [
                 {
                     "date": "28-10-2017 23:59:00",
@@ -50,6 +52,36 @@
             ],
             "status": 0.239999994635582,
             "task": "Create a color palette for the website"
+        },
+        {
+            "cancel": false,
+            "created": "28-10-2017 22:32:45",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": "shlomi",
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "task": "added a new task with high load impact"
+        },
+        {
+            "cancel": false,
+            "created": "28-10-2017 22:34:20",
+            "load": 3,
+            "plan": [
+                {
+                    "date": "28-10-2017 23:59:00",
+                    "user": "shlomi",
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "task": "added a new task with a very high load impact with opt enabled"
         }
     ],
     "types": {
