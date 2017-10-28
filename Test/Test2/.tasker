@@ -320,8 +320,15 @@
                     "v": "1.0.1"
                 }
             ],
-            "report": [],
-            "status": 1.0,
+            "report": [
+                {
+                    "by": "",
+                    "date": "28-10-2017 13:13:17",
+                    "note": "a task report",
+                    "status": 0.899999976158142
+                }
+            ],
+            "status": 0.899999976158142,
             "task": "a new task added on the fly"
         }
     ],

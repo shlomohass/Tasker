@@ -736,22 +736,31 @@ bool TaskerMain::deluser(const std::string& _user)
 	//Check if set & delete:
 	int  index = this->findDefinedUser(user);
 	int  counter_tasks = 0;
-
+	int  counter_reports = 0;
 	if (index != -1) {
+
 		//Remove user:
 		this->thestruct["users"].erase(index);
 		//Remove from assignments:
 		for (unsigned i = 0; i < this->thestruct["tasks"].size(); i++) {
+			//Remove from main
 			for (unsigned j = 0; j < this->thestruct["tasks"].at(i).at("plan").size(); j++) {
 				if (this->thestruct["tasks"].at(i).at("plan").at(j).at("user") == user) {
 					this->thestruct["tasks"].at(i).at("plan").at(j).at("user") = "";
 					counter_tasks++;
 				}
 			}
+			//Remove from reports:
+			for (unsigned j = 0; j < this->thestruct["tasks"].at(i).at("report").size(); j++) {
+				if (this->thestruct["tasks"].at(i).at("report").at(j).at("by") == user) {
+					this->thestruct["tasks"].at(i).at("report").at(j).at("by") = "";
+					counter_reports++;
+				}
+			}
 		}
 		//print results:
 		this->printTaskerNotify("User deleted!");
-		this->printTaskerInfo("Info", "Affected: " + std::to_string(counter_tasks) + " Tasks.");
+		this->printTaskerInfo("Info", "Affected: " + std::to_string(counter_tasks) + " Tasks, " + std::to_string(counter_reports) + " reports.");
 
 	} else {
 		this->printTaskerNotify("User `" + user + "` is not defined.");
@@ -953,7 +962,7 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 					<< onlyhour
 					<< ", by "
 					<< this->usecolor() << this->getcolor("user")
-					<< byuser
+					<< (byuser == "" ? "unknown" : byuser )
 					<< this->usecolor() << this->getcolor("reset")
 					<< std::endl;
 			}
