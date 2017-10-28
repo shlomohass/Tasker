@@ -42,12 +42,15 @@ inline void _pclose(FILE* file) {
 
 namespace cm = CommandLineProcessing;
 
-void setMainArgs(cm::ArgvParser *cmd, bool *run_init, bool *enable_debug) {
+void setMainArgs(cm::ArgvParser *cmd, bool *run_init, bool *enable_debug, bool *use_colors) {
 	if (cmd->foundOption("debug")) {
 		*enable_debug = true;
 	}
 	if (cmd->foundOption("init")) {
 		*run_init = true;
+	}
+	if (cmd->foundOption("discolor")) {
+		*use_colors = false;
 	}
 	return;
 }
@@ -64,6 +67,7 @@ int main(int argc, char** argv) {
 	cm::ArgvParser cmd;
 	bool enable_debug	= TASKER_DEBUG;
 	bool use_colors		= true;
+	bool enable_loads	= true;
 	bool run_init		= false;
 
 	cmd.addErrorCode(exitCodeOk,	"Success"	);
@@ -93,8 +97,11 @@ int main(int argc, char** argv) {
 	cmd.defineOption("listopen", "List all open tasks -> expect integer for display level", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("listtoday", "List tasks that are due to today -> expect integer for display level", cm::ArgvParser::OptionRequiresValue);
 	
-	cmd.defineOption("discolor", "Disable colored console text.", cm::ArgvParser::NoOptionAttribute);
-	
+	cmd.defineOption("discolor", "Disable colored console text for one execution only.", cm::ArgvParser::NoOptionAttribute);
+	cmd.defineOption("set_optcolor", "Set option whether use colored console text. Expect true|false OR 1|0", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("set_optdelete", "Set option whether to allow task delete. Expect true|false OR 1|0", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("set_optloads", "Set option whether to use task loads. Expect true|false OR 1|0", cm::ArgvParser::OptionRequiresValue);
+
 	cmd.defineOptionAlternative("task",			"t"	);
 	cmd.defineOptionAlternative("report",		"r"	);
 	cmd.defineOptionAlternative("cancel",		"c"	);
@@ -120,17 +127,12 @@ int main(int argc, char** argv) {
 		}
 		exitCode = 1;
 	} else {
-		setMainArgs(&cmd, &run_init, &enable_debug);
+		setMainArgs(&cmd, &run_init, &enable_debug, &use_colors);
 	}
 
 	//Help is requested?
 	if (result == cm::ArgvParser::ParserHelpRequested) {
 		exit(exitCode);
-	}
-
-	//Set colored output:
-	if (cmd.foundOption("discolor")) {
-		use_colors = false;
 	}
 
 	//Main Tasker Object:
@@ -160,6 +162,9 @@ int main(int argc, char** argv) {
 			Task->printTaskerNotify("Oups!");
 			Task->printTaskerInfo("Error", "Can't load Tasker object make sure you ran `--init` in this directory before.");
 			exit(exitCodeError);
+		} else {
+			//Get local options:
+			Task->parseOptions(cmd.foundOption("discolor"));
 		}
 		//Handle set tasks:
 		if (cmd.foundOption("task")) {
@@ -325,6 +330,41 @@ int main(int argc, char** argv) {
 				exit(exitCodeError);
 			}
 
+		}
+
+		//Handle Options:
+		if (cmd.foundOption("set_optcolor") ||
+			cmd.foundOption("set_optdelete") ||
+			cmd.foundOption("set_optloads")
+			) {
+			// Get option:
+			std::string state;
+			std::string which;
+			//Grab:
+			if (cmd.foundOption("set_optcolor")) {
+				state = cmd.optionValue("set_optcolor");
+				which = "optcolor";
+			} else if (cmd.foundOption("set_optdelete")) {
+				state = cmd.optionValue("set_optdelete");
+				which = "optdelete";
+			}
+			else if (cmd.foundOption("set_optloads")) {
+				state = cmd.optionValue("set_optloads");
+				which = "optloads";
+			}
+
+			//Set the option:
+			if (!Task->setOption(which, state)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Bad input - can't set option.");
+				Task->printTaskerInfo("Advice", "You should use -> true|false OR 1|0.");
+				exit(exitCodeError);
+			}
+			if (!Task->writeObj(true)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Could not write to Tasker object.");
+				exit(exitCodeError);
+			}
 		}
 	} else {
 		Task->printTaskerNotify("Oups!");

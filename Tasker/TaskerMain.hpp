@@ -19,8 +19,12 @@ namespace tasker {
 
 	class TaskerMain
 	{
+		//Flags:
 		bool color;
+		bool load;
+		bool delitems;
 
+		//Containers:
 		std::string  basepath;
 		std::string  fullpath;
 		json thestruct;
@@ -35,6 +39,8 @@ namespace tasker {
 		std::string _fullpath();
 		bool loadBase();
 		bool closeBase();
+		void parseOptions(bool colors_override);
+		bool setOption(const std::string& which, const std::string& state);
 		void createEmpty();
 		void createEmpty(json structure);
 		std::string getSerialized();

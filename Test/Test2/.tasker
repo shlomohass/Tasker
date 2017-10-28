@@ -4,6 +4,7 @@
     "note": {},
     "tasker": {
         "allowdelete": true,
+        "enableloads": false,
         "usecolors": true,
         "version": "1.0.0"
     },
@@ -49,20 +50,6 @@
             ],
             "status": 0.239999994635582,
             "task": "Create a color palette for the website"
-        },
-        {
-            "cancel": false,
-            "created": "28-10-2017 18:50:23",
-            "plan": [
-                {
-                    "date": "",
-                    "user": "shlomi",
-                    "v": "1.0.0"
-                }
-            ],
-            "report": [],
-            "status": 0.400000005960464,
-            "task": "Add the app.js minified version"
         }
     ],
     "types": {

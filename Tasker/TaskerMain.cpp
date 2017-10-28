@@ -125,12 +125,56 @@ bool TaskerMain::closeBase()
 {
 	return true;
 }
+void TaskerMain::parseOptions(bool colors_override)
+{
+	//Set color mode:
+	if (!colors_override) {
+		this->color = this->thestruct["tasker"].at("usecolors");
+	}
+	//Set load modes:
+	this->load = this->thestruct["tasker"].at("enableloads");
+
+	//Set delete flag:
+	this->delitems = this->thestruct["tasker"].at("allowdelete");
+}
+bool TaskerMain::setOption(const std::string& which, const std::string& state)
+{
+	//Validate state:
+	if (state != "1" && state != "0" && state != "true" && state != "false") {
+		return false;
+	}
+	//Parse state:
+	bool boolstate = (state == "1" || state== "true") ? true : false;
+
+	//Save to object
+	if (which == "optcolor") {
+		this->thestruct["tasker"].at("usecolors") = boolstate;
+
+	} else if (which == "optdelete") {
+		this->thestruct["tasker"].at("allowdelete") = boolstate;
+
+	} else if (which == "optloads") {
+		this->thestruct["tasker"].at("enableloads") = boolstate;
+
+	} else {
+		return false;
+	}
+	//Reparse options:
+	this->parseOptions(false);
+
+	//Notify:
+	this->printTaskerNotify("Option saved!");
+	std::cout << std::endl;
+
+	return true;
+}
 void TaskerMain::createEmpty()
 {	
 	//Sets :
 	this->thestruct["tasker"] = {
 		{ "version",			TASKER_VERSION	},
 		{ "usecolors",			true			},
+		{ "enableloads",		true			},
 		{ "allowdelete",		true			}
 	};
 	this->thestruct["users"] = json::array();
@@ -683,11 +727,17 @@ bool TaskerMain::deleteTask(const std::string& strTask)
 
 	//Does the task exists:
 	if ((int)this->thestruct["tasks"].size() <= theTask) { return false; }
-
-	//Delete task
-	std::cout << std::endl << " > Deleting task: " << theTask << std::endl;
-	this->thestruct["tasks"].erase(theTask);
-	this->printTaskerNotify("Task deleted successfully!");
+	
+	//Validate allowed delete:
+	if (this->delitems == false) {
+		this->printTaskerNotify("Task delete Prevented!");
+		this->printTaskerInfo("Info", "You can't delete tasks because a global option was set tp prevent that - you may want to `--cancel {id}` insted.");
+	} else {
+		//Delete task
+		std::cout << std::endl << " > Deleting task: " << theTask << std::endl;
+		this->thestruct["tasks"].erase(theTask);
+		this->printTaskerNotify("Task deleted successfully!");
+	}
 	std::cout << std::endl;
 	return true;
 }
