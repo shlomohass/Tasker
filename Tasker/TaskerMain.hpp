@@ -68,6 +68,7 @@ namespace tasker {
 		std::time_t getEpochTime(const std::wstring& dateTime);
 		int findDefinedUser(const std::string& user);
 		std::string getDefindUserName(int index);
+		std::string getReservedUserNames(const std::string& deli);
 
 		//Task Operations:
 		bool setNewTask(const std::string& strTask);

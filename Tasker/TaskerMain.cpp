@@ -8,6 +8,7 @@
 
 #include "TaskerMain.hpp"
 #include "SETTASKER.hpp"
+#include "TaskerAdd.hpp"
 
 #include <time.h>
 #include <iostream>
@@ -422,6 +423,13 @@ std::string TaskerMain::getDefindUserName(int index) {
 	}
 	return "";
 }
+std::string TaskerMain::getReservedUserNames(const std::string& deli)
+{
+	std::string reserved_names_str;
+	for (auto value : tasker::reserve_user_names)
+		reserved_names_str += value + deli;
+	return reserved_names_str.substr(0, reserved_names_str.size() - deli.size());
+}
 
 bool TaskerMain::setNewTask(const std::string& strTask)
 {	
@@ -656,7 +664,8 @@ void TaskerMain::showusers()
 	}
 	if (counter > 0) {
 		std::cout << std::endl;
-		this->printTaskerInfo("Info", "Total users defined : " + std::to_string(counter));
+		this->printTaskerInfo("Info", "Total users defined: " + std::to_string(counter));
+		this->printTaskerInfo("Info", "Reserved user names: " + this->getReservedUserNames(", ") + ".");
 		std::cout << std::endl;
 	} else {
 		this->printTaskerNotify("No users were defined");
@@ -674,8 +683,9 @@ bool TaskerMain::adduser(const std::string& _user)
 	user.erase(end_pos, user.end());
 
 	//Early validate:
-	if (user.length() < 2) {
-		return false;
+	if (user.length() < 2) { return false; } /* name must be atleast 2 chars long */
+	if (std::find(reserve_user_names.begin(), reserve_user_names.end(), user) != reserve_user_names.end()) {
+		return false; /* reserved name used */
 	}
 
 	//Print main:

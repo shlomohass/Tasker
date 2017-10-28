@@ -189,7 +189,8 @@ int main(int argc, char** argv) {
 			std::string user = cmd.optionValue("adduser");
 			if (!Task->adduser(user)) {
 				Task->printTaskerNotify("Oups!");
-				Task->printTaskerInfo("Error", "User name must be at least 2 chars long without spaces.");
+				Task->printTaskerInfo("Error", "User name must be at least 2 chars long without spaces and not a reserve name.");
+				Task->printTaskerInfo("Info", "Reserved names: " + Task->getReservedUserNames(", ") + ".");
 				exit(exitCodeError);
 			}
 			if (!Task->writeObj(true)) {
