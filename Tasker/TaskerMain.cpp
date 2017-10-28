@@ -923,10 +923,16 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 			//Will print task notes
 			for (unsigned j = 0; j < this->thestruct["tasks"].at(i).at("report").size(); j++) {
 
+				//Prepare for print:
+				std::string byuser = this->thestruct["tasks"].at(i).at("report").at(j).at("by");
+				byuser.erase(std::remove(byuser.begin(), byuser.end(), '"'), byuser.end());
+
 				std::string dateout = this->thestruct["tasks"].at(i).at("report").at(j).at("date");
 				dateout.erase(std::remove(dateout.begin(), dateout.end(), '"'), dateout.end());
+				
 				std::string onlydate = dateout.substr(0, 10);
 				std::string onlyhour = dateout.substr(11, 8);
+				//Print report:
 				std::cout
 					<< "\t- "
 					<< "["
@@ -947,7 +953,7 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 					<< onlyhour
 					<< ", by "
 					<< this->usecolor() << this->getcolor("user")
-					<< this->thestruct["tasks"].at(i).at("report").at(j).at("by")
+					<< byuser
 					<< this->usecolor() << this->getcolor("reset")
 					<< std::endl;
 			}
