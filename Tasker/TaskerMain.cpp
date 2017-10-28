@@ -932,8 +932,8 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 					<< "["
 					<< this->usecolor() << this->getcolor("status", (float)this->thestruct["tasks"].at(i).at("report").at(j).at("status"))
 					<< std::to_string(
-					(int)((float)this->thestruct["tasks"].at(i).at("report").at(j).at("status") * 100)
-					).substr(0, 3)
+							(int)((float)this->thestruct["tasks"].at(i).at("report").at(j).at("status") * 100)
+						).substr(0, 3)
 					<< "%"
 					<< this->usecolor() << this->getcolor("reset")
 					<< "] : "
@@ -945,6 +945,9 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 					<< " : "
 					<< this->usecolor() << this->getcolor("hour")
 					<< onlyhour
+					<< ", by "
+					<< this->usecolor() << this->getcolor("user")
+					<< this->thestruct["tasks"].at(i).at("report").at(j).at("by")
 					<< this->usecolor() << this->getcolor("reset")
 					<< std::endl;
 			}
