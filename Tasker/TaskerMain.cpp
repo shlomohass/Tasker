@@ -434,6 +434,8 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 	float		task_status_num;
 	bool        reloop_user	 = true;
 	bool        reloop_date  = true;
+	bool        show_advice_user = true;
+
 	//Interactively get all needed:
 	std::cout << std::endl << " > New task: ";
 	std::cout << std::endl << "  1. Assign to user (empty for none): ";
@@ -452,9 +454,12 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 			break;
 		} else if (this->findDefinedUser(plan_user) == -1) {
 			this->printTaskerInfo("Error", "The user name you typed can't be found.");
-			this->printTaskerInfo("Advice", "Leave empty and press ENTER for not assigned.");
-			this->printTaskerInfo("Advice", "Type `default` and press ENTER for auto assign default user.");
-			this->printTaskerInfo("Advice", "Run `--users` to see all users defined.");
+			if (show_advice_user) {
+				this->printTaskerInfo("Advice", "Leave empty and press ENTER for not assigned.");
+				this->printTaskerInfo("Advice", "Type `default` and press ENTER for auto assign default user.");
+				this->printTaskerInfo("Advice", "Run `--users` to see all users defined.");
+				show_advice_user = false;
+			}
 			std::cout << "\tType: ";
 		} else {
 			reloop_user = false;
@@ -512,23 +517,24 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 
 	//Create finall Object:
 	json taskObj = {
-		{ "plan", "" },
-		{ "created", task_created },
-		{ "task", trim_copy(strTask) },
-		{ "status", task_status_num },
-		{ "report", "" } 
+		{ "plan",		""					},
+		{ "created",	task_created		},
+		{ "task",		trim_copy(strTask)	},
+		{ "status",		task_status_num		},
+		{ "report",		""					} 
 	};
 	taskObj["plan"] = json::array(); 
 	taskObj["plan"].push_back({ 
-		{ "v" , trim_copy(plan_version) },
-		{ "user" , plan_user },
-		{ "date" , plan_duedate } 
+		{ "v" ,			trim_copy(plan_version) },
+		{ "user" ,		plan_user				},
+		{ "date" ,		plan_duedate			} 
 	});
 	taskObj["report"] = json::array();
 
 	//Save
 	this->thestruct["tasks"].push_back(taskObj);
 
+	//Notify:
 	this->printTaskerNotify("New task Created!");
 	this->printTaskerInfo("Info","Task ID is: " + std::to_string(this->thestruct["tasks"].size()));
 
@@ -553,7 +559,8 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 	float		rep_status_num;
 	bool		reloop_user = true;
 	bool		reloop_note = true;
-
+	bool        show_advice_user = true;
+	
 	//Interactively get all needed:
 	std::cout << std::endl << "> Report to task: " << strTask;
 	std::cout << std::endl << "  1. Set new progress status (0.0 - 1.0): ";
@@ -579,9 +586,12 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 		}
 		else if (this->findDefinedUser(rep_user) == -1) {
 			this->printTaskerInfo("Error", "The user name you typed can't be found.");
-			this->printTaskerInfo("Advice", "Leave empty and press ENTER for not assigned.");
-			this->printTaskerInfo("Advice", "Type `default` and press ENTER for setting the default user.");
-			this->printTaskerInfo("Advice", "Run `--users` to see all users defined.");
+			if (show_advice_user) {
+				this->printTaskerInfo("Advice", "Leave empty and press ENTER for not assigned.");
+				this->printTaskerInfo("Advice", "Type `default` and press ENTER for setting the default user.");
+				this->printTaskerInfo("Advice", "Run `--users` to see all users defined.");
+				show_advice_user = false;
+			}
 			std::cout << "\tType: ";
 		} else {
 			reloop_user = false;

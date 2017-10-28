@@ -300,10 +300,29 @@
                     "date": "28-10-2017 11:57:39",
                     "note": "A report note added",
                     "status": 0.119999997317791
+                },
+                {
+                    "by": "shira",
+                    "date": "28-10-2017 12:54:56",
+                    "note": "yet another report",
+                    "status": 0.349999994039536
                 }
             ],
-            "status": 0.119999997317791,
+            "status": 0.349999994039536,
             "task": "new protected task lkjasd 7873"
+        },
+        {
+            "created": "28-10-2017 12:56:09",
+            "plan": [
+                {
+                    "date": "",
+                    "user": "shlomi",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 1.0,
+            "task": "a new task added on the fly"
         }
     ],
     "types": {
