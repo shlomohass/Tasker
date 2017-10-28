@@ -73,7 +73,9 @@ namespace tasker {
 		//Task Operations:
 		bool setNewTask(const std::string& strTask);
 		bool reportToTask(const std::string& strTask);
-		
+		bool cancelTask(const std::string& strTask, bool state);
+		bool deleteTask(const std::string& strTask);
+
 		//General Operations:
 		void showusers();
 		bool adduser(const std::string& _user);

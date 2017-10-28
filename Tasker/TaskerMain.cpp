@@ -128,7 +128,11 @@ bool TaskerMain::closeBase()
 void TaskerMain::createEmpty()
 {	
 	//Sets :
-	this->thestruct["tasker"] = {{"version", TASKER_VERSION }};
+	this->thestruct["tasker"] = {
+		{ "version",			TASKER_VERSION	},
+		{ "usecolors",			true			},
+		{ "allowdelete",		true			}
+	};
 	this->thestruct["users"] = json::array();
 	this->thestruct["types"] = {{"task",{"desc","simple task"}}};
 	this->thestruct["tasks"] = json::array();
@@ -529,6 +533,7 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 		{ "created",	task_created		},
 		{ "task",		trim_copy(strTask)	},
 		{ "status",		task_status_num		},
+		{ "cancel",		false				},
 		{ "report",		""					} 
 	};
 	taskObj["plan"] = json::array(); 
@@ -545,10 +550,9 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 	//Notify:
 	this->printTaskerNotify("New task Created!");
 	this->printTaskerInfo("Info","Task ID is: " + std::to_string(this->thestruct["tasks"].size()));
-
+	std::cout << std::endl;
 	return true;
 }
-
 bool TaskerMain::reportToTask(const std::string& strTask) {
 
 	int theTask = -1;
@@ -560,6 +564,9 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 	//Does the task exists:
 	if ((int)this->thestruct["tasks"].size() <= theTask) { return false; }
 
+	//Does the task enabled:
+	if (this->thestruct["tasks"].at(theTask).at("cancel") == true) { return false; }
+
 	std::string rep_date = this->getcurdatetime();
 	std::string rep_user = "";
 	std::string rep_note = "";
@@ -570,7 +577,7 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 	bool        show_advice_user = true;
 	
 	//Interactively get all needed:
-	std::cout << std::endl << "> Report to task: " << strTask;
+	std::cout << std::endl << " > Report to task: " << strTask;
 	std::cout << std::endl << "  1. Set new progress status (0.0 - 1.0): ";
 	std::getline(std::cin, rep_status);
 	//Get the user who made the report:
@@ -637,6 +644,55 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 
 	return true;
 }
+bool TaskerMain::cancelTask(const std::string& strTask, bool state)
+{
+	int theTask = -1;
+
+	//Validate the index: 
+	try { theTask = stoi(strTask) - 1; }
+	catch (...) { return false; }
+	if (theTask < 0) return false;
+
+	//Does the task exists:
+	if ((int)this->thestruct["tasks"].size() <= theTask) { return false; }
+
+	//Set cancel
+	if (state) {
+		std::cout << std::endl << " > Canceling task: " << theTask << std::endl;
+		this->thestruct["tasks"].at(theTask).at("cancel") = true;
+		this->printTaskerNotify("Task marked as canceled!");
+		this->printTaskerInfo("Info", "You can run `--listcancel` to see all canceled tasks");
+		this->printTaskerInfo("Info", "You can enable a task again by running `--enabletask {id}`");
+	} else {
+		std::cout << std::endl << " > Enabling task: " << theTask << std::endl;
+		this->thestruct["tasks"].at(theTask).at("cancel") = false;
+		this->printTaskerNotify("Task was enabled!");
+		this->printTaskerInfo("Info", "You can run `--listcancel` to see all canceled tasks");
+	}
+	std::cout << std::endl;
+	return true;
+}
+bool TaskerMain::deleteTask(const std::string& strTask)
+{
+	int theTask = -1;
+
+	//Validate the index: 
+	try { theTask = stoi(strTask) - 1; }
+	catch (...) { return false; }
+	if (theTask < 0) return false;
+
+	//Does the task exists:
+	if ((int)this->thestruct["tasks"].size() <= theTask) { return false; }
+
+	//Delete task
+	std::cout << std::endl << " > Deleting task: " << theTask << std::endl;
+	this->thestruct["tasks"].erase(theTask);
+	this->printTaskerNotify("Task deleted successfully!");
+	std::cout << std::endl;
+	return true;
+}
+
+
 void TaskerMain::showusers()
 {
 	//Print main
@@ -776,6 +832,7 @@ bool TaskerMain::deluser(const std::string& _user)
 		this->printTaskerNotify("User `" + user + "` is not defined.");
 		this->printTaskerInfo("Advice", "You can use `users` to list all users defined.");
 	}
+	std::cout << std::endl;
 	return true;
 }
 bool TaskerMain::updateuser(const std::string& _user)
@@ -869,6 +926,12 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 	for (unsigned i = 0; i < this->thestruct["tasks"].size(); i++) {
 
 		//Selective print:
+		if (which != "cancel" && this->thestruct["tasks"].at(i).at("cancel") == true) {
+			continue;
+		}
+		if (which == "cancel" && this->thestruct["tasks"].at(i).at("cancel") != true) {
+			continue;
+		}
 		if (which == "done" && (float)this->thestruct["tasks"].at(i).at("status") < 1.00) {
 			continue;
 		}
@@ -921,6 +984,9 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 			<< "%"
 			<< this->usecolor() << this->getcolor("reset")
 			<< "] -> "
+			<< this->usecolor() << ((which == "cancel") ? this->getcolor("error") : this->getcolor("reset"))
+			<< ((which == "cancel") ? "CANCELED / " : "")
+			<< this->usecolor() << this->getcolor("reset")
 			<< this->thestruct["tasks"].at(i).at("task") 
 			<< std::endl
 			<< this->usecolor() << this->getcolor("faded")

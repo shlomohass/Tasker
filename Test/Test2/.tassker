@@ -1,0 +1,368 @@
+{
+    "desc": "",
+    "name": "proj1",
+    "note": {},
+    "tasker": {
+        "version": "1.0.0"
+    },
+    "tasks": [
+        {
+            "created": "24-10-2017 01:36:00",
+            "plan": [
+                {
+                    "date": "",
+                    "user": "shlomi",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [
+                {
+                    "by": "shlomi",
+                    "date": "27-10-2017 12:00:29",
+                    "note": "added some new borders for the header part as mentioned in the review",
+                    "status": 0.100000001490116
+                }
+            ],
+            "status": 1.0,
+            "task": "new task number 1"
+        },
+        {
+            "created": "27-10-2017 00:18:15",
+            "plan": [
+                {
+                    "date": "27-10-2017 12:00:29",
+                    "user": "shlomi",
+                    "v": "1.2"
+                }
+            ],
+            "report": [
+                {
+                    "by": "shlomi",
+                    "date": "27-10-2017 00:20:47",
+                    "note": "made new changes to model",
+                    "status": 0.5
+                },
+                {
+                    "by": "shlomi",
+                    "date": "27-10-2017 11:57:39",
+                    "note": "checking adding to one",
+                    "status": 0.699999988079071
+                },
+                {
+                    "by": "shlomi",
+                    "date": "27-10-2017 11:58:09",
+                    "note": "some new information added",
+                    "status": 0.800000011920929
+                },
+                {
+                    "by": "shlomi",
+                    "date": "27-10-2017 12:05:16",
+                    "note": "allmost done just color header",
+                    "status": 0.899999976158142
+                }
+            ],
+            "status": 0.0,
+            "task": "shlomi task test 34"
+        },
+        {
+            "created": "27-10-2017 00:24:08",
+            "plan": [
+                {
+                    "date": "",
+                    "user": "shlomi",
+                    "v": "1.0"
+                }
+            ],
+            "report": [
+                {
+                    "by": "shlomi",
+                    "date": "27-10-2017 01:13:10",
+                    "note": "finally solved the bug! Now all is left is to wrap it up and clean.",
+                    "status": 0.600000023841858
+                }
+            ],
+            "status": 0.5,
+            "task": "shlomi task task 76575"
+        },
+        {
+            "created": "27-10-2017 12:12:56",
+            "plan": [
+                {
+                    "date": "",
+                    "user": "shlomi",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "task": "Add some pubs area in the main left area"
+        },
+        {
+            "created": "27-10-2017 14:05:22",
+            "plan": [
+                {
+                    "date": "",
+                    "user": "",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 1.0,
+            "task": "Without users"
+        },
+        {
+            "created": "27-10-2017 15:46:55",
+            "plan": [
+                {
+                    "date": "27-10-2017 23:12:00",
+                    "user": "bar",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.100000001490116,
+            "task": "Anew task designed for a new user"
+        },
+        {
+            "created": "27-10-2017 16:51:36",
+            "plan": [
+                {
+                    "date": "28-10-2017 23:12:05",
+                    "user": "bar",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "task": "Add some slider widte pictures to main page"
+        },
+        {
+            "created": "27-10-2017 17:11:23",
+            "plan": [
+                {
+                    "date": "27-10-2017 23:59:00",
+                    "user": "",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.5,
+            "task": "Bla bla go away"
+        },
+        {
+            "created": "27-10-2017 17:12:11",
+            "plan": [
+                {
+                    "date": "",
+                    "user": "shlomi",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "task": "Bla bla go away 2"
+        },
+        {
+            "created": "27-10-2017 17:12:52",
+            "plan": [
+                {
+                    "date": "",
+                    "user": "bar",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "task": "Bla bla go away 3"
+        },
+        {
+            "created": "27-10-2017 17:23:09",
+            "plan": [
+                {
+                    "date": "27-10-2017 00:00:00",
+                    "user": "bar",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "task": "Some tasks managers really sucks"
+        },
+        {
+            "created": "27-10-2017 17:25:36",
+            "plan": [
+                {
+                    "date": "27-10-2017 23:59:00",
+                    "user": "",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [
+                {
+                    "by": "dan",
+                    "date": "27-10-2017 18:10:04",
+                    "note": "made some major changes",
+                    "status": 0.150000005960464
+                },
+                {
+                    "by": "dan",
+                    "date": "27-10-2017 18:17:03",
+                    "note": "Minor changes done",
+                    "status": 0.159999996423721
+                },
+                {
+                    "by": "dan",
+                    "date": "27-10-2017 18:22:38",
+                    "note": "again yey!!!!!",
+                    "status": 0.280000001192093
+                }
+            ],
+            "status": 0.280000001192093,
+            "task": "Many many work to be done"
+        },
+        {
+            "created": "27-10-2017 17:31:47",
+            "plan": [
+                {
+                    "date": "27-10-2017 23:59:00",
+                    "user": "shlomi",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "task": "Trying to improve speed"
+        },
+        {
+            "created": "28-10-2017 01:18:41",
+            "plan": [
+                {
+                    "date": "28-10-2017 23:59:00",
+                    "user": "shlomi",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.5,
+            "task": "new protected task"
+        },
+        {
+            "created": "28-10-2017 01:22:36",
+            "plan": [
+                {
+                    "date": "",
+                    "user": "shlomix",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.310000002384186,
+            "task": "new protected task 33444"
+        },
+        {
+            "created": "28-10-2017 01:26:12",
+            "plan": [
+                {
+                    "date": "",
+                    "user": "",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "task": "new protected task lkjasd 87612386 871276 762762672 767"
+        },
+        {
+            "created": "28-10-2017 01:26:38",
+            "plan": [
+                {
+                    "date": "",
+                    "user": "shlomi",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "task": "new protected task lkjasd"
+        },
+        {
+            "created": "28-10-2017 01:26:54",
+            "plan": [
+                {
+                    "date": "",
+                    "user": "shira",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [
+                {
+                    "by": "shlomi",
+                    "date": "28-10-2017 11:57:39",
+                    "note": "A report note added",
+                    "status": 0.119999997317791
+                },
+                {
+                    "by": "shira",
+                    "date": "28-10-2017 12:54:56",
+                    "note": "yet another report",
+                    "status": 0.349999994039536
+                }
+            ],
+            "status": 0.349999994039536,
+            "task": "new protected task lkjasd 7873"
+        },
+        {
+            "created": "28-10-2017 12:56:09",
+            "plan": [
+                {
+                    "date": "",
+                    "user": "shlomi",
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [
+                {
+                    "by": "",
+                    "date": "28-10-2017 13:13:17",
+                    "note": "a task report",
+                    "status": 0.899999976158142
+                }
+            ],
+            "status": 0.899999976158142,
+            "task": "a new task added on the fly"
+        }
+    ],
+    "types": {
+        "task": [
+            "desc",
+            "simple task"
+        ]
+    },
+    "users": [
+        {
+            "shlomi": {
+                "desc": "",
+                "mail": "shlomi@gmail.com"
+            }
+        },
+        {
+            "shira": {
+                "desc": "the lead designer",
+                "mail": "shira@gmail.com"
+            }
+        },
+        {
+            "shlomix": {
+                "desc": "",
+                "mail": ""
+            }
+        },
+        {
+            "bar": {
+                "desc": "A manager user",
+                "mail": "barmail@yahoo.com"
+            }
+        }
+    ],
+    "version": "1.0.1"
+}
