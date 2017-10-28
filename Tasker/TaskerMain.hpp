@@ -26,6 +26,7 @@ namespace tasker {
 		json thestruct;
 
 	public:
+
 		TaskerMain(bool _color);
 		void setPath();
 		void _basepath(std::string path);

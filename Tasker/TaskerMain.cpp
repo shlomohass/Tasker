@@ -551,23 +551,52 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 	std::string rep_note = "";
 	std::string rep_status = "";
 	float		rep_status_num;
-	bool		reloop = true;
+	bool		reloop_user = true;
+	bool		reloop_note = true;
 
 	//Interactively get all needed:
 	std::cout << std::endl << "> Report to task: " << strTask;
 	std::cout << std::endl << "  1. Set new progress status (0.0 - 1.0): ";
 	std::getline(std::cin, rep_status);
+	//Get the user who made the report:
 	std::cout << "  2. Progress of user: ";
-	std::getline(std::cin, rep_user);
+	while (reloop_user) {
+		std::getline(std::cin, rep_user);
+
+		rep_user = trim_copy(rep_user);
+		std::string::iterator end_pos = std::remove(rep_user.begin(), rep_user.end(), ' ');
+		rep_user.erase(end_pos, rep_user.end());
+		
+		if (rep_user == "default") {
+			rep_user = this->getDefindUserName(0);
+			reloop_user = false;
+			break;
+		}
+		else if (rep_user == "") {
+			rep_user = "";
+			reloop_user = false;
+			break;
+		}
+		else if (this->findDefinedUser(rep_user) == -1) {
+			this->printTaskerInfo("Error", "The user name you typed can't be found.");
+			this->printTaskerInfo("Advice", "Leave empty and press ENTER for not assigned.");
+			this->printTaskerInfo("Advice", "Type `default` and press ENTER for setting the default user.");
+			this->printTaskerInfo("Advice", "Run `--users` to see all users defined.");
+			std::cout << "\tType: ";
+		} else {
+			reloop_user = false;
+		}
+	}
+	//Get the report note:
 	std::cout << "  3. Type task report note: ";
-	while (reloop) {
+	while (reloop_note) {
 		std::getline(std::cin, rep_note);
 		rep_note = trim_copy(rep_note);
 		if (rep_note == "") {
 			this->printTaskerInfo("Error", "Please retry. You must add a report note.");
 			std::cout << "\tType: ";
 		} else {
-			reloop = false;
+			reloop_note = false;
 		}
 	}
 

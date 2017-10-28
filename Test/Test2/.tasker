@@ -193,7 +193,7 @@
             "plan": [
                 {
                     "date": "27-10-2017 23:59:00",
-                    "user": "dan",
+                    "user": "",
                     "v": "1.0.1"
                 }
             ],
@@ -294,8 +294,15 @@
                     "v": "1.0.1"
                 }
             ],
-            "report": [],
-            "status": 0.0,
+            "report": [
+                {
+                    "by": "shlomi",
+                    "date": "28-10-2017 11:57:39",
+                    "note": "A report note added",
+                    "status": 0.119999997317791
+                }
+            ],
+            "status": 0.119999997317791,
             "task": "new protected task lkjasd 7873"
         }
     ],
@@ -313,27 +320,21 @@
             }
         },
         {
-            "aa": {
-                "desc": "love this tasker stuff",
-                "mail": "aa.mail@gmail.com"
-            }
-        },
-        {
             "shira": {
                 "desc": "the lead designer",
                 "mail": "shira@gmail.com"
             }
         },
         {
-            "dan": {
+            "shlomix": {
                 "desc": "",
                 "mail": ""
             }
         },
         {
-            "shlomix": {
-                "desc": "",
-                "mail": ""
+            "bar": {
+                "desc": "A manager user",
+                "mail": "barmail@yahoo.com"
             }
         }
     ],
