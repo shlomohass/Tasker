@@ -102,6 +102,8 @@ int main(int argc, char** argv) {
 	cmd.defineOption("set_optdelete", "Set option whether to allow task delete. Expect true|false OR 1|0", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("set_optloads", "Set option whether to use task loads. Expect true|false OR 1|0", cm::ArgvParser::OptionRequiresValue);
 
+	cmd.defineOption("stats", "Show project work stats -> expect tags|users", cm::ArgvParser::OptionRequiresValue);
+
 	cmd.defineOptionAlternative("task",			"t"	);
 	cmd.defineOptionAlternative("report",		"r"	);
 	cmd.defineOptionAlternative("cancel",		"c"	);
@@ -241,6 +243,12 @@ int main(int argc, char** argv) {
 		if (cmd.foundOption("users")) {
 			// Expose the users list:
 			Task->showusers();
+		}
+		//Handle stats show:
+		if (cmd.foundOption("stats")) {
+			// Expose the stats list:
+			std::string statstype = cmd.optionValue("stats");
+			Task->showstats(statstype);
 		}
 		//Handle add user:
 		if (cmd.foundOption("adduser")) {

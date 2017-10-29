@@ -84,6 +84,7 @@ namespace tasker {
 
 		//General Operations:
 		void showusers();
+		bool showstats(const std::string& type);
 		bool adduser(const std::string& _user);
 		bool deluser(const std::string& _user);
 		bool updateuser(const std::string& _user);

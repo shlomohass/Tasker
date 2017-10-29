@@ -17,6 +17,8 @@
 #include <algorithm>
 #include <cctype>
 #include <locale>
+#include <map>
+#include <iterator>
 
 #ifdef LINUX
 	#include <string>
@@ -797,6 +799,70 @@ void TaskerMain::showusers()
 		this->printTaskerNotify("No users were defined");
 		this->printTaskerInfo("Advice", "You can use `adduser {username}` to define a user name.");
 	}
+}
+bool TaskerMain::showstats(const std::string& type)
+{
+	//Validate type:
+	if (type != "tags" && type != "users") {
+		return false;
+	}
+	//Define
+	struct statobj {
+		double loadunits;
+		double workunits;
+		double workunitsleft;
+		statobj() {
+			loadunits = 0;
+			workunits = 0;
+			workunitsleft = 0;
+		}
+	} total;
+	std::map<std::string, statobj> container;
+	if (type == "users") {
+		//Build users:
+		for (json::iterator it = this->thestruct["users"].begin(); it != this->thestruct["users"].end(); ++it) {
+			for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
+				container.insert(std::pair<std::string, statobj>(ite.key(), statobj()));
+			}
+		}
+		//Add not assigned
+		container.insert(std::pair<std::string, statobj>("not assigned", statobj()));
+	} else {
+		//Build tags:
+	}
+
+	//Calculate and collect:
+	for (unsigned i = 0; i < this->thestruct["tasks"].size(); i++) {
+		//Skip cancel:
+		if (this->thestruct["tasks"].at(i).at("cancel")) continue;
+		//Calculate this task:
+		double _workunitsleft = (1.0 - (double)this->thestruct["tasks"].at(i).at("status")) * 100.0;
+		double _loadunits = (double)this->thestruct["tasks"].at(i).at("load") * (1.0 - (double)this->thestruct["tasks"].at(i).at("status"));
+		//Set total:
+		total.workunits += 100;
+		total.workunitsleft += _workunitsleft;
+		total.loadunits += _loadunits;
+		//Set object:
+		if (type == "users") {
+			//Get assigned:
+			std::string user = this->thestruct["tasks"].at(i).at("plan").back().at("user");
+			user = (user == "") ? "not assigned" : user;
+			container[user].loadunits += _loadunits;
+			container[user].workunitsleft += _workunitsleft;
+			container[user].workunits += 100;
+		} else {
+
+		}
+	}
+
+
+
+
+	//Notify:
+	this->printTaskerNotify("Option saved!");
+	std::cout << std::endl;
+
+	return true;
 }
 bool TaskerMain::adduser(const std::string& _user)
 {

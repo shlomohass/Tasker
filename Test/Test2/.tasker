@@ -82,6 +82,36 @@
             "report": [],
             "status": 0.0,
             "task": "added a new task with a very high load impact with opt enabled"
+        },
+        {
+            "cancel": false,
+            "created": "28-10-2017 23:06:04",
+            "load": 2,
+            "plan": [
+                {
+                    "date": "",
+                    "user": "bar",
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.300000011920929,
+            "task": "A sample task"
+        },
+        {
+            "cancel": false,
+            "created": "28-10-2017 23:06:33",
+            "load": 4,
+            "plan": [
+                {
+                    "date": "28-10-2017 23:59:00",
+                    "user": "dan",
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.800000011920929,
+            "task": "A sample task 2"
         }
     ],
     "types": {
@@ -95,6 +125,18 @@
             "shlomi": {
                 "desc": "the manager",
                 "mail": "shlomi@gmail.com"
+            }
+        },
+        {
+            "bar": {
+                "desc": "worker number 2",
+                "mail": ""
+            }
+        },
+        {
+            "dan": {
+                "desc": "worker number 3",
+                "mail": ""
             }
         }
     ],
