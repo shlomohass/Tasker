@@ -851,11 +851,57 @@ bool TaskerMain::showstats(const std::string& type)
 			container[user].workunitsleft += _workunitsleft;
 			container[user].workunits += 100;
 		} else {
+			//Get assigned:
 
 		}
 	}
 
+	//Print main
+	std::cout << std::endl << " > Tasker work status: " << std::endl << std::endl;
 
+	//Print out the stats:
+	if (total.workunits > 0) {
+
+		if (type == "users") {
+			//Print by users:
+			for (auto const& x : container)
+			{
+				float percwork   = (x.second.workunitsleft > 0) ? (x.second.workunitsleft / x.second.workunits) : -1.0;
+				float loadStatus = (percwork > -1.0) ? (percwork * x.second.loadunits) : -1.0;
+				std::string bar = "";
+				float barprogress = (percwork > -1.0) ? percwork : 0.0;
+
+				//Progress bar:
+				int barWidth = TASKER_BAR_LENGTH;
+				bar += TASKER_BAR_OPEN;
+				int pos = barWidth * percwork;
+				for (int i = 0; i < barWidth; ++i) {
+					if (i < pos) bar += TASKER_BAR_FULL;
+					else if (i == pos) bar += TASKER_BAR_ARROW;
+					else bar += TASKER_BAR_EMPTY;
+				}
+				bar += TASKER_BAR_CLOSE;
+
+				std::cout
+					<< "   - "
+					<< this->usecolor() << this->getcolor("user")
+					<< x.first
+					<< ":" << std::endl
+					<< this->usecolor() << this->getcolor("hour")
+					<< "    \t -> Progress     : "
+					<< bar << ((percwork > -1.0) ? std::to_string(int(percwork * 100.0)) + "%" : "Empty") << std::endl
+					<< "    \t -> Work Load    : "
+					<< ((loadStatus > -1.0) ? loadStatus : 0)
+					<< this->usecolor() << this->getcolor("reset") << std::endl;
+			}
+		} else {
+			//Print by tags:
+		}
+		
+	} else {
+		//Print no stats:
+
+	}
 
 
 	//Notify:
