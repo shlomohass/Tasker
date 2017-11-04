@@ -383,6 +383,27 @@ std::string TaskerMain::getcolor(const std::string& which, float value, const st
 	if (which == "status") {
 		return (value > 0.99 ? TASKER_COLOR_GREEN : TASKER_COLOR_YELLOW);
 	}
+	if (which == "workbar") {
+		if (value > 0.8) {
+			return TASKER_COLOR_GREEN;
+		}
+		else if (value > 0.4) {
+			return TASKER_COLOR_YELLOW;
+		} else {
+			return TASKER_COLOR_RED;
+		}
+	}
+	if (which == "loadbar") {
+		if (value > 0.8) {
+			return TASKER_COLOR_RED;
+		}
+		else if (value > 0.4) {
+			return TASKER_COLOR_YELLOW;
+		}
+		else {
+			return TASKER_COLOR_GREEN;
+		}
+	}
 	if (which == "notify") {
 		return TASKER_COLOR_YELLOW;
 	}
@@ -808,13 +829,15 @@ bool TaskerMain::showstats(const std::string& type)
 	}
 	//Define
 	struct statobj {
-		double loadunits;
-		double workunits;
-		double workunitsleft;
+		float loadunits;
+		float loadunitsleft;
+		float workunits;
+		float workunitsleft;
 		statobj() {
-			loadunits = 0;
-			workunits = 0;
-			workunitsleft = 0;
+			loadunits		= float(0.0);
+			loadunitsleft	= float(0.0);
+			workunits		= float(0.0);
+			workunitsleft	= float(0.0);
 		}
 	} total;
 	std::map<std::string, statobj> container;
@@ -836,18 +859,22 @@ bool TaskerMain::showstats(const std::string& type)
 		//Skip cancel:
 		if (this->thestruct["tasks"].at(i).at("cancel")) continue;
 		//Calculate this task:
-		double _workunitsleft = (1.0 - (double)this->thestruct["tasks"].at(i).at("status")) * 100.0;
-		double _loadunits = (double)this->thestruct["tasks"].at(i).at("load") * (1.0 - (double)this->thestruct["tasks"].at(i).at("status"));
+		float _workunitsleft = (float(1.0) - (float)this->thestruct["tasks"].at(i).at("status")) * float(100.0);
+		float _loadbase		 = (float)this->thestruct["tasks"].at(i).at("load");
+		float _loadunitsleft = _loadbase * (float(1.0) - (float)this->thestruct["tasks"].at(i).at("status"));
 		//Set total:
 		total.workunits += 100;
 		total.workunitsleft += _workunitsleft;
-		total.loadunits += _loadunits;
+		total.loadunits		+= _loadbase;
+		total.loadunitsleft += _loadunitsleft;
+
 		//Set object:
 		if (type == "users") {
 			//Get assigned:
 			std::string user = this->thestruct["tasks"].at(i).at("plan").back().at("user");
 			user = (user == "") ? "not assigned" : user;
-			container[user].loadunits += _loadunits;
+			container[user].loadunits += _loadbase;
+			container[user].loadunitsleft += _loadunitsleft;
 			container[user].workunitsleft += _workunitsleft;
 			container[user].workunits += 100;
 		} else {
@@ -861,27 +888,40 @@ bool TaskerMain::showstats(const std::string& type)
 
 	//Print out the stats:
 	if (total.workunits > 0) {
+		
+		//Set percision:
+		std::cout << std::setprecision(2) << std::fixed;
 
 		if (type == "users") {
 			//Print by users:
 			for (auto const& x : container)
 			{
-				float percwork   = (x.second.workunitsleft > 0) ? (x.second.workunitsleft / x.second.workunits) : -1.0;
-				float loadStatus = (percwork > -1.0) ? (percwork * x.second.loadunits) : -1.0;
-				std::string bar = "";
-				float barprogress = (percwork > -1.0) ? percwork : 0.0;
+				float percwork   = (x.second.workunitsleft > 0) ? (float(1.0) - (x.second.workunitsleft / x.second.workunits)) : float(-1.0);
+				float loadcalc = (x.second.loadunitsleft > 0) ? (x.second.loadunitsleft / total.loadunitsleft) : float(0.0);
+				std::string workbar = "";
+				std::string loadbar = "";
+				float barprogress = (percwork > float(-1.0)) ? percwork : float(0.0);
 
-				//Progress bar:
+				//Work Progress bar:
 				int barWidth = TASKER_BAR_LENGTH;
-				bar += TASKER_BAR_OPEN;
-				int pos = barWidth * percwork;
+				int workpos = int(barWidth * percwork);
 				for (int i = 0; i < barWidth; ++i) {
-					if (i < pos) bar += TASKER_BAR_FULL;
-					else if (i == pos) bar += TASKER_BAR_ARROW;
-					else bar += TASKER_BAR_EMPTY;
+					if (i < workpos) workbar += TASKER_BAR_FULL;
+					else if (i == workpos) workbar += TASKER_BAR_ARROW;
+					else workbar += TASKER_BAR_EMPTY;
 				}
-				bar += TASKER_BAR_CLOSE;
 
+				//Work Progress bar:
+				int loadpos = int(barWidth * loadcalc);
+				for (int i = 0; i < barWidth; ++i) {
+					if (i < loadpos) loadbar += TASKER_BAR_FULL;
+					else if (i == loadpos) {
+						loadbar += TASKER_BAR_CURSSOR;
+					}
+					else loadbar += TASKER_BAR_EMPTY;
+				}
+
+				//Load bar:
 				std::cout
 					<< "   - "
 					<< this->usecolor() << this->getcolor("user")
@@ -889,9 +929,24 @@ bool TaskerMain::showstats(const std::string& type)
 					<< ":" << std::endl
 					<< this->usecolor() << this->getcolor("hour")
 					<< "    \t -> Progress     : "
-					<< bar << ((percwork > -1.0) ? std::to_string(int(percwork * 100.0)) + "%" : "Empty") << std::endl
+					<< TASKER_BAR_OPEN;
+				std::cout
+					<< this->usecolor() << this->getcolor("workbar", percwork)
+					<< workbar;
+				std::cout
+					<< this->usecolor() << this->getcolor("hour")
+					<< TASKER_BAR_CLOSE
+					<< ((percwork > -1.0) ? std::to_string(int(percwork * 100.0)) + "%" : "Empty") << std::endl
 					<< "    \t -> Work Load    : "
-					<< ((loadStatus > -1.0) ? loadStatus : 0)
+					<< TASKER_BAR_OPEN;
+				std::cout
+					<< this->usecolor() << this->getcolor("loadbar", loadcalc)
+					<< loadbar;
+				std::cout
+					<< this->usecolor() << this->getcolor("hour")
+					<< TASKER_BAR_CLOSE
+					<< ((loadcalc > 0) ? std::to_string(int(loadcalc * 100.0)) + "%" : "Empty")
+					<< ", " << x.second.loadunitsleft << std::endl
 					<< this->usecolor() << this->getcolor("reset") << std::endl;
 			}
 		} else {
@@ -905,7 +960,7 @@ bool TaskerMain::showstats(const std::string& type)
 
 
 	//Notify:
-	this->printTaskerNotify("Option saved!");
+	this->printTaskerNotify("Stats calculated successfully!");
 	std::cout << std::endl;
 
 	return true;
