@@ -658,17 +658,30 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 	std::string rep_user = "";
 	std::string rep_note = "";
 	std::string rep_status = "";
+	std::string owner = this->thestruct["tasks"].at(theTask).at("plan").back().at("user");
 	float		rep_status_num;
 	bool		reloop_user = true;
 	bool		reloop_note = true;
 	bool        show_advice_user = true;
 	
+	//Set percision:
+	std::cout << std::setprecision(2) << std::fixed;
 	//Interactively get all needed:
 	std::cout << std::endl << " > Report to task: " << strTask;
-	std::cout << std::endl << "  1. Set new progress status (0.0 - 1.0): ";
-	std::getline(std::cin, rep_status);
 	//Get the user who made the report:
-	std::cout << "  2. Progress of user: ";
+	std::cout << std::endl << "  1. Set new progress status (0.0 - 1.0, current "; 
+	std::cout << usecolor() << getcolor("workbar");
+	std::cout << (float)this->thestruct["tasks"].at(theTask).at("status");
+	std::cout << usecolor() << getcolor("reset");
+	std::cout << "): ";
+	std::getline(std::cin, rep_status);
+
+	//Get the user who made the report:
+	std::cout << "  2. Progress of user (assigned to "; 
+	std::cout << usecolor() << getcolor("user");
+	std::cout << ((owner == "") ? "not assigned" : owner);
+	std::cout << usecolor() << getcolor("reset");
+	std::cout << "): ";
 	while (reloop_user) {
 		std::getline(std::cin, rep_user);
 
@@ -936,7 +949,7 @@ bool TaskerMain::showstats(const std::string& type)
 				std::cout
 					<< this->usecolor() << this->getcolor("hour")
 					<< TASKER_BAR_CLOSE
-					<< ((percwork > -1.0) ? std::to_string(int(percwork * 100.0)) + "%" : "Empty") << std::endl
+					<< " " << ((percwork > -1.0) ? std::to_string(int(percwork * 100.0)) + "%" : "Empty") << std::endl
 					<< "    \t -> Work Load    : "
 					<< TASKER_BAR_OPEN;
 				std::cout
@@ -945,7 +958,7 @@ bool TaskerMain::showstats(const std::string& type)
 				std::cout
 					<< this->usecolor() << this->getcolor("hour")
 					<< TASKER_BAR_CLOSE
-					<< ((loadcalc > 0) ? std::to_string(int(loadcalc * 100.0)) + "%" : "Empty")
+					<< " " << ((loadcalc > 0) ? std::to_string(int(loadcalc * 100.0)) + "%" : "Empty")
 					<< ", " << x.second.loadunitsleft << std::endl
 					<< this->usecolor() << this->getcolor("reset") << std::endl;
 			}

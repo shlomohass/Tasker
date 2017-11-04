@@ -48,9 +48,15 @@
                     "date": "28-10-2017 19:05:41",
                     "note": "\"I have all the color I need coded\"",
                     "status": 0.239999994635582
+                },
+                {
+                    "by": "shlomi",
+                    "date": "04-11-2017 10:28:08",
+                    "note": "Minor work done",
+                    "status": 0.300000011920929
                 }
             ],
-            "status": 0.239999994635582,
+            "status": 0.300000011920929,
             "task": "Create a color palette for the website"
         },
         {
@@ -64,8 +70,15 @@
                     "v": "1.0.0"
                 }
             ],
-            "report": [],
-            "status": 0.0,
+            "report": [
+                {
+                    "by": "shlomi",
+                    "date": "04-11-2017 10:30:50",
+                    "note": "Made all the base work",
+                    "status": 0.180000007152557
+                }
+            ],
+            "status": 0.180000007152557,
             "task": "added a new task with high load impact"
         },
         {
