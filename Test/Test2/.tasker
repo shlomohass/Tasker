@@ -79,8 +79,15 @@
                     "v": "1.0.0"
                 }
             ],
-            "report": [],
-            "status": 0.0,
+            "report": [
+                {
+                    "by": "shlomi",
+                    "date": "04-11-2017 10:13:13",
+                    "note": "Made some progress here",
+                    "status": 0.430000007152557
+                }
+            ],
+            "status": 0.430000007152557,
             "task": "added a new task with a very high load impact with opt enabled"
         },
         {
@@ -94,8 +101,15 @@
                     "v": "1.0.0"
                 }
             ],
-            "report": [],
-            "status": 0.300000011920929,
+            "report": [
+                {
+                    "by": "shlomi",
+                    "date": "04-11-2017 10:14:58",
+                    "note": "Added some colors",
+                    "status": 0.479999989271164
+                }
+            ],
+            "status": 0.479999989271164,
             "task": "A sample task"
         },
         {

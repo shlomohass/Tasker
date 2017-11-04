@@ -75,34 +75,34 @@ int main(int argc, char** argv) {
 	cmd.setIntroductoryDescription("Tasker Manager - version: " + std::string(TASKER_VERSION) + " - By: " + std::string(TASKER_AUTHOR));
 	
 	cmd.setHelpOption("h", "help", "Print this help page");
-	cmd.defineOption("init", "Initialize a Tasker object in the current path", cm::ArgvParser::NoOptionAttribute);
-	cmd.defineOption("debug", "enable debug.", cm::ArgvParser::NoOptionAttribute);
+	cmd.defineOption("init", "Initialize a `Tasker` object in the current path", cm::ArgvParser::NoOptionAttribute);
+	cmd.defineOption("debug", "Enable debug mode.", cm::ArgvParser::NoOptionAttribute);
 	
-	cmd.defineOption("task", "Add a new task -> will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("report", "Report progress to a task -> will ask for more options snd settings interactivly", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("task", "Add a new task -> Will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("report", "Report progress to a task -> Will ask for more options and settings interactivly", cm::ArgvParser::OptionRequiresValue);
 	
-	cmd.defineOption("cancel", "Cancel a task -> will be reserved and later could be activated.", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("enable", "Enable a cnaceled task.", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("deltask", "Delete a task -> will completely delete from records", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("cancel", "Cancel a task -> Will be reserved and later could be activated.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("enable", "Enable a canceled task.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("deltask", "Delete a task -> Will completely delete from records", cm::ArgvParser::OptionRequiresValue);
 
-	cmd.defineOption("users", "Show all users defined", cm::ArgvParser::NoOptionAttribute);
-	cmd.defineOption("adduser", "Add a new user -> will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("deluser", "Delete a user -> will remove the user from tasks also.", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("updateuser", "Update a user credentials -> will ask for more options interactivly.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("users", "Show all defined users", cm::ArgvParser::NoOptionAttribute);
+	cmd.defineOption("adduser", "Add a new user -> Will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("deluser", "Delete a user -> Will remove the user from tasks also.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("updateuser", "Update a user credentials -> Will ask for more options interactivly.", cm::ArgvParser::OptionRequiresValue);
 
-	cmd.defineOption("listall", "List all tasks -> expect integer for display level", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("listdone", "List all closed / finished tasks -> expect integer for display level", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listall", "List all tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listdone", "List all closed / finished tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("listcancel", "List all canceled tasks.", cm::ArgvParser::NoOptionAttribute);
-	cmd.defineOption("listuser", "List user tasks -> expect integer for display level", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("listopen", "List all open tasks -> expect integer for display level", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("listtoday", "List tasks that are due to today -> expect integer for display level", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listuser", "List user tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listopen", "List all open tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listtoday", "List tasks that are due to today -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
 	
 	cmd.defineOption("discolor", "Disable colored console text for one execution only.", cm::ArgvParser::NoOptionAttribute);
 	cmd.defineOption("set_optcolor", "Set option whether use colored console text. Expect true|false OR 1|0", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("set_optdelete", "Set option whether to allow task delete. Expect true|false OR 1|0", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("set_optloads", "Set option whether to use task loads. Expect true|false OR 1|0", cm::ArgvParser::OptionRequiresValue);
 
-	cmd.defineOption("stats", "Show project work stats -> expect tags|users", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("stats", "Show project work stats -> Expect tags|users", cm::ArgvParser::OptionRequiresValue);
 
 	cmd.defineOptionAlternative("task",			"t"	);
 	cmd.defineOptionAlternative("report",		"r"	);
