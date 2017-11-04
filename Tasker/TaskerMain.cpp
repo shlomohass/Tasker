@@ -182,6 +182,7 @@ void TaskerMain::createEmpty()
 	this->thestruct["users"] = json::array();
 	this->thestruct["types"] = {{"task",{"desc","simple task"}}};
 	this->thestruct["tasks"] = json::array();
+	this->thestruct["tags"]	 = json::array();
 	this->thestruct["note"]	 = json::object();
 	std::string projName;
 	std::string projDesc;
@@ -206,9 +207,9 @@ void TaskerMain::createEmpty()
 	std::getline(std::cin, userEmail);
 
 	//Finish:
-	this->thestruct["name"] = projName;
-	this->thestruct["desc"] = projDesc;
-	this->thestruct["version"] = projVersion;
+	this->thestruct["name"]		= projName;
+	this->thestruct["desc"]		= projDesc;
+	this->thestruct["version"]	= projVersion;
 	this->thestruct["users"].push_back({ { userName, {{"desc",userDesc },{"mail",userEmail }}} });
 }
 void TaskerMain::createEmpty(json structure) 
@@ -416,6 +417,9 @@ std::string TaskerMain::getcolor(const std::string& which, float value, const st
 	if (which == "user") {
 		return TASKER_COLOR_MAGENTA;
 	}
+	if (which == "tag") {
+		return TASKER_COLOR_MAGENTA;
+	}
 	if (which == "target") {
 		return TASKER_COLOR_BLUE;
 	}
@@ -481,6 +485,18 @@ int TaskerMain::findDefinedUser(const std::string& user) {
 	}
 	return -1;
 }
+int TaskerMain::findDefinedTag(const std::string& tag) {
+	bool check = 0;
+	int  index = 0;
+	for (json::iterator it = this->thestruct["tags"].begin(); it != this->thestruct["tags"].end(); ++it) {
+		for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
+			if (ite.key() == tag)
+				return index;
+		}
+		index++;
+	}
+	return -1;
+}
 std::string TaskerMain::getDefindUserName(int index) {
 	for (unsigned i = 0; i < this->thestruct["users"].size(); i++) {
 		if (i == index) {
@@ -498,6 +514,13 @@ std::string TaskerMain::getReservedUserNames(const std::string& deli)
 {
 	std::string reserved_names_str;
 	for (auto value : tasker::reserve_user_names)
+		reserved_names_str += value + deli;
+	return reserved_names_str.substr(0, reserved_names_str.size() - deli.size());
+}
+std::string TaskerMain::getReservedTagNames(const std::string& deli)
+{
+	std::string reserved_names_str;
+	for (auto value : tasker::reserve_tag_names)
 		reserved_names_str += value + deli;
 	return reserved_names_str.substr(0, reserved_names_str.size() - deli.size());
 }
@@ -799,6 +822,90 @@ bool TaskerMain::deleteTask(const std::string& strTask)
 }
 
 
+void TaskerMain::showtags()
+{
+	//Print main
+	std::cout << std::endl << " > Defined tags: " << std::endl << std::endl;
+
+	int counter = 0;
+	//Iterate:
+	for (json::iterator it = this->thestruct["tags"].begin(); it != this->thestruct["tags"].end(); ++it) {
+		for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
+			counter++;
+			std::string desc = ite.value().at("desc");
+			std::cout
+				<< "   (" << counter << ") "
+				<< this->usecolor() << this->getcolor("tag")
+				<< ite.key()
+				<< " -> "
+				<< this->usecolor() << this->getcolor("hour")
+				<< (desc == "" ? "Description not set" : desc)
+				<< this->usecolor() << this->getcolor("reset")
+				<< std::endl;
+		}
+	}
+	if (counter > 0) {
+		std::cout << std::endl;
+		this->printTaskerInfo("Info", "Total tags defined: " + std::to_string(counter));
+		this->printTaskerInfo("Info", "Reserved tag names: " + this->getReservedUserNames(", ") + ".");
+		std::cout << std::endl;
+	}
+	else {
+		this->printTaskerNotify("No tags were defined");
+		this->printTaskerInfo("Advice", "You can use `addtag {tagname}` to define a tag.");
+	}
+}
+bool TaskerMain::addtag(const std::string& _tag)
+{
+	std::string tag = trim_copy(_tag);
+	std::string desc;
+
+	//Remove spaces:
+	std::string::iterator end_pos = std::remove(tag.begin(), tag.end(), ' ');
+	tag.erase(end_pos, tag.end());
+
+	//Early validate:
+	if (tag.length() < 2) { return false; } /* tag name must be atleast 2 chars long */
+	if (std::find(reserve_tag_names.begin(), reserve_tag_names.end(), tag) != reserve_tag_names.end()) {
+		return false; /* reserved tag name used */
+	}
+
+	//Print main:
+	std::cout << std::endl
+		<< " > Define tag: "
+		<< this->usecolor() << this->getcolor("tag")
+		<< tag
+		<< this->usecolor() << this->getcolor("reset")
+		<< std::endl;
+
+	//Check not allready set:
+	int check = this->findDefinedTag(tag);
+	if (check == -1) {
+
+		//Interactively get all needed:
+		std::cout << std::endl << "  1. Set tag description (enter for none): ";
+		std::getline(std::cin, desc);
+
+		//Save to Object:
+		this->thestruct["tags"].push_back({
+			{ tag, {
+				{ "desc", desc }
+			} }
+		});
+
+		//print results:
+		this->printTaskerNotify("New tag defined!");
+		this->printTaskerInfo("Info", "Tag ID is: " + std::to_string(this->thestruct["tags"].size()));
+
+	} else {
+		this->printTaskerNotify("Tag `" + tag + "` is allready defined!");
+		this->printTaskerInfo("Advice", "You can use `tags` to list all tags defined.");
+		this->printTaskerInfo("Advice", "You can use `updatetag {tagname}` to change tag credentials.");
+	}
+	return true;
+}
+
+
 void TaskerMain::showusers()
 {
 	//Print main
@@ -831,7 +938,7 @@ void TaskerMain::showusers()
 		std::cout << std::endl;
 	} else {
 		this->printTaskerNotify("No users were defined");
-		this->printTaskerInfo("Advice", "You can use `adduser {username}` to define a user name.");
+		this->printTaskerInfo("Advice", "You can use `adduser {username}` to define a user.");
 	}
 }
 bool TaskerMain::showstats(const std::string& type)
@@ -1305,6 +1412,7 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 	}
 	return true;
 }
+
 
 TaskerMain::~TaskerMain()
 {

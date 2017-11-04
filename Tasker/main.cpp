@@ -74,33 +74,39 @@ int main(int argc, char** argv) {
 	cmd.addErrorCode(exitCodeError, "Error"		);
 	cmd.setIntroductoryDescription("Tasker Manager - version: " + std::string(TASKER_VERSION) + " - By: " + std::string(TASKER_AUTHOR));
 	
-	cmd.setHelpOption("h", "help", "Print this help page");
-	cmd.defineOption("init", "Initialize a `Tasker` object in the current path", cm::ArgvParser::NoOptionAttribute);
-	cmd.defineOption("debug", "Enable debug mode.", cm::ArgvParser::NoOptionAttribute);
+	cmd.setHelpOption("h",		"help", "Print this help page");
+	cmd.defineOption("init",	"Initialize a `Tasker` object in the current path", cm::ArgvParser::NoOptionAttribute);
+	cmd.defineOption("debug",	"Enable debug mode.", cm::ArgvParser::NoOptionAttribute);
 	
-	cmd.defineOption("task", "Add a new task -> Will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("report", "Report progress to a task -> Will ask for more options and settings interactivly", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("task",	"Add a new task -> Will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("report",	"Report progress to a task -> Will ask for more options and settings interactivly", cm::ArgvParser::OptionRequiresValue);
 	
-	cmd.defineOption("cancel", "Cancel a task -> Will be reserved and later could be activated.", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("enable", "Enable a canceled task.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("cancel",	"Cancel a task -> Will be reserved and later could be activated.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("enable",	"Enable a canceled task.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("deltask", "Delete a task -> Will completely delete from records", cm::ArgvParser::OptionRequiresValue);
 
-	cmd.defineOption("users", "Show all defined users", cm::ArgvParser::NoOptionAttribute);
-	cmd.defineOption("adduser", "Add a new user -> Will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("deluser", "Delete a user -> Will remove the user from tasks also.", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("updateuser", "Update a user credentials -> Will ask for more options interactivly.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("tags",		"Show all defined tags", cm::ArgvParser::NoOptionAttribute);
+	cmd.defineOption("addtag",		"Add a new tag -> Will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("deltag",		"Delete a tag -> Will remove the tag from tasks also.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("updatetag",	"Update a tag credentials -> Will ask for more options interactivly.", cm::ArgvParser::OptionRequiresValue);
 
-	cmd.defineOption("listall", "List all tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("listdone", "List all closed / finished tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("listcancel", "List all canceled tasks.", cm::ArgvParser::NoOptionAttribute);
-	cmd.defineOption("listuser", "List user tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("listopen", "List all open tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("listtoday", "List tasks that are due to today -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
+
+	cmd.defineOption("users",		"Show all defined users", cm::ArgvParser::NoOptionAttribute);
+	cmd.defineOption("adduser",		"Add a new user -> Will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("deluser",		"Delete a user -> Will remove the user from tasks also.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("updateuser",	"Update a user credentials -> Will ask for more options interactivly.", cm::ArgvParser::OptionRequiresValue);
+
+	cmd.defineOption("listall",		"List all tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listdone",	"List all closed / finished tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listcancel",	"List all canceled tasks.", cm::ArgvParser::NoOptionAttribute);
+	cmd.defineOption("listuser",	"List user tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listopen",	"List all open tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listtoday",	"List tasks that are due to today -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
 	
-	cmd.defineOption("discolor", "Disable colored console text for one execution only.", cm::ArgvParser::NoOptionAttribute);
-	cmd.defineOption("set_optcolor", "Set option whether use colored console text. Expect true|false OR 1|0", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("set_optdelete", "Set option whether to allow task delete. Expect true|false OR 1|0", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("set_optloads", "Set option whether to use task loads. Expect true|false OR 1|0", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("discolor",		"Disable colored console text for one execution only.", cm::ArgvParser::NoOptionAttribute);
+	cmd.defineOption("set_optcolor",	"Set option whether use colored console text. Expect true|false OR 1|0", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("set_optdelete",	"Set option whether to allow task delete. Expect true|false OR 1|0", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("set_optloads",	"Set option whether to use task loads. Expect true|false OR 1|0", cm::ArgvParser::OptionRequiresValue);
 
 	cmd.defineOption("stats", "Show project work stats -> Expect tags|users", cm::ArgvParser::OptionRequiresValue);
 
@@ -239,6 +245,28 @@ int main(int argc, char** argv) {
 				exit(exitCodeError);
 			}
 		}
+		//Handle tags show:
+		if (cmd.foundOption("tags")) {
+			// Expose the users list:
+			Task->showtags();
+		}
+		//Handle add tag:
+		if (cmd.foundOption("addtag")) {
+			// Add new user:
+			std::string tag = cmd.optionValue("addtag");
+			if (!Task->addtag(tag)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Tag name must be at least 2 chars long without spaces and not a reserved name.");
+				Task->printTaskerInfo("Info", "Reserved names: " + Task->getReservedTagNames(", ") + ".");
+				exit(exitCodeError);
+			}
+			if (!Task->writeObj(true)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Could not write to Tasker object.");
+				exit(exitCodeError);
+			}
+		}
+
 		//Handle users show:
 		if (cmd.foundOption("users")) {
 			// Expose the users list:
@@ -256,7 +284,7 @@ int main(int argc, char** argv) {
 			std::string user = cmd.optionValue("adduser");
 			if (!Task->adduser(user)) {
 				Task->printTaskerNotify("Oups!");
-				Task->printTaskerInfo("Error", "User name must be at least 2 chars long without spaces and not a reserve name.");
+				Task->printTaskerInfo("Error", "User name must be at least 2 chars long without spaces and not a reserved name.");
 				Task->printTaskerInfo("Info", "Reserved names: " + Task->getReservedUserNames(", ") + ".");
 				exit(exitCodeError);
 			}

@@ -2,6 +2,13 @@
     "desc": "a newer test project",
     "name": "Shlomi Project",
     "note": {},
+    "tags": [
+        {
+            "design": {
+                "desc": "Design tasks related to the photoshop group"
+            }
+        }
+    ],
     "tasker": {
         "allowdelete": true,
         "enableloads": true,

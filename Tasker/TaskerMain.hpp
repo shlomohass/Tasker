@@ -73,8 +73,10 @@ namespace tasker {
 		float normalizeStatus(std::string str);
 		std::time_t getEpochTime(const std::wstring& dateTime);
 		int findDefinedUser(const std::string& user);
+		int findDefinedTag(const std::string& tag);
 		std::string getDefindUserName(int index);
 		std::string getReservedUserNames(const std::string& deli);
+		std::string getReservedTagNames(const std::string& deli);
 
 		//Task Operations:
 		bool setNewTask(const std::string& strTask);
@@ -83,6 +85,9 @@ namespace tasker {
 		bool deleteTask(const std::string& strTask);
 
 		//General Operations:
+		void showtags();
+		bool addtag(const std::string& _tag);
+
 		void showusers();
 		bool showstats(const std::string& type);
 		bool adduser(const std::string& _user);
