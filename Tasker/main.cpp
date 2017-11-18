@@ -266,7 +266,20 @@ int main(int argc, char** argv) {
 				exit(exitCodeError);
 			}
 		}
-
+		//Handle delete tasks:
+		if (cmd.foundOption("deltag")) {
+			std::string taskId = cmd.optionValue("deltag");
+			if (!Task->deleteTag(taskId)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Tag could not be found or input is invalid.");
+				exit(exitCodeError);
+			}
+			if (!Task->writeObj(true)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Could not write to Tasker object.");
+				exit(exitCodeError);
+			}
+		}
 		//Handle users show:
 		if (cmd.foundOption("users")) {
 			// Expose the users list:

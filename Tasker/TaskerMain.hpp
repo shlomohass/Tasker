@@ -87,6 +87,7 @@ namespace tasker {
 		//General Operations:
 		void showtags();
 		bool addtag(const std::string& _tag);
+		bool deltag(const std::string& _tag);
 
 		void showusers();
 		bool showstats(const std::string& type);

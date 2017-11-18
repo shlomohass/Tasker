@@ -528,6 +528,7 @@ std::string TaskerMain::getReservedTagNames(const std::string& deli)
 bool TaskerMain::setNewTask(const std::string& strTask)
 {	
 	std::string plan_user	 = "";
+	std::string tagged_as	 = "";
 	std::string plan_currentversion = this->thestruct["version"];
 	std::string plan_version = "";
 	std::string plan_duedate = "";
@@ -537,10 +538,11 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 	float		task_status_num;
 	int			loadint      = 1;
 	bool        reloop_user	 = true;
+	bool        reloop_tags = true;
 	bool        reloop_date  = true;
 	bool        reloop_load  = true;
 	bool        show_advice_user = true;
-
+	bool        show_advice_tags = true;
 	//Interactively get all needed:
 	std::cout << std::endl << " > New task: ";
 	std::cout << std::endl << "  1. Assign to user (empty for none): ";
@@ -570,9 +572,35 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 			reloop_user = false;
 		}
 	}
-	std::cout << "  2. Planned for version (empty for current): ";
+
+	std::cout << "  2. Tag the task (empty for none): ";
+	while (reloop_tags) {
+		std::getline(std::cin, tagged_as);
+		tagged_as = trim_copy(tagged_as);
+		std::string::iterator end_pos = std::remove(tagged_as.begin(), tagged_as.end(), ' ');
+		plan_user.erase(end_pos, tagged_as.end());
+		if (tagged_as == "") {
+			tagged_as = "";
+			reloop_tags = false;
+			break;
+		}
+		else if (this->findDefinedTag(tagged_as) == -1) {
+			this->printTaskerInfo("Error", "The Tag you typed can't be found.");
+			if (show_advice_tags) {
+				this->printTaskerInfo("Advice", "Leave empty and press ENTER for not tagged.");
+				this->printTaskerInfo("Advice", "Run `--tags` to see all tags defined.");
+				show_advice_tags = false;
+			}
+			std::cout << "\tType: ";
+		}
+		else {
+			reloop_tags = false;
+		}
+	}
+
+	std::cout << "  3. Planned for version (empty for current): ";
 	std::getline(std::cin, plan_version);
-	std::cout << "  3. Due date `d-m-Y H:M:S` (empty for none or `today`): ";
+	std::cout << "  4. Due date `d-m-Y H:M:S` (empty for none or `today`): ";
 	while (reloop_date) {
 		std::getline(std::cin, plan_duedate);
 		if (plan_duedate == "") {
@@ -613,11 +641,11 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 		
 	}
 	
-	std::cout << "  4. Set current status (1|0, true|false): ";
+	std::cout << "  5. Set current status (1|0, true|false): ";
 	std::getline(std::cin, task_status);
 
 	if (this->load) {
-		std::cout << "  4. Set load units of this task (use an integer): ";
+		std::cout << "  6. Set load units of this task (use an integer): ";
 		while (reloop_date) {
 			std::getline(std::cin, task_load);
 			int scan_value = std::sscanf(task_load.c_str(), "%d", &loadint);
@@ -644,8 +672,11 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 		{ "status",		task_status_num		},
 		{ "cancel",		false				},
 		{ "load",		loadint				},
+		{ "tagged",		""					},
 		{ "report",		""					} 
 	};
+	taskObj["tagged"] = json::array();
+	taskObj["tagged"].push_back(tagged_as);
 	taskObj["plan"] = json::array(); 
 	taskObj["plan"].push_back({ 
 		{ "v" ,			trim_copy(plan_version) },
@@ -904,7 +935,54 @@ bool TaskerMain::addtag(const std::string& _tag)
 	}
 	return true;
 }
+bool TaskerMain::deltag(const std::string& _tag)
+{
 
+	std::string tag = trim_copy(_tag);
+
+	//Print main:
+	std::cout << std::endl
+		<< " > Deleting tag: "
+		<< this->usecolor() << this->getcolor("tag")
+		<< tag
+		<< this->usecolor() << this->getcolor("reset")
+		<< std::endl;
+
+	//validate first:
+	if (this->thestruct["tags"].size() < 1) {
+		return false;
+	}
+
+	//Check if set & delete:
+	int  index = this->findDefinedTag(tag);
+	int  counter_tags = 0;
+	if (index != -1) {
+
+		//Remove tag:
+		this->thestruct["tags"].erase(index);
+		//Remove from assignments:
+		for (unsigned i = 0; i < this->thestruct["tasks"].size(); i++) {
+			//Remove from main
+			for (unsigned j = 0; j < this->thestruct["tasks"].at(i).at("tagged").size(); j++) {
+				if (this->thestruct["tasks"].at(i).at("tagged").at(j) == tag) {
+					this->thestruct["tasks"].at(i).at("tagged").erase(j);
+					counter_tags++;
+				}
+			}
+			
+		}
+		//print results:
+		this->printTaskerNotify("Tag deleted!");
+		this->printTaskerInfo("Info", "Affected: " + std::to_string(counter_tags) + " Tasks.");
+
+	}
+	else {
+		this->printTaskerNotify("Tag `" + tag + "` is not defined.");
+		this->printTaskerInfo("Advice", "You can use `--tags` to list all tags defined.");
+	}
+	std::cout << std::endl;
+	return true;
+}
 
 void TaskerMain::showusers()
 {
