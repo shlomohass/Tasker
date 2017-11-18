@@ -266,10 +266,10 @@ int main(int argc, char** argv) {
 				exit(exitCodeError);
 			}
 		}
-		//Handle delete tasks:
+		//Handle delete tags:
 		if (cmd.foundOption("deltag")) {
-			std::string taskId = cmd.optionValue("deltag");
-			if (!Task->deleteTag(taskId)) {
+			std::string tagId = cmd.optionValue("deltag");
+			if (!Task->deltag(tagId)) {
 				Task->printTaskerNotify("Oups!");
 				Task->printTaskerInfo("Error", "Tag could not be found or input is invalid.");
 				exit(exitCodeError);

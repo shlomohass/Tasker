@@ -1398,6 +1398,16 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 		std::string user = this->thestruct["tasks"].at(i).at("plan").back().at("user");
 		std::string target = this->thestruct["tasks"].at(i).at("plan").back().at("date");
 		std::string created = this->thestruct["tasks"].at(i).at("created");
+		std::stringstream tagged;
+		std::string tagged_str;
+		for (json::iterator it = this->thestruct["tasks"].at(i).at("tagged").begin(); it != this->thestruct["tasks"].at(i).at("tagged").end(); ++it) {
+			tagged << "#" << it.value();
+			if (std::next(it) != this->thestruct["tasks"].at(i).at("tagged").end()) // last element
+				tagged << ", ";
+		}
+		tagged_str = tagged.str();
+		tagged_str.erase(remove(tagged_str.begin(), tagged_str.end(), '\"'), tagged_str.end());
+
 		if (user == "" || user == "\"\"") {
 			user = "not assigned";
 		}
@@ -1408,6 +1418,7 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 		target.erase(std::remove(target.begin(), target.end(), '"'), target.end());
 		created.erase(std::remove(created.begin(), created.end(), '"'), created.end());
 
+		//Group tags:
 		std::cout
 			<< " ("
 			<< (i + 1)
@@ -1436,6 +1447,12 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 			<< " , Assigned To: "
 			<< this->usecolor() << this->getcolor("user")
 			<< user
+			<< this->usecolor() << this->getcolor("reset")
+			<< std::endl
+			<< this->usecolor() << this->getcolor("faded")
+			<< "\t* Tags: "
+			<< this->usecolor() << this->getcolor("tag")
+			<< (tagged_str.size() > 0 ? tagged_str : "not tagged")
 			<< this->usecolor() << this->getcolor("reset")
 			<< std::endl;
 
