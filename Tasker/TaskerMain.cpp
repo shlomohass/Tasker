@@ -1332,6 +1332,7 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 
 	int theLevel = -1;
 	std::vector<std::string> users;
+	std::vector<std::string> tags;
 	std::string filter = trim_copy(_filter);
 	int counter_found = 0;
 
@@ -1356,6 +1357,18 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 		}
 		if (users.size() == 0 || theusersstr.length() > 0)
 			users.push_back(theusersstr);
+	} else if (which == "tag") {
+		std::string thetagsstr = filter;
+		std::string deli = TASKER_SPLIT_DELI;
+		size_t pos = 0;
+		std::string token;
+		while ((pos = thetagsstr.find(deli)) != std::string::npos) {
+			token = thetagsstr.substr(0, pos);
+			thetagsstr.erase(0, pos + deli.length());
+			tags.push_back(token);
+		}
+		if (tags.size() == 0 || thetagsstr.length() > 0)
+			tags.push_back(thetagsstr);
 	}
 	//Print tasks
 	for (unsigned i = 0; i < this->thestruct["tasks"].size(); i++) {
@@ -1390,6 +1403,21 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 			if (std::find(users.begin(), users.end(), theuser) != users.end()) {
 
 			} else {
+				continue;
+			}
+		}
+		if (which == "tag") {
+			bool tagtest = false;
+			for (json::iterator it = this->thestruct["tasks"].at(i).at("tagged").begin(); it != this->thestruct["tasks"].at(i).at("tagged").end(); ++it) {
+				std::stringstream t;
+				std::string ts;
+				t << it.value();
+				ts = t.str();
+				ts.erase(std::remove(ts.begin(), ts.end(), '"'), ts.end());
+				if (std::find(tags.begin(), tags.end(), ts) != tags.end())
+					tagtest = true;
+			}
+			if (!tagtest) {
 				continue;
 			}
 		}

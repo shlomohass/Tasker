@@ -99,7 +99,8 @@ int main(int argc, char** argv) {
 	cmd.defineOption("listall",		"List all tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("listdone",	"List all closed / finished tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("listcancel",	"List all canceled tasks.", cm::ArgvParser::NoOptionAttribute);
-	cmd.defineOption("listuser",	"List user tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listuser",	"List user tasks -> Expects the users string to be shown", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listtag",		"List tagged tasks -> Expects the tags string to be shown", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("listopen",	"List all open tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("listtoday",	"List tasks that are due to today -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
 	
@@ -119,6 +120,7 @@ int main(int argc, char** argv) {
 	cmd.defineOptionAlternative("listdone",		"ld");
 	cmd.defineOptionAlternative("listcancel",	"lc");
 	cmd.defineOptionAlternative("listuser",		"lu");
+	cmd.defineOptionAlternative("listtag",		"ltg");
 	cmd.defineOptionAlternative("listopen",		"lo");
 	cmd.defineOptionAlternative("listtoday",	"lt");
 
@@ -343,6 +345,7 @@ int main(int argc, char** argv) {
 			cmd.foundOption("listdone")		||
 			cmd.foundOption("listcancel")	||
 			cmd.foundOption("listuser")		||
+			cmd.foundOption("listtag")		||
 			cmd.foundOption("listopen")		||
 			cmd.foundOption("listtoday")
 		) {
@@ -364,7 +367,12 @@ int main(int argc, char** argv) {
 				listlevel = "2";
 				filter = cmd.optionValue("listuser");
 				which = "user";
-			} else if (cmd.foundOption("listopen")) {
+			} else if (cmd.foundOption("listtag")) {
+				listlevel = "2";
+				filter = cmd.optionValue("listtag");
+				which = "tag";
+			}
+			else if (cmd.foundOption("listopen")) {
 				listlevel = cmd.optionValue("listopen");
 				which = "open";
 			} else if (cmd.foundOption("listtoday")) {
