@@ -555,7 +555,7 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 	std::cout << std::endl << "  1. Assign to user (empty for none): ";
 	while (reloop_user) {
 		std::getline(std::cin, plan_user);
-		plan_user = trim_copy(plan_user);
+		plan_user = this->trim_gen(trim_copy(plan_user), '"');
 		std::string::iterator end_pos = std::remove(plan_user.begin(), plan_user.end(), ' ');
 		plan_user.erase(end_pos, plan_user.end());
 		if (plan_user == "default") {
@@ -583,9 +583,9 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 	std::cout << "  2. Tag the task (empty for none): ";
 	while (reloop_tags) {
 		std::getline(std::cin, tagged_as);
-		tagged_as = trim_copy(tagged_as);
+		tagged_as = this->trim_gen(trim_copy(tagged_as), '"');
 		std::string::iterator end_pos = std::remove(tagged_as.begin(), tagged_as.end(), ' ');
-		plan_user.erase(end_pos, tagged_as.end());
+		tagged_as.erase(end_pos, tagged_as.end());
 		if (tagged_as == "") {
 			tagged_as = "";
 			reloop_tags = false;
@@ -668,14 +668,14 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 	}
 
 	//Normalize:
-	plan_version = plan_version != "" ? plan_version : plan_currentversion;
+	plan_version = this->trim_gen((plan_version != "" ? plan_version : plan_currentversion), '"');
 	task_status_num = this->normalizeStatus(task_status);
 
 	//Create finall Object:
 	json taskObj = {
 		{ "plan",		""					},
 		{ "created",	task_created		},
-		{ "task",		trim_copy(strTask)	},
+		{ "task",		this->trim_gen(trim_copy(strTask), '"')	},
 		{ "status",		task_status_num		},
 		{ "cancel",		false				},
 		{ "load",		loadint				},
@@ -688,7 +688,7 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 	taskObj["plan"].push_back({ 
 		{ "v" ,			trim_copy(plan_version) },
 		{ "user" ,		plan_user				},
-		{ "date" ,		plan_duedate			} 
+		{ "date" ,		plan_duedate			}
 	});
 	taskObj["report"] = json::array();
 
@@ -791,10 +791,10 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 
 	//Push to plan notes:
 	this->thestruct["tasks"].at(theTask).at("report").push_back({
-		{"date",		rep_date			},
-		{"status",		rep_status_num		},
-		{"note",		trim_copy(rep_note) }, 
-		{"by",			trim_copy(rep_user) }
+		{"date",		this->trim_gen(rep_date, '"')			 },
+		{"status",		rep_status_num							 },
+		{"note",		this->trim_gen(trim_copy(rep_note), '"') },
+		{"by",			this->trim_gen(trim_copy(rep_user), '"') }
 	});
 
 	//Update parent status:
@@ -895,7 +895,7 @@ void TaskerMain::showtags()
 }
 bool TaskerMain::addtag(const std::string& _tag)
 {
-	std::string tag = trim_copy(_tag);
+	std::string tag = trim_gen(trim_copy(_tag), '"');
 	std::string desc;
 
 	//Remove spaces:
@@ -944,8 +944,7 @@ bool TaskerMain::addtag(const std::string& _tag)
 }
 bool TaskerMain::deltag(const std::string& _tag)
 {
-
-	std::string tag = trim_copy(_tag);
+	std::string tag = trim_gen(trim_copy(_tag), '"');
 
 	//Print main:
 	std::cout << std::endl
@@ -1228,7 +1227,7 @@ bool TaskerMain::showstats(const std::string& type)
 }
 bool TaskerMain::adduser(const std::string& _user)
 {
-	std::string user = trim_copy(_user);
+	std::string user = trim_gen(trim_copy(_user), '"');
 	std::string desc;
 	std::string mail;
 
@@ -1282,7 +1281,7 @@ bool TaskerMain::adduser(const std::string& _user)
 bool TaskerMain::deluser(const std::string& _user)
 {
 
-	std::string user = trim_copy(_user);
+	std::string user = trim_gen(trim_copy(_user), '"');
 
 	//Print main:
 	std::cout << std::endl
@@ -1335,7 +1334,7 @@ bool TaskerMain::deluser(const std::string& _user)
 }
 bool TaskerMain::updateuser(const std::string& _user)
 {
-	std::string user = trim_copy(_user);
+	std::string user = trim_gen(trim_copy(_user), '"');
 	std::string desc;
 	std::string mail;
 	//Print main:
@@ -1361,8 +1360,8 @@ bool TaskerMain::updateuser(const std::string& _user)
 		std::getline(std::cin, mail);
 
 		//Trim
-		desc = trim_copy(desc);
-		mail = trim_copy(mail);
+		desc = trim_gen(trim_copy(desc), '"');
+		mail = trim_gen(trim_copy(mail), '"');
 
 		//Save to Object:
 		if (desc == "empty") {
@@ -1383,11 +1382,13 @@ bool TaskerMain::updateuser(const std::string& _user)
 		//print results:
 		this->printTaskerNotify("User updated successfully!");
 		std::cout << std::endl;
+
 	} else {
 		return false;
 	}
 	return true;
 }
+
 bool TaskerMain::list(const std::string& level, const std::string& which) {
 	return this->list(level, which, "");
 }
