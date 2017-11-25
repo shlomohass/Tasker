@@ -6,11 +6,13 @@
         {
             "design": {
                 "desc": "Design tasks related to the photoshop group"
-            },
-            "progs": {
-                "desc": "Pure programming tasks"
             }
         },
+		{
+			"progs": {
+                "desc": "Pure programming tasks"
+            }
+		},
         {
             "bug": {
                 "desc": "Only bugs to kill"

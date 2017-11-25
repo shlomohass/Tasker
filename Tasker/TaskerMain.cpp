@@ -874,7 +874,7 @@ void TaskerMain::showtags()
 			std::cout
 				<< "   (" << counter << ") "
 				<< this->usecolor() << this->getcolor("tag")
-				<< ite.key()
+				<< TASKER_TAG_PREFIX << ite.key()
 				<< " -> "
 				<< this->usecolor() << this->getcolor("hour")
 				<< (desc == "" ? "Description not set" : desc)
@@ -1061,7 +1061,7 @@ void TaskerMain::showusers()
 			std::cout
 				<< "   (" << counter << ") "
 				<< this->usecolor() << this->getcolor("user")
-				<< ite.key()
+				<< TASKER_USER_PREFIX << ite.key()
 				<< " -> "
 				<< this->usecolor() << this->getcolor("hour")
 				<< (desc == "" ? "Description not set" : desc)
@@ -1112,6 +1112,13 @@ bool TaskerMain::showstats(const std::string& type)
 		container.insert(std::pair<std::string, statobj>("not assigned", statobj()));
 	} else {
 		//Build tags:
+		for (json::iterator it = this->thestruct["tags"].begin(); it != this->thestruct["tags"].end(); ++it) {
+			for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
+				container.insert(std::pair<std::string, statobj>(ite.key(), statobj()));
+			}
+		}
+		//Add not tagged
+		container.insert(std::pair<std::string, statobj>("not tagged", statobj()));
 	}
 
 	//Calculate and collect:
@@ -1138,8 +1145,24 @@ bool TaskerMain::showstats(const std::string& type)
 			container[user].workunitsleft += _workunitsleft;
 			container[user].workunits += 100;
 		} else {
-			//Get assigned:
-
+			//Get tagged:
+			unsigned int tagged_size = (unsigned int)this->thestruct["tasks"].at(i).at("tagged").size();
+			if (tagged_size > 0) {
+				for (unsigned int j = 0; j < tagged_size; j++) {
+					std::string _tag = this->thestruct["tasks"].at(i).at("tagged").at(j);
+					if (this->findDefinedTag(_tag) != -1) {
+						container[_tag].loadunits += _loadbase;
+						container[_tag].loadunitsleft += _loadunitsleft;
+						container[_tag].workunitsleft += _workunitsleft;
+						container[_tag].workunits += 100;
+					}
+				}
+			} else {
+				container["not tagged"].loadunits += _loadbase;
+				container["not tagged"].loadunitsleft += _loadunitsleft;
+				container["not tagged"].workunitsleft += _workunitsleft;
+				container["not tagged"].workunits += 100;
+			}
 		}
 	}
 
@@ -1151,66 +1174,66 @@ bool TaskerMain::showstats(const std::string& type)
 		
 		//Set percision:
 		std::cout << std::setprecision(2) << std::fixed;
+		
+		//Set the prefix:
+		std::string prefix_name = (type == "tags" ? TASKER_TAG_PREFIX : TASKER_USER_PREFIX);
+		std::string color_name = (type == "tags" ? "tag" : "user");
+		//Print by users or tags:
+		for (auto const& x : container)
+		{
+			float percwork   = (x.second.workunitsleft > 0) ? (float(1.0) - (x.second.workunitsleft / x.second.workunits)) : float(-1.0);
+			float loadcalc = (x.second.loadunitsleft > 0) ? (x.second.loadunitsleft / total.loadunitsleft) : float(0.0);
+			std::string workbar = "";
+			std::string loadbar = "";
 
-		if (type == "users") {
-			//Print by users:
-			for (auto const& x : container)
-			{
-				float percwork   = (x.second.workunitsleft > 0) ? (float(1.0) - (x.second.workunitsleft / x.second.workunits)) : float(-1.0);
-				float loadcalc = (x.second.loadunitsleft > 0) ? (x.second.loadunitsleft / total.loadunitsleft) : float(0.0);
-				std::string workbar = "";
-				std::string loadbar = "";
-				float barprogress = (percwork > float(-1.0)) ? percwork : float(0.0);
+			float barprogress = (percwork > float(-1.0)) ? percwork : float(0.0);
 
-				//Work Progress bar:
-				int barWidth = TASKER_BAR_LENGTH;
-				int workpos = int(barWidth * percwork);
-				for (int i = 0; i < barWidth; ++i) {
-					if (i < workpos) workbar += TASKER_BAR_FULL;
-					else if (i == workpos) workbar += TASKER_BAR_ARROW;
-					else workbar += TASKER_BAR_EMPTY;
-				}
-
-				//Work Progress bar:
-				int loadpos = int(barWidth * loadcalc);
-				for (int i = 0; i < barWidth; ++i) {
-					if (i < loadpos) loadbar += TASKER_BAR_FULL;
-					else if (i == loadpos) {
-						loadbar += TASKER_BAR_CURSSOR;
-					}
-					else loadbar += TASKER_BAR_EMPTY;
-				}
-
-				//Load bar:
-				std::cout
-					<< "   - "
-					<< this->usecolor() << this->getcolor("user")
-					<< x.first
-					<< ":" << std::endl
-					<< this->usecolor() << this->getcolor("hour")
-					<< "    \t -> Progress     : "
-					<< TASKER_BAR_OPEN;
-				std::cout
-					<< this->usecolor() << this->getcolor("workbar", percwork)
-					<< workbar;
-				std::cout
-					<< this->usecolor() << this->getcolor("hour")
-					<< TASKER_BAR_CLOSE
-					<< " " << ((percwork > -1.0) ? std::to_string(int(percwork * 100.0)) + "%" : "Empty") << std::endl
-					<< "    \t -> Work Load    : "
-					<< TASKER_BAR_OPEN;
-				std::cout
-					<< this->usecolor() << this->getcolor("loadbar", loadcalc)
-					<< loadbar;
-				std::cout
-					<< this->usecolor() << this->getcolor("hour")
-					<< TASKER_BAR_CLOSE
-					<< " " << ((loadcalc > 0) ? std::to_string(int(loadcalc * 100.0)) + "%" : "Empty")
-					<< ", " << x.second.loadunitsleft << std::endl
-					<< this->usecolor() << this->getcolor("reset") << std::endl;
+			//Work Progress bar:
+			int barWidth = TASKER_BAR_LENGTH;
+			int workpos = int(barWidth * percwork);
+			for (int i = 0; i < barWidth; ++i) {
+				if (i < workpos) workbar += TASKER_BAR_FULL;
+				else if (i == workpos) workbar += TASKER_BAR_ARROW;
+				else workbar += TASKER_BAR_EMPTY;
 			}
-		} else {
-			//Print by tags:
+
+			//Work Progress bar:
+			int loadpos = int(barWidth * loadcalc);
+			for (int i = 0; i < barWidth; ++i) {
+				if (i < loadpos) loadbar += TASKER_BAR_FULL;
+				else if (i == loadpos) {
+					loadbar += TASKER_BAR_CURSSOR;
+				}
+				else loadbar += TASKER_BAR_EMPTY;
+			}
+
+			//Load bar:
+			std::cout
+				<< "   - "
+				<< this->usecolor() << this->getcolor(color_name)
+				<< prefix_name << x.first
+				<< ":" << std::endl
+				<< this->usecolor() << this->getcolor("hour")
+				<< "    \t -> Progress     : "
+				<< TASKER_BAR_OPEN;
+			std::cout
+				<< this->usecolor() << this->getcolor("workbar", percwork)
+				<< workbar;
+			std::cout
+				<< this->usecolor() << this->getcolor("hour")
+				<< TASKER_BAR_CLOSE
+				<< " " << ((percwork > -1.0) ? std::to_string(int(percwork * 100.0)) + "%" : "Empty") << std::endl
+				<< "    \t -> Work Load    : "
+				<< TASKER_BAR_OPEN;
+			std::cout
+				<< this->usecolor() << this->getcolor("loadbar", loadcalc)
+				<< loadbar;
+			std::cout
+				<< this->usecolor() << this->getcolor("hour")
+				<< TASKER_BAR_CLOSE
+				<< " " << ((loadcalc > 0) ? std::to_string(int(loadcalc * 100.0)) + "%" : "Empty")
+				<< ", " << x.second.loadunitsleft << std::endl
+				<< this->usecolor() << this->getcolor("reset") << std::endl;
 		}
 		
 	} else {
@@ -1493,7 +1516,7 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 		std::stringstream tagged;
 		std::string tagged_str;
 		for (json::iterator it = this->thestruct["tasks"].at(i).at("tagged").begin(); it != this->thestruct["tasks"].at(i).at("tagged").end(); ++it) {
-			tagged << "#" << it.value();
+			tagged << TASKER_TAG_PREFIX << it.value();
 			if (std::next(it) != this->thestruct["tasks"].at(i).at("tagged").end()) // last element
 				tagged << ", ";
 		}
@@ -1538,7 +1561,7 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 			<< this->usecolor() << this->getcolor("faded")
 			<< " , Assigned To: "
 			<< this->usecolor() << this->getcolor("user")
-			<< user
+			<< TASKER_USER_PREFIX << user
 			<< this->usecolor() << this->getcolor("reset")
 			<< std::endl
 			<< this->usecolor() << this->getcolor("faded")

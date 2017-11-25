@@ -79,10 +79,12 @@ int main(int argc, char** argv) {
 	cmd.defineOption("debug",	"Enable debug mode.", cm::ArgvParser::NoOptionAttribute);
 	
 	cmd.defineOption("task",	"Add a new task -> Will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
+	
 	cmd.defineOption("report",	"Report progress to a task -> Will ask for more options and settings interactivly", cm::ArgvParser::OptionRequiresValue);
 	
 	cmd.defineOption("cancel",	"Cancel a task -> Will be reserved and later could be activated.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("enable",	"Enable a canceled task.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("update",	"Update a task -> Will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("deltask", "Delete a task -> Will completely delete from records", cm::ArgvParser::OptionRequiresValue);
 
 	cmd.defineOption("tags",		"Show all defined tags", cm::ArgvParser::NoOptionAttribute);
@@ -115,6 +117,7 @@ int main(int argc, char** argv) {
 	cmd.defineOptionAlternative("report",		"r"	);
 	cmd.defineOptionAlternative("cancel",		"c"	);
 	cmd.defineOptionAlternative("enable",		"e"	);
+	cmd.defineOptionAlternative("update",		"u");
 	cmd.defineOptionAlternative("deltask",		"dt");
 	cmd.defineOptionAlternative("listall",		"la");
 	cmd.defineOptionAlternative("listdone",		"ld");
@@ -218,6 +221,20 @@ int main(int argc, char** argv) {
 		//Handle delete tasks:
 		if (cmd.foundOption("deltask")) {
 			std::string taskId = cmd.optionValue("deltask");
+			if (!Task->deleteTask(taskId)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Task could not be found or input is invalid.");
+				exit(exitCodeError);
+			}
+			if (!Task->writeObj(true)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Could not write to Tasker object.");
+				exit(exitCodeError);
+			}
+		}
+		//Handle update tasks:
+		if (cmd.foundOption("update")) {
+			std::string taskId = cmd.optionValue("update");
 			if (!Task->deleteTask(taskId)) {
 				Task->printTaskerNotify("Oups!");
 				Task->printTaskerInfo("Error", "Task could not be found or input is invalid.");

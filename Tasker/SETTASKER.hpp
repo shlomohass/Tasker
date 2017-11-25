@@ -26,6 +26,14 @@
 #define TASKER_OBJNAME ".tasker"
 #endif
 
+#ifndef TASKER_NAMES_PREFIX
+/**
+* Set Default obj name
+*/
+#define TASKER_USER_PREFIX "@"
+#define TASKER_TAG_PREFIX "#"
+#endif
+
 #ifndef TASKER_SPLIT_DELI
 /**
 * Set the list delimeter for inputs:
