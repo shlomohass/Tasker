@@ -13,7 +13,7 @@
         },
         {
             "bug": {
-                "desc": "Reported bugs to kill and handle"
+                "desc": "Only bugs to kill"
             }
         }
     ],

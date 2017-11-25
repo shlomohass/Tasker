@@ -77,6 +77,7 @@ namespace tasker {
 		std::string getDefindUserName(int index);
 		std::string getReservedUserNames(const std::string& deli);
 		std::string getReservedTagNames(const std::string& deli);
+		std::string trim_gen(const std::string& str, const char rem);
 
 		//Task Operations:
 		bool setNewTask(const std::string& strTask);

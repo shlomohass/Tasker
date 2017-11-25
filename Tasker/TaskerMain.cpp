@@ -524,6 +524,13 @@ std::string TaskerMain::getReservedTagNames(const std::string& deli)
 		reserved_names_str += value + deli;
 	return reserved_names_str.substr(0, reserved_names_str.size() - deli.size());
 }
+std::string TaskerMain::trim_gen(const std::string& str, const char rem)
+{
+	size_t first = str.find_first_not_of(rem);
+	if (std::string::npos == first) return str;
+	size_t last = str.find_last_not_of(rem);
+	return str.substr(first, (last - first + 1));
+}
 
 bool TaskerMain::setNewTask(const std::string& strTask)
 {	
@@ -984,8 +991,9 @@ bool TaskerMain::deltag(const std::string& _tag)
 	return true;
 }
 bool TaskerMain::updatetag(const std::string& _tag) {
-	std::string tag = trim_copy(_tag);
+	std::string tag = trim_gen(trim_copy(_tag), '"');
 	std::string desc;
+	std::string desc_old;
 
 	//Remove spaces:
 	std::string::iterator end_pos = std::remove(tag.begin(), tag.end(), ' ');
@@ -1009,10 +1017,20 @@ bool TaskerMain::updatetag(const std::string& _tag) {
 	int check = this->findDefinedTag(tag);
 	if (check != -1) {
 
+		desc_old = trim_gen(this->thestruct["tags"].at(check).at(tag).at("desc"), '"');
+		desc_old = trim_gen(desc_old, ' ');
+
 		//Interactively get all needed:
-		std::cout << std::endl << "  > Tag description: " << this->thestruct["tags"].at(check).at(tag).at("desc");
+		std::cout << std::endl << "  > Tag description: " 
+							   << this->usecolor() << this->getcolor("faded")
+							   << (desc_old != "" ? desc_old : "Not set") 
+							   << this->usecolor() << this->getcolor("reset");
+
 		std::cout << std::endl << "  1. Update tag description (enter for none): ";
 		std::getline(std::cin, desc);
+
+		//clean:
+		desc = trim_gen(trim_copy(desc), '"');
 
 		//Save to Object:
 		this->thestruct["tags"].at(check).at(tag).at("desc") = desc;
@@ -1028,6 +1046,7 @@ bool TaskerMain::updatetag(const std::string& _tag) {
 	}
 	return true;
 }
+
 void TaskerMain::showusers()
 {
 	//Print main
