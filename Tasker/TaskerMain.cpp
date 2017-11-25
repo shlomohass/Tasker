@@ -983,7 +983,51 @@ bool TaskerMain::deltag(const std::string& _tag)
 	std::cout << std::endl;
 	return true;
 }
+bool TaskerMain::updatetag(const std::string& _tag) {
+	std::string tag = trim_copy(_tag);
+	std::string desc;
 
+	//Remove spaces:
+	std::string::iterator end_pos = std::remove(tag.begin(), tag.end(), ' ');
+	tag.erase(end_pos, tag.end());
+
+	//Early validate:
+	if (tag.length() < 2) { return false; } /* tag name must be atleast 2 chars long */
+	if (std::find(reserve_tag_names.begin(), reserve_tag_names.end(), tag) != reserve_tag_names.end()) {
+		return false; /* reserved tag name used */
+	}
+
+	//Print main:
+	std::cout << std::endl
+		<< " > Update tag: "
+		<< this->usecolor() << this->getcolor("tag")
+		<< tag
+		<< this->usecolor() << this->getcolor("reset")
+		<< std::endl;
+
+	//Check not allready set:
+	int check = this->findDefinedTag(tag);
+	if (check != -1) {
+
+		//Interactively get all needed:
+		std::cout << std::endl << "  > Tag description: " << this->thestruct["tags"].at(check).at(tag).at("desc");
+		std::cout << std::endl << "  1. Update tag description (enter for none): ";
+		std::getline(std::cin, desc);
+
+		//Save to Object:
+		this->thestruct["tags"].at(check).at(tag).at("desc") = desc;
+
+		//print results:
+		this->printTaskerNotify("Tag Updated!");
+		this->printTaskerInfo("Info", "Tag ID is: " + std::to_string(check));
+
+	} else {
+		this->printTaskerNotify("Tag `" + tag + "` is not defined!");
+		this->printTaskerInfo("Advice", "You can use `--tags` to list all tags defined.");
+		this->printTaskerInfo("Advice", "You can use `--addtag {tagname}` to add a new tag.");
+	}
+	return true;
+}
 void TaskerMain::showusers()
 {
 	//Print main

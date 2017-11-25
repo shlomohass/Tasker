@@ -282,6 +282,20 @@ int main(int argc, char** argv) {
 				exit(exitCodeError);
 			}
 		}
+		//Handle update tag:
+		if (cmd.foundOption("updatetag")) {
+			std::string tagId = cmd.optionValue("updatetag");
+			if (!Task->updatetag(tagId)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Tag could not be found or input is invalid.");
+				exit(exitCodeError);
+			}
+			if (!Task->writeObj(true)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Could not write to Tasker object.");
+				exit(exitCodeError);
+			}
+		}
 		//Handle users show:
 		if (cmd.foundOption("users")) {
 			// Expose the users list:

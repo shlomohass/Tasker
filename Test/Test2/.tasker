@@ -7,8 +7,13 @@
             "design": {
                 "desc": "Design tasks related to the photoshop group"
             },
-			"progs": {
+            "progs": {
                 "desc": "Pure programming tasks"
+            }
+        },
+        {
+            "bug": {
+                "desc": "Reported bugs to kill and handle"
             }
         }
     ],
@@ -38,8 +43,11 @@
                     "status": 0.150000005960464
                 }
             ],
-			"tagged": ["design", "progs"],
             "status": 0.150000005960464,
+            "tagged": [
+                "design",
+                "progs"
+            ],
             "task": "Another great task assigned to default user"
         },
         {
@@ -67,8 +75,10 @@
                     "status": 0.300000011920929
                 }
             ],
-			"tagged": ["design"],
             "status": 0.300000011920929,
+            "tagged": [
+                "design"
+            ],
             "task": "Create a color palette for the website"
         },
         {
@@ -90,8 +100,8 @@
                     "status": 0.180000007152557
                 }
             ],
-			"tagged": [],
             "status": 0.180000007152557,
+            "tagged": [],
             "task": "added a new task with high load impact"
         },
         {
@@ -113,8 +123,8 @@
                     "status": 0.430000007152557
                 }
             ],
-			"tagged": [],
             "status": 0.430000007152557,
+            "tagged": [],
             "task": "added a new task with a very high load impact with opt enabled"
         },
         {
@@ -136,8 +146,8 @@
                     "status": 0.479999989271164
                 }
             ],
-			"tagged": [],
             "status": 0.479999989271164,
+            "tagged": [],
             "task": "A sample task"
         },
         {
@@ -152,8 +162,8 @@
                 }
             ],
             "report": [],
-			"tagged": [],
             "status": 0.800000011920929,
+            "tagged": [],
             "task": "A sample task 2"
         }
     ],
