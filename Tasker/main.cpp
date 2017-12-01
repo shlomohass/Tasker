@@ -8,12 +8,6 @@
 //  Command Line Examples:
 //
 
-#ifdef __GNUC__
-	#define LINUX
-#else
-	#define WINDOWS
-#endif
-
 #define _UNICODE
 #define UNICODE
 
@@ -28,6 +22,7 @@
 #include "TaskerAdd.hpp"
 #include "TaskerMain.hpp"
 
+/*
 #ifndef _WIN32
 inline int _pipe(int fildes[2], unsigned psize, int textmode) {
 	return pipe(fildes);
@@ -39,6 +34,7 @@ inline void _pclose(FILE* file) {
 	pclose(file);
 }
 #endif
+*/
 
 namespace cm = CommandLineProcessing;
 
@@ -58,6 +54,10 @@ void setMainArgs(cm::ArgvParser *cmd, bool *run_init, bool *enable_debug, bool *
 
 int main(int argc, char** argv) {
 
+	#ifdef PLATOTHER
+		std::cout << "This program was not compiled correctly" << std::endl;
+		return 0;
+	#else
 	//Define args and project settings:
 	int exitCodeError	= 1;
 	int exitCodeOk		= 0;
@@ -466,4 +466,5 @@ int main(int argc, char** argv) {
 
 	delete Task;
 	return exitCodeOk;
+	#endif
 }

@@ -20,10 +20,13 @@
 #include <map>
 #include <iterator>
 
-#ifdef LINUX
+#ifdef PLATLINUX
 	#include <string>
 	#include <limits.h>
 	#include <unistd.h>
+	#ifndef MAX_PATH
+		#define MAX_PATH = PATH_MAX
+	#endif	
 #else
 	#include <string>
 	#include <io.h>
@@ -82,8 +85,9 @@ TaskerMain::TaskerMain(bool _color)
 }
 void TaskerMain::setPath()
 {
-	#ifdef LINUX
-		char buffer[PATH_MAX];
+
+	#ifdef PLATLINUX
+		char buffer[MAX_PATH];
 		if (getcwd(buffer, sizeof(buffer))) {
 			this->fullpath = std::string(buffer) + "\\" + TASKER_OBJNAME;
 		}
@@ -112,7 +116,7 @@ std::string TaskerMain::_fullpath()
 }
 bool TaskerMain::loadBase()
 {
-	#ifdef LINUX
+	#ifdef PLATLINUX
 		if (_access(this->fullpath.c_str(), F_OK) == 0) {
 			return true;
 		}
@@ -233,7 +237,7 @@ bool TaskerMain::checkWriteObj(bool full)
 }
 bool TaskerMain::checkWriteObj(std::string& path) 
 {
-	#ifdef LINUX
+	#ifdef PLATLINUX
 		if (access(path.c_str(), W_OK) == 0 || access(path.c_str(), RW_OK) == 0)
 			return true; 
 	#else
