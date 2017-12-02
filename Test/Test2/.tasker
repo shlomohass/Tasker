@@ -21,8 +21,21 @@
                     "v": "1.0.0"
                 }
             ],
-            "report": [],
-            "status": 0.0,
+            "report": [
+                {
+                    "by": "",
+                    "date": "02-12-2017 22:15:19",
+                    "note": "Added basic guidelines",
+                    "status": 0.0500000007450581
+                },
+                {
+                    "by": "shlomi",
+                    "date": "02-12-2017 22:20:56",
+                    "note": "Now supports hebrew",
+                    "status": 0.119999997317791
+                }
+            ],
+            "status": 0.119999997317791,
             "tagged": [
                 ""
             ],

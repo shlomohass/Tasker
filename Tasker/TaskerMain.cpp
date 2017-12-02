@@ -754,7 +754,7 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 	std::cout << usecolor() << getcolor("user");
 	std::cout << ((owner == "") ? "not assigned" : owner);
 	std::cout << usecolor() << getcolor("reset");
-	std::cout << "): ";
+	std::cout << " - Empty for unknown" << "): ";
 	while (reloop_user) {
 		std::getline(std::cin, rep_user);
 
@@ -786,7 +786,7 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 		}
 	}
 	//Get the report note:
-	std::cout << "  3. Type task report note: ";
+	std::cout << "  3. Task progress report note: ";
 	while (reloop_note) {
 		std::getline(std::cin, rep_note);
 		rep_note = trim_copy(rep_note);
@@ -1601,7 +1601,10 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 				//Print report:
 				std::cout
 					<< "\t- "
-					<< "["
+					<< "("
+					<< (i+1) << "." << (j+1)
+					<< ")"
+					<< " : ["
 					<< this->usecolor() << this->getcolor("status", (float)this->thestruct["tasks"].at(i).at("report").at(j).at("status"))
 					<< std::to_string(
 							(int)((float)this->thestruct["tasks"].at(i).at("report").at(j).at("status") * 100)

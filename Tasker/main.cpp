@@ -82,6 +82,8 @@ int main(int argc, char** argv) {
 	
 	cmd.defineOption("report",	"Report progress to a task -> Will ask for more options and settings interactivly", cm::ArgvParser::OptionRequiresValue);
 	
+	cmd.defineOption("refactor", "Refactor a Task or a report progress of a task Expect integer that represents the task id or a float that represets the report.", cm::ArgvParser::OptionRequiresValue);
+
 	cmd.defineOption("cancel",	"Cancel a task -> Will be reserved and later could be activated.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("enable",	"Enable a canceled task.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("update",	"Update a task -> Will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
@@ -115,6 +117,7 @@ int main(int argc, char** argv) {
 
 	cmd.defineOptionAlternative("task",			"t"	);
 	cmd.defineOptionAlternative("report",		"r"	);
+	cmd.defineOptionAlternative("refactor",		"ref");
 	cmd.defineOptionAlternative("cancel",		"c"	);
 	cmd.defineOptionAlternative("enable",		"e"	);
 	cmd.defineOptionAlternative("update",		"u");
