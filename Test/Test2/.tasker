@@ -1,24 +1,8 @@
 {
-    "desc": "a newer test project",
-    "name": "Shlomi Project",
+    "desc": "A great project I created now",
+    "name": "Test project 1",
     "note": {},
-    "tags": [
-        {
-            "design": {
-                "desc": "Design tasks related to the photoshop group"
-            }
-        },
-		{
-			"progs": {
-                "desc": "Pure programming tasks"
-            }
-		},
-        {
-            "bug": {
-                "desc": "Only bugs to kill"
-            }
-        }
-    ],
+    "tags": [],
     "tasker": {
         "allowdelete": true,
         "enableloads": true,
@@ -28,145 +12,21 @@
     "tasks": [
         {
             "cancel": false,
-            "created": "28-10-2017 18:36:54",
+            "created": "02-12-2017 16:36:56",
             "load": 1,
             "plan": [
                 {
-                    "date": "28-10-2017 23:59:00",
+                    "date": "02-12-2017 23:59:00",
                     "user": "shlomi",
-                    "v": "1.0.0"
-                }
-            ],
-            "report": [
-                {
-                    "by": "shlomi",
-                    "date": "28-10-2017 19:03:34",
-                    "note": "a quick update of this task",
-                    "status": 0.150000005960464
-                }
-            ],
-            "status": 0.150000005960464,
-            "tagged": [
-                "design",
-                "progs"
-            ],
-            "task": "Another great task assigned to default user"
-        },
-        {
-            "cancel": false,
-            "created": "28-10-2017 18:49:33",
-            "load": 1,
-            "plan": [
-                {
-                    "date": "28-10-2017 23:59:00",
-                    "user": "shlomi",
-                    "v": "1.0.0"
-                }
-            ],
-            "report": [
-                {
-                    "by": "shlomi",
-                    "date": "28-10-2017 19:05:41",
-                    "note": "\"I have all the color I need coded\"",
-                    "status": 0.239999994635582
-                },
-                {
-                    "by": "shlomi",
-                    "date": "04-11-2017 10:28:08",
-                    "note": "Minor work done",
-                    "status": 0.300000011920929
-                }
-            ],
-            "status": 0.300000011920929,
-            "tagged": [
-                "design"
-            ],
-            "task": "Create a color palette for the website"
-        },
-        {
-            "cancel": false,
-            "created": "28-10-2017 22:32:45",
-            "load": 1,
-            "plan": [
-                {
-                    "date": "",
-                    "user": "shlomi",
-                    "v": "1.0.0"
-                }
-            ],
-            "report": [
-                {
-                    "by": "shlomi",
-                    "date": "04-11-2017 10:30:50",
-                    "note": "Made all the base work",
-                    "status": 0.180000007152557
-                }
-            ],
-            "status": 0.180000007152557,
-            "tagged": [],
-            "task": "added a new task with high load impact"
-        },
-        {
-            "cancel": false,
-            "created": "28-10-2017 22:34:20",
-            "load": 3,
-            "plan": [
-                {
-                    "date": "28-10-2017 23:59:00",
-                    "user": "shlomi",
-                    "v": "1.0.0"
-                }
-            ],
-            "report": [
-                {
-                    "by": "shlomi",
-                    "date": "04-11-2017 10:13:13",
-                    "note": "Made some progress here",
-                    "status": 0.430000007152557
-                }
-            ],
-            "status": 0.430000007152557,
-            "tagged": [],
-            "task": "added a new task with a very high load impact with opt enabled"
-        },
-        {
-            "cancel": false,
-            "created": "28-10-2017 23:06:04",
-            "load": 2,
-            "plan": [
-                {
-                    "date": "",
-                    "user": "bar",
-                    "v": "1.0.0"
-                }
-            ],
-            "report": [
-                {
-                    "by": "shlomi",
-                    "date": "04-11-2017 10:14:58",
-                    "note": "Added some colors",
-                    "status": 0.479999989271164
-                }
-            ],
-            "status": 0.479999989271164,
-            "tagged": [],
-            "task": "A sample task"
-        },
-        {
-            "cancel": false,
-            "created": "28-10-2017 23:06:33",
-            "load": 4,
-            "plan": [
-                {
-                    "date": "28-10-2017 23:59:00",
-                    "user": "dan",
                     "v": "1.0.0"
                 }
             ],
             "report": [],
-            "status": 0.800000011920929,
-            "tagged": [],
-            "task": "A sample task 2"
+            "status": 0.0,
+            "tagged": [
+                ""
+            ],
+            "task": "my first task"
         }
     ],
     "types": {
@@ -178,20 +38,8 @@
     "users": [
         {
             "shlomi": {
-                "desc": "the manager",
+                "desc": "The project manager",
                 "mail": "shlomi@gmail.com"
-            }
-        },
-        {
-            "bar": {
-                "desc": "worker number 2",
-                "mail": ""
-            }
-        },
-        {
-            "dan": {
-                "desc": "worker number 3",
-                "mail": ""
             }
         }
     ],

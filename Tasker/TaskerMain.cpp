@@ -902,7 +902,7 @@ void TaskerMain::showtags()
 	}
 	else {
 		this->printTaskerNotify("No tags were defined");
-		this->printTaskerInfo("Advice", "You can use `addtag {tagname}` to define a tag.");
+		this->printTaskerInfo("Advice", "You can use `--addtag {tagname}` to define a tag.");
 	}
 }
 bool TaskerMain::addtag(const std::string& _tag)
@@ -1179,7 +1179,7 @@ bool TaskerMain::showstats(const std::string& type)
 	}
 
 	//Print main
-	std::cout << std::endl << " > Tasker work status: " << std::endl << std::endl;
+	std::cout << std::endl << " > Tasker stats: " << std::endl << std::endl;
 
 	//Print out the stats:
 	if (total.workunits > 0) {
@@ -1249,10 +1249,12 @@ bool TaskerMain::showstats(const std::string& type)
 		}
 		
 	} else {
+
 		//Print no stats:
-
+		this->printTaskerNotify("Tasker is empty. Add some tasks.");
+		std::cout << std::endl;
+		return true;
 	}
-
 
 	//Notify:
 	this->printTaskerNotify("Stats calculated successfully!");
@@ -1579,7 +1581,7 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 			<< this->usecolor() << this->getcolor("faded")
 			<< "\t* Tags: "
 			<< this->usecolor() << this->getcolor("tag")
-			<< (tagged_str.size() > 0 ? tagged_str : "not tagged")
+			<< (tagged_str.size() > 1 ? tagged_str : "not tagged")
 			<< this->usecolor() << this->getcolor("reset")
 			<< std::endl;
 
