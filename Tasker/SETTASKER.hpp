@@ -6,16 +6,16 @@
 
 
 #ifndef SETTASKER_H
-#define	SETTASKER_H
+    #define	SETTASKER_H
 
 #ifdef USEPLATLINUX
-#define PLATLINUX
+    #define PLATLINUX
 #endif
 #ifdef USEPLATWIN
-#define PLATWIN
+    #define PLATWIN
 #endif
 #if !defined(PLATLINUX) && !defined(PLATWIN)
-#define PLATOTHER
+    #define PLATOTHER
 #endif
 
 #define TASKER_VERSION "1.0.0"
@@ -62,6 +62,7 @@
 	#define TASKER_BAR_FULL "\u2593"
 	#define TASKER_BAR_ARROW "\u2593"
 	#define TASKER_BAR_CURSSOR "\u2593"
+    #define TASKER_FOLDER_SEP "/"
 #endif
 #ifdef PLATWIN
 	#define TASKER_BAR_LENGTH 20
@@ -71,6 +72,7 @@
 	#define TASKER_BAR_FULL "-"
 	#define TASKER_BAR_ARROW ">"
 	#define TASKER_BAR_CURSSOR "|"
+    #define TASKER_FOLDER_SEP "\\"
 #endif
 #ifdef PLATOTHER
 	#define TASKER_BAR_LENGTH 20
@@ -80,6 +82,7 @@
 	#define TASKER_BAR_FULL "-"
 	#define TASKER_BAR_ARROW ">"
 	#define TASKER_BAR_CURSSOR "|"
+    #define TASKER_FOLDER_SEP "\\"
 #endif
 
 #ifndef TASKER_CONSOLE_COLORS

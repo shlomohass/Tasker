@@ -3,7 +3,7 @@
 //  Tasker
 //
 //  Created by Shlomo Hassid on 06/11/2017.
-//  Copyright © 2017 Shlomo Hassid. All rights reserved.
+//  Copyright Â© 2017 Shlomo Hassid. All rights reserved.
 //  
 //  Command Line Examples:
 //
@@ -461,7 +461,13 @@ int main(int argc, char** argv) {
 	}
 
 	if (enable_debug) {
-		system("pause");
+        #ifdef PLATWIN
+            system("pause");
+            
+        #else
+            std::cout << "Enter to exit the program: ";
+            std::cin.ignore().get(); //Pause Command for Linux Terminal
+        #endif
 	}
 
 	delete Task;

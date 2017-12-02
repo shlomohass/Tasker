@@ -1,4 +1,4 @@
-﻿//
+//
 //  Tasker.cpp
 //  Tasker
 //
@@ -24,8 +24,9 @@
 	#include <string>
 	#include <limits.h>
 	#include <unistd.h>
+    #include <time.h>
 	#ifndef MAX_PATH
-		#define MAX_PATH = PATH_MAX
+		#define MAX_PATH PATH_MAX
 	#endif	
 #else
 	#include <string>
@@ -89,13 +90,14 @@ void TaskerMain::setPath()
 	#ifdef PLATLINUX
 		char buffer[MAX_PATH];
 		if (getcwd(buffer, sizeof(buffer))) {
-			this->fullpath = std::string(buffer) + "\\" + TASKER_OBJNAME;
+            this->basepath = std::string(buffer);
+			this->fullpath = std::string(buffer) + TASKER_FOLDER_SEP + TASKER_OBJNAME;
 		}
 	#else
 		char buffer[MAX_PATH];
 		GetCurrentDirectory(MAX_PATH, buffer);
 		this->basepath = std::string(buffer);
-		this->fullpath = std::string(buffer) + "\\" + TASKER_OBJNAME;
+		this->fullpath = std::string(buffer) + TASKER_FOLDER_SEP + TASKER_OBJNAME;
 	#endif
 }
 void TaskerMain::_basepath(std::string path)
@@ -117,7 +119,7 @@ std::string TaskerMain::_fullpath()
 bool TaskerMain::loadBase()
 {
 	#ifdef PLATLINUX
-		if (_access(this->fullpath.c_str(), F_OK) == 0) {
+		if (access(this->fullpath.c_str(), F_OK) == 0) {
 			return true;
 		}
 	#else
@@ -238,7 +240,7 @@ bool TaskerMain::checkWriteObj(bool full)
 bool TaskerMain::checkWriteObj(std::string& path) 
 {
 	#ifdef PLATLINUX
-		if (access(path.c_str(), W_OK) == 0 || access(path.c_str(), RW_OK) == 0)
+		if (access(path.c_str(), W_OK) == 0 || access(path.c_str(), W_OK) == 0)
 			return true; 
 	#else
 		if (_access(path.c_str(), W_OK) == 0 || _access(path.c_str(), RW_OK) == 0)
@@ -309,7 +311,13 @@ std::string TaskerMain::getcurdatetime(const std::string& format) {
 	std::time_t rawtime;
 	struct tm timeinfo;
 	time(&rawtime);
-	localtime_s(&timeinfo, &rawtime);
+    
+    #ifdef PLATLINUX
+        localtime_r(&rawtime, &timeinfo);
+    #else
+        localtime_s(&timeinfo, &rawtime);
+    #endif
+    
 	std::strftime(buffer.data(), sizeof(buffer), format.c_str(), &timeinfo);
 	return std::string(buffer.data());
 }
