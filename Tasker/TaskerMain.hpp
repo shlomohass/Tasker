@@ -91,10 +91,10 @@ namespace tasker {
 		//Console get:
 		std::string getUserName(bool& push_plan, bool allowskip, int taskIdForSkip);
 		std::string getStrMessage(const std::string& err);
-		std::string getStrDate(const std::string& err);
+		std::string getStrDate(const std::string& err, bool allowSkip);
 		int         getLoad(const std::string& err);
 		std::string getStrTag(const std::string& err);
-
+		std::string getStrVersion(bool& push_plan, bool allowskip, const std::string& versionForSkip);
 		//Task Operations:
 		bool setNewTask(const std::string& strTask);
 		bool reportToTask(const std::string& strTask);

@@ -658,16 +658,20 @@ std::string TaskerMain::getStrMessage(const std::string& err) {
 	}
 	return mes;
 }
-std::string TaskerMain::getStrDate(const std::string& err) {
+std::string TaskerMain::getStrDate(const std::string& err, bool allowSkip) {
 	bool reloop = true;
 	std::string datestr;
 	while (reloop) {
 		std::getline(std::cin, datestr);
+		datestr = this->trim_gen(trim_copy(datestr), '"');
 		if (datestr == "") {
 			break;
 		}
 		else if (datestr == "today") {
 			datestr = this->getcurdatetime("%d-%m-%Y 23:59:00");
+			break;
+		}
+		else if (datestr == "skip" && allowSkip) {
 			break;
 		}
 		else {
@@ -749,6 +753,18 @@ std::string TaskerMain::getStrTag(const std::string& err) {
 	}
 	return tagStr;
 }
+std::string TaskerMain::getStrVersion(bool& push_plan, bool allowskip, const std::string& versionForSkip) {
+	std::string version;
+	std::string currentversion = this->thestruct["version"];
+	std::getline(std::cin, version);
+	if (version == "skip" && allowskip) {
+		version = versionForSkip;
+	} else {
+		push_plan = true;
+		version = this->trim_gen((version != "" ? version : currentversion), '"');
+	}
+	return version;
+}
 
 bool TaskerMain::setNewTask(const std::string& strTask)
 {	
@@ -776,25 +792,22 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 
 	//Set the planned version:
 	std::cout << "  3. Planned for version (empty for current): ";
-	std::getline(std::cin, plan_version);
+	plan_version = this->getStrVersion(push_plan, false, "");
 
 	//Set due date:
 	std::cout << "  4. Due date `d-m-Y H:M:S` (empty for none or `today`): ";
-	plan_duedate = this->getStrDate("Please retry. Use the correct format: `d-m-Y H:M:S` or `d-m-Y`.");
+	plan_duedate = this->getStrDate("Please retry. Use the correct format: `d-m-Y H:M:S` or `d-m-Y`.", false);
 	
 	//Set status:
 	std::cout << "  5. Set current status (1|0, true|false): ";
 	std::getline(std::cin, task_status);
+	task_status_num = this->normalizeStatus(task_status);
 
-	//Set load of task in enabled:
+	//Set load of task if enabled:
 	if (this->load) {
 		std::cout << "  6. Set load units of this task (use an integer): ";
 		loadint = this->getLoad("Bad input - Please enter a positive integer only.");
 	}
-
-	//Normalize:
-	plan_version = this->trim_gen((plan_version != "" ? plan_version : plan_currentversion), '"');
-	task_status_num = this->normalizeStatus(task_status);
 
 	//Create finall Object:
 	json taskObj = {
@@ -906,21 +919,18 @@ bool TaskerMain::refactorTask(const std::string& strTask) {
 		//Refactor Task:
 		std::string new_task_title = "";
 		std::string plan_user = "";
-		std::string tagged_as = "";
-		std::string plan_currentversion = this->thestruct["version"];
 		std::string plan_version = "";
 		std::string plan_duedate = "";
 		std::string task_updated = this->getcurdatetime();
 		std::string task_load = "1";
-
 		int			loadint		= 1;
-		bool        reloop_date = true;
-		bool        reloop_load = true;
 		bool        push_plan	= false;
 
 		//Interactively get all needed:
 		std::cout << std::endl << " > Refactor Task: ";
-		std::cout << usecolor() << getcolor("faded") << this->thestruct["tasks"].at(theRow.taskId).at("task");
+		std::cout << usecolor() << getcolor("faded") 
+				  << this->thestruct["tasks"].at(theRow.taskId).at("task")
+				  << usecolor() << getcolor("reset");
 
 		//Set new title:
 		std::cout << std::endl << "  1. Set New task title (empty for skip): ";
@@ -929,29 +939,59 @@ bool TaskerMain::refactorTask(const std::string& strTask) {
 			this->thestruct["tasks"].at(theRow.taskId).at("task").get<std::string>() : 
 			this->trim_gen(trim_copy(new_task_title), '"');
 
-
 		//Change assigned user:
-		std::cout << std::endl << "  2. Change user (empty = none | 'skip' = skip): ";
+		std::cout << "  2. Change user (empty = none | 'skip' = skip): ";
 		plan_user = this->getUserName(push_plan, true, theRow.taskId);
+
+		//Update the planned version:
+		std::cout << "  3. Update planned for version (empty = current | 'skip' = skip): ";\
+		plan_version = this->getStrVersion(
+			push_plan, true,
+			this->thestruct["tasks"].at(theRow.taskId).at("plan").back().at("v").get<std::string>()
+		);
+
+		//Update Due date:
+		std::string prevDateSet = this->thestruct["tasks"].at(theRow.taskId).at("plan").back().at("date").get<std::string>();
+		std::cout << "  4. Update Due date (" 
+				  << this->usecolor() << this->getcolor("hour")
+				  << (prevDateSet == "" ? "not set" : prevDateSet)
+				  << this->usecolor() << this->getcolor("reset")
+				  << ") - Expects `d-m-Y H:M:S` | empty for none | `today` | `skip`: ";
+		plan_duedate = this->getStrDate("Please retry. Use the correct format: `d-m-Y H:M:S` or `d-m-Y`.", true);
+		if (plan_duedate == "skip") {
+			plan_duedate = prevDateSet;
+			push_plan = true;
+		}
+
+		//Update Load if enabled:
+		if (this->load) {
+			int prevLoadSet = this->thestruct["tasks"].at(theRow.taskId).at("load").get<int>();
+			std::cout << "  5. Update load units of this task (use an integer) - Currently `"
+				<< this->usecolor() << this->getcolor("notify")
+				<< prevLoadSet
+				<< this->usecolor() << this->getcolor("reset")
+				<< "`: ";
+			loadint = this->getLoad("Bad input - Please enter a positive integer only.");
+		}
 
 		//Create finall Object:
 		json taskObj = {
-			{ "plan",		this->thestruct["tasks"].at(theRow.taskId).at("plan") },
-			{ "created",	this->thestruct["tasks"].at(theRow.taskId).at("created") },
-			{ "updated",	task_updated },
-			{ "task",		new_task_title },
+			{ "plan",		this->thestruct["tasks"].at(theRow.taskId).at("plan")	},
+			{ "created",	this->thestruct["tasks"].at(theRow.taskId).at("created")},
+			{ "updated",	task_updated											},
+			{ "task",		new_task_title											},
 			{ "status",		this->thestruct["tasks"].at(theRow.taskId).at("status") },
-			{ "cancel",		false },
-			{ "load",		this->thestruct["tasks"].at(theRow.taskId).at("load") },
+			{ "cancel",		false													},
+			{ "load",		loadint													},
 			{ "tagged",		this->thestruct["tasks"].at(theRow.taskId).at("tagged") },
 			{ "report",		this->thestruct["tasks"].at(theRow.taskId).at("report") }
 		};
 		//Add plan if needed:
 		if (push_plan) {
 			taskObj["plan"].push_back({
-				{ "v" ,			taskObj["plan"].back().at("v")    },
+				{ "v" ,			trim_copy(plan_version)			  },
 				{ "user" ,		plan_user						  },
-				{ "date" ,		taskObj["plan"].back().at("date") }
+				{ "date" ,		plan_duedate					  }
 			});
 		}
 
@@ -1868,13 +1908,10 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 					<< this->usecolor() << this->getcolor("reset")
 					<< "] : "
 					<< this->usecolor() << this->getcolor("hour")
-					<< onlydate
+					<< onlydate << " " << onlyhour
 					<< this->usecolor() << this->getcolor("reset")
 					<< " -> "
 					<< this->thestruct["tasks"].at(i).at("report").at(j).at("note")
-					<< " : "
-					<< this->usecolor() << this->getcolor("hour")
-					<< onlyhour
 					<< ", by "
 					<< this->usecolor() << this->getcolor("user")
 					<< (byuser == "" ? "unknown" : (TASKER_USER_PREFIX + byuser) )

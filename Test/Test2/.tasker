@@ -13,7 +13,7 @@
         {
             "cancel": false,
             "created": "02-12-2017 16:36:56",
-            "load": 1,
+            "load": 2,
             "plan": [
                 {
                     "date": "02-12-2017 23:59:00",
@@ -43,14 +43,39 @@
                     "date": "02-12-2017 22:20:56",
                     "note": "Now supports hebrew",
                     "status": 0.119999997317791
+                },
+                {
+                    "by": "shlomi",
+                    "date": "09-12-2017 21:01:36",
+                    "note": "new buttons with shades",
+                    "status": 0.230000004172325
                 }
             ],
-            "status": 0.119999997317791,
+            "status": 0.230000004172325,
             "tagged": [
                 ""
             ],
-            "task": "my first task updated",
-            "updated": "09-12-2017 11:36:09"
+            "task": "my first task",
+            "updated": "09-12-2017 21:02:42"
+        },
+        {
+            "cancel": false,
+            "created": "09-12-2017 21:05:32",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "09-12-2017 23:59:00",
+                    "user": "shlomi",
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                ""
+            ],
+            "task": "design logo",
+            "updated": "09-12-2017 21:05:32"
         }
     ],
     "types": {
