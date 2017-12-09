@@ -236,11 +236,11 @@ int main(int argc, char** argv) {
 			}
 		}
 		//Handle update tasks:
-		if (cmd.foundOption("update")) {
-			std::string taskId = cmd.optionValue("update");
-			if (!Task->deleteTask(taskId)) {
+		if (cmd.foundOption("refactor")) {
+			std::string taskId = cmd.optionValue("refactor");
+			if (!Task->refactorTask(taskId)) {
 				Task->printTaskerNotify("Oups!");
-				Task->printTaskerInfo("Error", "Task could not be found or input is invalid.");
+				Task->printTaskerInfo("Error", "Task or Report could not be found or input is invalid.");
 				exit(exitCodeError);
 			}
 			if (!Task->writeObj(true)) {

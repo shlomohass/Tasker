@@ -17,6 +17,12 @@ namespace tasker {
 
 	using json = nlohmann::json;
 
+	struct exists {
+		int type; // 0 - notset, 1 - task, 2 - report, 3 - note
+		float id;
+		int taskId;
+		int reportId;
+	};
 	class TaskerMain
 	{
 		//Flags:
@@ -78,10 +84,14 @@ namespace tasker {
 		std::string getReservedUserNames(const std::string& deli);
 		std::string getReservedTagNames(const std::string& deli);
 		std::string trim_gen(const std::string& str, const char rem);
+		std::vector<std::string> splitString(const std::string &text, char sep);
+		exists findRow(const std::string& strId);
+		bool onlyDigits(const std::string str);
 
 		//Task Operations:
 		bool setNewTask(const std::string& strTask);
 		bool reportToTask(const std::string& strTask);
+		bool refactorTask(const std::string& strTask);
 		bool cancelTask(const std::string& strTask, bool state);
 		bool deleteTask(const std::string& strTask);
 
