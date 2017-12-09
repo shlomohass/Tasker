@@ -89,7 +89,7 @@ namespace tasker {
 		bool onlyDigits(const std::string str);
 
 		//Console get:
-		std::string getUserName(bool& push_plan, bool allowskip, int taskIdForSkip);
+		std::string getUserName(bool& push_plan, bool allowskip, int taskIdForSkip, const std::string& userFixStr);
 		std::string getStrMessage(const std::string& err);
 		std::string getStrDate(const std::string& err, bool allowSkip);
 		int         getLoad(const std::string& err);

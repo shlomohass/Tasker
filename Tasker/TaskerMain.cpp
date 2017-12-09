@@ -601,7 +601,7 @@ exists TaskerMain::findRow(const std::string& strId) {
 	return ret;
 }
 
-std::string TaskerMain::getUserName(bool& push_plan, bool allowskip, int taskIdForSkip) {
+std::string TaskerMain::getUserName(bool& push_plan, bool allowskip, int taskIdForSkip, const std::string& userFixStr) {
 	bool showAdvice = true;
 	bool reloop = true;
 	std::string userStr = "";
@@ -622,7 +622,12 @@ std::string TaskerMain::getUserName(bool& push_plan, bool allowskip, int taskIdF
 			break;
 		}
 		else if (userStr == "skip" && allowskip) {
-			userStr = this->thestruct["tasks"].at(taskIdForSkip).at("plan").back().at("user").get<std::string>();
+			if (taskIdForSkip == -1) {
+				userStr = userFixStr;
+			}
+			else {
+				userStr = this->thestruct["tasks"].at(taskIdForSkip).at("plan").back().at("user").get<std::string>();
+			}
 			reloop = false;
 			break;
 		}
@@ -784,7 +789,7 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 
 	//Assign a user name:
 	std::cout << std::endl << "  1. Assign to user (empty for none): ";
-	plan_user = this->getUserName(push_plan, false, 0);
+	plan_user = this->getUserName(push_plan, false, 0, "");
 
 	//Tag the task:
 	std::cout << "  2. Tag the task (empty for none): ";
@@ -884,7 +889,7 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 	std::cout << ((owner == "") ? "not assigned" : TASKER_USER_PREFIX + owner);
 	std::cout << usecolor() << getcolor("reset");
 	std::cout << " - Empty for unknown" << "): ";
-	rep_user = this->getUserName(push_plan, false, 0);
+	rep_user = this->getUserName(push_plan, false, 0, "");
 	
 	//Get the report note:
 	std::cout << "  3. Task progress report note: ";
@@ -909,7 +914,6 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 bool TaskerMain::refactorTask(const std::string& strTask) {
 
 	exists theRow = this->findRow(strTask);
-	int theTask = -1;
 
 	if (theRow.type == 0) {
 		return false;
@@ -926,7 +930,7 @@ bool TaskerMain::refactorTask(const std::string& strTask) {
 		int			loadint		= 1;
 		bool        push_plan	= false;
 
-		//Interactively get all needed:
+		//Interactively update all needed:
 		std::cout << std::endl << " > Refactor Task: ";
 		std::cout << usecolor() << getcolor("faded") 
 				  << this->thestruct["tasks"].at(theRow.taskId).at("task")
@@ -941,7 +945,7 @@ bool TaskerMain::refactorTask(const std::string& strTask) {
 
 		//Change assigned user:
 		std::cout << "  2. Change user (empty = none | 'skip' = skip): ";
-		plan_user = this->getUserName(push_plan, true, theRow.taskId);
+		plan_user = this->getUserName(push_plan, true, theRow.taskId, "");
 
 		//Update the planned version:
 		std::cout << "  3. Update planned for version (empty = current | 'skip' = skip): ";\
@@ -1004,109 +1008,62 @@ bool TaskerMain::refactorTask(const std::string& strTask) {
 		std::cout << std::endl;
 	}
 	else {
+
 		//Refactor Report:
-		std::string rep_date = this->getcurdatetime();
-		std::string rep_user = "";
+		json theObjOld = this->thestruct["tasks"].at(theRow.taskId).at("report").at(theRow.reportId);
 		std::string rep_note = "";
 		std::string rep_status = "";
-		std::string owner = this->thestruct["tasks"].at(theTask).at("plan").back().at("user");
-		float		rep_status_num;
-		bool		reloop_user = true;
-		bool		reloop_note = true;
-		bool        show_advice_user = true;
+		bool		push_plan = true;
+
+		//Set percision:
+		std::cout << std::setprecision(2) << std::fixed;
+
+		//Interactively update all needed:
+		std::cout << std::endl << " > Refactor Task report: ";
+		std::cout << usecolor() << getcolor("faded")
+				  << theObjOld["note"]
+				  << usecolor() << getcolor("reset");
+
+		//Update report progress:
+		std::cout << std::endl << "  1. Update progress status (0.0 - 1.0, current ";
+		std::cout << usecolor() << getcolor("workbar");
+		std::cout << (float)theObjOld.at("status");
+		std::cout << usecolor() << getcolor("reset");
+		std::cout << ") OR type `skip`: ";
+		std::getline(std::cin, rep_status);
+		rep_status  = this->trim_gen(trim_copy(rep_status), '"');
+
+		//Normalize progress status:
+		if (rep_status != "skip") {
+			theObjOld["status"] = this->normalizeStatus(rep_status);
+		}
+
+		//Get the user who made the report:
+		std::cout << "  2. Updtae user that issued the report (currently ";
+		std::cout << usecolor() << getcolor("user");
+		std::cout << ((theObjOld["by"].get<std::string>() == "") ? "not assigned" : TASKER_USER_PREFIX + theObjOld["by"].get<std::string>());
+		std::cout << usecolor() << getcolor("reset");
+		std::cout << " - Expects empty for unknown | `skip` | `default`" << "): ";
+		theObjOld["by"] = this->trim_gen(trim_copy(this->getUserName(push_plan, true, -1, theObjOld["by"].get<std::string>())), '"');
+
+		//Get the report note:
+		std::cout << "  3. Update task report note (Type `skip` to skip): ";
+		rep_note = this->trim_gen(trim_copy(this->getStrMessage("Please retry. You must add a report note.")),'"');
+		if (rep_note != "skip") {
+			theObjOld["note"] = rep_note;
+		}
+
+		//Push to plan notes:
+		this->thestruct["tasks"].at(theRow.taskId).at("report").at(theRow.reportId) = theObjOld;
+
+		//Update parent status:
+		if (theRow.reportId == (int)this->thestruct["tasks"].at(theRow.taskId).at("report").size() - 1) {
+			this->thestruct["tasks"].at(theRow.taskId).at("status") = theObjOld["status"];
+		}
+
+		this->printTaskerNotify("Refactored task report and saved successfully! ");
+		this->printTaskerInfo("Info", "Report Id: " + std::to_string(theRow.taskId + 1) + "." + std::to_string(theRow.reportId + 1));
 	}
-
-	/*
-	std::string rep_date = this->getcurdatetime();
-	std::string rep_user = "";
-	std::string rep_note = "";
-	std::string rep_status = "";
-	std::string owner = this->thestruct["tasks"].at(theTask).at("plan").back().at("user");
-	float		rep_status_num;
-	bool		reloop_user = true;
-	bool		reloop_note = true;
-	bool        show_advice_user = true;
-
-	//Set percision:
-	std::cout << std::setprecision(2) << std::fixed;
-	//Interactively get all needed:
-	std::cout << std::endl << " > Report to task: " << strTask;
-	//Get the user who made the report:
-	std::cout << std::endl << "  1. Set new progress status (0.0 - 1.0, current ";
-	std::cout << usecolor() << getcolor("workbar");
-	std::cout << (float)this->thestruct["tasks"].at(theTask).at("status");
-	std::cout << usecolor() << getcolor("reset");
-	std::cout << "): ";
-	std::getline(std::cin, rep_status);
-
-	//Get the user who made the report:
-	std::cout << "  2. Progress of user (assigned to ";
-	std::cout << usecolor() << getcolor("user");
-	std::cout << ((owner == "") ? "not assigned" : owner);
-	std::cout << usecolor() << getcolor("reset");
-	std::cout << " - Empty for unknown" << "): ";
-	while (reloop_user) {
-		std::getline(std::cin, rep_user);
-
-		rep_user = trim_copy(rep_user);
-		std::string::iterator end_pos = std::remove(rep_user.begin(), rep_user.end(), ' ');
-		rep_user.erase(end_pos, rep_user.end());
-
-		if (rep_user == "default") {
-			rep_user = this->getDefindUserName(0);
-			reloop_user = false;
-			break;
-		}
-		else if (rep_user == "") {
-			rep_user = "";
-			reloop_user = false;
-			break;
-		}
-		else if (this->findDefinedUser(rep_user) == -1) {
-			this->printTaskerInfo("Error", "The user name you typed can't be found.");
-			if (show_advice_user) {
-				this->printTaskerInfo("Advice", "Leave empty and press ENTER for not assigned.");
-				this->printTaskerInfo("Advice", "Type `default` and press ENTER for setting the default user.");
-				this->printTaskerInfo("Advice", "Run `--users` to see all users defined.");
-				show_advice_user = false;
-			}
-			std::cout << "\tType: ";
-		}
-		else {
-			reloop_user = false;
-		}
-	}
-	//Get the report note:
-	std::cout << "  3. Task progress report note: ";
-	while (reloop_note) {
-		std::getline(std::cin, rep_note);
-		rep_note = trim_copy(rep_note);
-		if (rep_note == "") {
-			this->printTaskerInfo("Error", "Please retry. You must add a report note.");
-			std::cout << "\tType: ";
-		}
-		else {
-			reloop_note = false;
-		}
-	}
-
-	//Normalize status:
-	rep_status_num = this->normalizeStatus(rep_status);
-
-	//Push to plan notes:
-	this->thestruct["tasks"].at(theTask).at("report").push_back({
-		{ "date",		this->trim_gen(rep_date, '"') },
-		{ "status",		rep_status_num },
-		{ "note",		this->trim_gen(trim_copy(rep_note), '"') },
-		{ "by",			this->trim_gen(trim_copy(rep_user), '"') }
-	});
-
-	//Update parent status:
-	this->thestruct["tasks"].at(theTask).at("status") = rep_status_num;
-
-	this->printTaskerNotify("Reported and saved successfully! ");
-	this->printTaskerInfo("Info", "Reported to Task Id: " + strTask);
-	*/
 	return true;
 }
 bool TaskerMain::cancelTask(const std::string& strTask, bool state)
@@ -1162,7 +1119,6 @@ bool TaskerMain::deleteTask(const std::string& strTask)
 	std::cout << std::endl;
 	return true;
 }
-
 
 void TaskerMain::showtags()
 {
@@ -1931,7 +1887,6 @@ bool TaskerMain::list(const std::string& level, const std::string& which, const 
 	}
 	return true;
 }
-
 
 TaskerMain::~TaskerMain()
 {

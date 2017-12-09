@@ -33,10 +33,10 @@
             ],
             "report": [
                 {
-                    "by": "",
+                    "by": "shlomi",
                     "date": "02-12-2017 22:15:19",
-                    "note": "Added basic guidelines",
-                    "status": 0.0500000007450581
+                    "note": "Added basic notes and comments",
+                    "status": 0.0599999986588955
                 },
                 {
                     "by": "shlomi",
@@ -48,10 +48,10 @@
                     "by": "shlomi",
                     "date": "09-12-2017 21:01:36",
                     "note": "new buttons with shades",
-                    "status": 0.230000004172325
+                    "status": 0.28999999165535
                 }
             ],
-            "status": 0.230000004172325,
+            "status": 0.28999999165535,
             "tagged": [
                 ""
             ],
@@ -69,8 +69,15 @@
                     "v": "1.0.0"
                 }
             ],
-            "report": [],
-            "status": 0.0,
+            "report": [
+                {
+                    "by": "shlomi",
+                    "date": "09-12-2017 22:05:41",
+                    "note": "created basic color template",
+                    "status": 0.379999995231628
+                }
+            ],
+            "status": 0.379999995231628,
             "tagged": [
                 ""
             ],
