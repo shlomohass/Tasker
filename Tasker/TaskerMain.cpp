@@ -600,139 +600,196 @@ exists TaskerMain::findRow(const std::string& strId) {
 	}
 	return ret;
 }
-bool TaskerMain::setNewTask(const std::string& strTask)
-{	
-	std::string plan_user	 = "";
-	std::string tagged_as	 = "";
-	std::string plan_currentversion = this->thestruct["version"];
-	std::string plan_version = "";
-	std::string plan_duedate = "";
-	std::string task_created = this->getcurdatetime();
-	std::string task_status  = "";
-	std::string task_load	 = "1";
-	float		task_status_num;
-	int			loadint      = 1;
-	bool        reloop_user	 = true;
-	bool        reloop_tags = true;
-	bool        reloop_date  = true;
-	bool        reloop_load  = true;
-	bool        show_advice_user = true;
-	bool        show_advice_tags = true;
-	//Interactively get all needed:
-	std::cout << std::endl << " > New task: ";
-	std::cout << std::endl << "  1. Assign to user (empty for none): ";
-	while (reloop_user) {
-		std::getline(std::cin, plan_user);
-		plan_user = this->trim_gen(trim_copy(plan_user), '"');
-		std::string::iterator end_pos = std::remove(plan_user.begin(), plan_user.end(), ' ');
-		plan_user.erase(end_pos, plan_user.end());
-		if (plan_user == "default") {
-			plan_user = this->getDefindUserName(0);
-			reloop_user = false;
+
+std::string TaskerMain::getUserName(bool& push_plan, bool allowskip, int taskIdForSkip) {
+	bool showAdvice = true;
+	bool reloop = true;
+	std::string userStr = "";
+	while (reloop) {
+		std::getline(std::cin, userStr);
+		userStr = this->trim_gen(trim_copy(userStr), '"');
+		std::string::iterator end_pos = std::remove(userStr.begin(), userStr.end(), ' ');
+		userStr.erase(end_pos, userStr.end());
+		if (userStr == "default") {
+			userStr = this->getDefindUserName(0);
+			reloop = false;
+			push_plan = true;
 			break;
-		} else if (plan_user == "") {
-			plan_user = "";
-			reloop_user = false;
+		}
+		else if (userStr == "") {
+			reloop = false;
+			push_plan = true;
 			break;
-		} else if (this->findDefinedUser(plan_user) == -1) {
+		}
+		else if (userStr == "skip" && allowskip) {
+			userStr = this->thestruct["tasks"].at(taskIdForSkip).at("plan").back().at("user").get<std::string>();
+			reloop = false;
+			break;
+		}
+		else if (this->findDefinedUser(userStr) == -1) {
 			this->printTaskerInfo("Error", "The user name you typed can't be found.");
-			if (show_advice_user) {
+			if (showAdvice) {
 				this->printTaskerInfo("Advice", "Leave empty and press ENTER for not assigned.");
 				this->printTaskerInfo("Advice", "Type `default` and press ENTER for auto assign default user.");
+				if (allowskip) this->printTaskerInfo("Advice", "Type `skip` and press ENTER to not change the user.");
 				this->printTaskerInfo("Advice", "Run `--users` to see all users defined.");
-				show_advice_user = false;
-			}
-			std::cout << "\tType: ";
-		} else {
-			reloop_user = false;
-		}
-	}
-
-	std::cout << "  2. Tag the task (empty for none): ";
-	while (reloop_tags) {
-		std::getline(std::cin, tagged_as);
-		tagged_as = this->trim_gen(trim_copy(tagged_as), '"');
-		std::string::iterator end_pos = std::remove(tagged_as.begin(), tagged_as.end(), ' ');
-		tagged_as.erase(end_pos, tagged_as.end());
-		if (tagged_as == "") {
-			tagged_as = "";
-			reloop_tags = false;
-			break;
-		}
-		else if (this->findDefinedTag(tagged_as) == -1) {
-			this->printTaskerInfo("Error", "The Tag you typed can't be found.");
-			if (show_advice_tags) {
-				this->printTaskerInfo("Advice", "Leave empty and press ENTER for not tagged.");
-				this->printTaskerInfo("Advice", "Run `--tags` to see all tags defined.");
-				show_advice_tags = false;
+				showAdvice = false;
 			}
 			std::cout << "\tType: ";
 		}
 		else {
-			reloop_tags = false;
+			reloop = false;
 		}
 	}
-
-	std::cout << "  3. Planned for version (empty for current): ";
-	std::getline(std::cin, plan_version);
-	std::cout << "  4. Due date `d-m-Y H:M:S` (empty for none or `today`): ";
-	while (reloop_date) {
-		std::getline(std::cin, plan_duedate);
-		if (plan_duedate == "") {
-			break;
-		} else if (plan_duedate == "today") {
-			plan_duedate = this->getcurdatetime("%d-%m-%Y 23:59:00");
-			break;
+	return userStr;
+}
+std::string TaskerMain::getStrMessage(const std::string& err) {
+	std::string mes;
+	bool reloop = true;
+	while (reloop) {
+		std::getline(std::cin, mes);
+		mes = trim_copy(mes);
+		if (mes == "") {
+			this->printTaskerInfo("Error", err);
+			std::cout << "\tType: ";
 		} else {
+			reloop = false;
+		}
+	}
+	return mes;
+}
+std::string TaskerMain::getStrDate(const std::string& err) {
+	bool reloop = true;
+	std::string datestr;
+	while (reloop) {
+		std::getline(std::cin, datestr);
+		if (datestr == "") {
+			break;
+		}
+		else if (datestr == "today") {
+			datestr = this->getcurdatetime("%d-%m-%Y 23:59:00");
+			break;
+		}
+		else {
 			int day = -1, mon = -1, year = -1, hour = 0, min = 0, sec = 0;
-			int found = this->parseDateParts(plan_duedate, day, mon, year, hour, min, sec);
+			int found = this->parseDateParts(datestr, day, mon, year, hour, min, sec);
 			if (found == 3) {
 				if (year < 1000 || day > 31 || day < 1 || mon > 12 || mon < 1) {
-					this->printTaskerInfo("Error", "Please retry. Use the correct format: `d-m-Y H:M:S` or `d-m-Y`.");
+					this->printTaskerInfo("Error", err);
 					std::cout << "\tType: ";
 				}
 				else {
-					plan_duedate = this->createDateFromInts(day, mon, year, 0, 0, 0);
-					reloop_date = false;
+					datestr = this->createDateFromInts(day, mon, year, 0, 0, 0);
+					reloop = false;
 				}
 			}
 			else if (found == 6) {
 				if (year < 1000 || day > 31 || day < 1 || mon > 12 || mon < 1
 					|| hour > 24 || hour < 0 || min < 0 || min > 60 || sec < 0 || sec > 60
 					) {
-					this->printTaskerInfo("Error", "Please retry. Use the correct format: `d-m-Y H:M:S` or `d-m-Y`.");
+					this->printTaskerInfo("Error", err);
 					std::cout << "\tType: ";
 				}
 				else {
-					plan_duedate = this->createDateFromInts(day, mon, year, hour, min, sec);
-					reloop_date = false;
-					
+					datestr = this->createDateFromInts(day, mon, year, hour, min, sec);
+					reloop = false;
 				}
-			} else {
-				this->printTaskerInfo("Error", "Please retry. Use the correct format: `d-m-Y H:M:S` or `d-m-Y`.");
+			}
+			else {
+				this->printTaskerInfo("Error", err);
 				std::cout << "\tType: ";
 			}
 		}
-		
 	}
+	return datestr;
+}
+int TaskerMain::getLoad(const std::string& err) {
+	std::string loadStr;
+	int loadint = 1;
+	bool reloop = true;
+	while (reloop) {
+		std::getline(std::cin, loadStr);
+		int scan_value = std::sscanf(loadStr.c_str(), "%d", &loadint);
+		if (scan_value == 0) {
+			// does not start with integer
+			this->printTaskerInfo("Error", err);
+			std::cout << "\tType: ";
+		} else {
+			// starts with integer
+			reloop = false;
+		}
+	}
+	return loadint;
+}
+std::string TaskerMain::getStrTag(const std::string& err) {
+	bool reloop		 = true;
+	bool showAdvice = true;
+	std::string tagStr;
+	while (reloop) {
+		std::getline(std::cin, tagStr);
+		tagStr = this->trim_gen(trim_copy(tagStr), '"');
+		std::string::iterator end_pos = std::remove(tagStr.begin(), tagStr.end(), ' ');
+		tagStr.erase(end_pos, tagStr.end());
+		if (tagStr == "") {
+			reloop = false;
+			break;
+		}
+		else if (this->findDefinedTag(tagStr) == -1) {
+			this->printTaskerInfo("Error", err);
+			if (showAdvice) {
+				this->printTaskerInfo("Advice", "Leave empty and press ENTER for not tagged.");
+				this->printTaskerInfo("Advice", "Run `--tags` to see all tags defined.");
+				showAdvice = false;
+			}
+			std::cout << "\tType: ";
+		}
+		else {
+			reloop = false;
+		}
+	}
+	return tagStr;
+}
+
+bool TaskerMain::setNewTask(const std::string& strTask)
+{	
+	std::string plan_user			= "";
+	std::string tagged_as			= "";
+	std::string plan_currentversion = this->thestruct["version"];
+	std::string plan_version		= "";
+	std::string plan_duedate		= "";
+	std::string task_created		= this->getcurdatetime();
+	std::string task_status			= "";
+	int			loadint				= 1;
+	bool        push_plan			= false;
+	float		task_status_num;
+
+	//Interactively get all needed:
+	std::cout << std::endl << " > New task: ";
+
+	//Assign a user name:
+	std::cout << std::endl << "  1. Assign to user (empty for none): ";
+	plan_user = this->getUserName(push_plan, false, 0);
+
+	//Tag the task:
+	std::cout << "  2. Tag the task (empty for none): ";
+	tagged_as = this->getStrTag("The Tag you typed can't be found.");
+
+	//Set the planned version:
+	std::cout << "  3. Planned for version (empty for current): ";
+	std::getline(std::cin, plan_version);
+
+	//Set due date:
+	std::cout << "  4. Due date `d-m-Y H:M:S` (empty for none or `today`): ";
+	plan_duedate = this->getStrDate("Please retry. Use the correct format: `d-m-Y H:M:S` or `d-m-Y`.");
 	
+	//Set status:
 	std::cout << "  5. Set current status (1|0, true|false): ";
 	std::getline(std::cin, task_status);
 
+	//Set load of task in enabled:
 	if (this->load) {
 		std::cout << "  6. Set load units of this task (use an integer): ";
-		while (reloop_date) {
-			std::getline(std::cin, task_load);
-			int scan_value = std::sscanf(task_load.c_str(), "%d", &loadint);
-			if (scan_value == 0) {
-				// does not start with integer
-				this->printTaskerInfo("Error", "Bad input - Please enter a positive integer only.");
-				std::cout << "\tType: ";
-			} else {
-				// starts with integer
-				reloop_date = false;
-			}
-		}
+		loadint = this->getLoad("Bad input - Please enter a positive integer only.");
 	}
 
 	//Normalize:
@@ -790,15 +847,14 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 	std::string rep_status = "";
 	std::string owner = this->thestruct["tasks"].at(theTask).at("plan").back().at("user");
 	float		rep_status_num;
-	bool		reloop_user = true;
-	bool		reloop_note = true;
-	bool        show_advice_user = true;
+	bool		push_plan = true;
 	
 	//Set percision:
 	std::cout << std::setprecision(2) << std::fixed;
 	//Interactively get all needed:
 	std::cout << std::endl << " > Report to task: " << strTask;
-	//Get the user who made the report:
+
+	//Set an updated progress:
 	std::cout << std::endl << "  1. Set new progress status (0.0 - 1.0, current "; 
 	std::cout << usecolor() << getcolor("workbar");
 	std::cout << (float)this->thestruct["tasks"].at(theTask).at("status");
@@ -806,57 +862,20 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 	std::cout << "): ";
 	std::getline(std::cin, rep_status);
 
+	//Normalize progress status:
+	rep_status_num = this->normalizeStatus(rep_status);
+
 	//Get the user who made the report:
 	std::cout << "  2. Progress of user (assigned to "; 
 	std::cout << usecolor() << getcolor("user");
-	std::cout << ((owner == "") ? "not assigned" : owner);
+	std::cout << ((owner == "") ? "not assigned" : TASKER_USER_PREFIX + owner);
 	std::cout << usecolor() << getcolor("reset");
 	std::cout << " - Empty for unknown" << "): ";
-	while (reloop_user) {
-		std::getline(std::cin, rep_user);
-
-		rep_user = trim_copy(rep_user);
-		std::string::iterator end_pos = std::remove(rep_user.begin(), rep_user.end(), ' ');
-		rep_user.erase(end_pos, rep_user.end());
-		
-		if (rep_user == "default") {
-			rep_user = this->getDefindUserName(0);
-			reloop_user = false;
-			break;
-		}
-		else if (rep_user == "") {
-			rep_user = "";
-			reloop_user = false;
-			break;
-		}
-		else if (this->findDefinedUser(rep_user) == -1) {
-			this->printTaskerInfo("Error", "The user name you typed can't be found.");
-			if (show_advice_user) {
-				this->printTaskerInfo("Advice", "Leave empty and press ENTER for not assigned.");
-				this->printTaskerInfo("Advice", "Type `default` and press ENTER for setting the default user.");
-				this->printTaskerInfo("Advice", "Run `--users` to see all users defined.");
-				show_advice_user = false;
-			}
-			std::cout << "\tType: ";
-		} else {
-			reloop_user = false;
-		}
-	}
+	rep_user = this->getUserName(push_plan, false, 0);
+	
 	//Get the report note:
 	std::cout << "  3. Task progress report note: ";
-	while (reloop_note) {
-		std::getline(std::cin, rep_note);
-		rep_note = trim_copy(rep_note);
-		if (rep_note == "") {
-			this->printTaskerInfo("Error", "Please retry. You must add a report note.");
-			std::cout << "\tType: ";
-		} else {
-			reloop_note = false;
-		}
-	}
-
-	//Normalize status:
-	rep_status_num = this->normalizeStatus(rep_status);
+	rep_note = this->getStrMessage("Please retry. You must add a report note.");
 
 	//Push to plan notes:
 	this->thestruct["tasks"].at(theTask).at("report").push_back({
@@ -895,10 +914,8 @@ bool TaskerMain::refactorTask(const std::string& strTask) {
 		std::string task_load = "1";
 
 		int			loadint		= 1;
-		bool        reloop_user = true;
 		bool        reloop_date = true;
 		bool        reloop_load = true;
-		bool        show_advice_user = true;
 		bool        push_plan	= false;
 
 		//Interactively get all needed:
@@ -915,43 +932,7 @@ bool TaskerMain::refactorTask(const std::string& strTask) {
 
 		//Change assigned user:
 		std::cout << std::endl << "  2. Change user (empty = none | 'skip' = skip): ";
-		while (reloop_user) {
-			std::getline(std::cin, plan_user);
-			plan_user = this->trim_gen(trim_copy(plan_user), '"');
-			std::string::iterator end_pos = std::remove(plan_user.begin(), plan_user.end(), ' ');
-			plan_user.erase(end_pos, plan_user.end());
-			if (plan_user == "default") {
-				plan_user	= this->getDefindUserName(0);
-				reloop_user = false;
-				push_plan	= true;
-				break;
-			}
-			else if (plan_user == "") {
-				plan_user	= "";
-				reloop_user = false;
-				push_plan	= true;
-				break;
-			}
-			else if (plan_user == "skip") {
-				plan_user = this->thestruct["tasks"].at(theRow.taskId).at("plan").back().at("user").get<std::string>();
-				reloop_user = false;
-				break;
-			}
-			else if (this->findDefinedUser(plan_user) == -1) {
-				this->printTaskerInfo("Error", "The user name you typed can't be found.");
-				if (show_advice_user) {
-					this->printTaskerInfo("Advice", "Leave empty and press ENTER for not assigned.");
-					this->printTaskerInfo("Advice", "Type `default` and press ENTER for auto assign default user.");
-					this->printTaskerInfo("Advice", "Type `skip` and press ENTER to not change the user.");
-					this->printTaskerInfo("Advice", "Run `--users` to see all users defined.");
-					show_advice_user = false;
-				}
-				std::cout << "\tType: ";
-			}
-			else {
-				reloop_user = false;
-			}
-		}
+		plan_user = this->getUserName(push_plan, true, theRow.taskId);
 
 		//Create finall Object:
 		json taskObj = {

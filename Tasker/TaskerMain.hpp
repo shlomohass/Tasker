@@ -88,6 +88,13 @@ namespace tasker {
 		exists findRow(const std::string& strId);
 		bool onlyDigits(const std::string str);
 
+		//Console get:
+		std::string getUserName(bool& push_plan, bool allowskip, int taskIdForSkip);
+		std::string getStrMessage(const std::string& err);
+		std::string getStrDate(const std::string& err);
+		int         getLoad(const std::string& err);
+		std::string getStrTag(const std::string& err);
+
 		//Task Operations:
 		bool setNewTask(const std::string& strTask);
 		bool reportToTask(const std::string& strTask);
