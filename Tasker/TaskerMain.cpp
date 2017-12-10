@@ -373,6 +373,25 @@ float TaskerMain::getFloat(std::string str)
 {
 	return std::stof(str);
 }
+std::vector<int> TaskerMain::parseTaskListStr(std::string str) {
+	std::string deli = TASKER_SPLIT_DELI;
+	std::vector<int> ret;
+	size_t pos = 0;
+	std::string token;
+	while ((pos = str.find(deli)) != std::string::npos) {
+		token = str.substr(0, pos);
+		str.erase(0, pos + deli.length());
+		exists row = this->findRow(token);
+		if (row.type == 1)
+			ret.push_back(row.taskId);
+	}
+	if (str.length() > 0) {
+		exists row = this->findRow(str);
+		if (row.type == 1)
+			ret.push_back(row.taskId);
+	}
+	return ret;
+}
 
 //Get Console color Values:
 std::string TaskerMain::getcolor(const std::string& which)
@@ -1153,9 +1172,75 @@ void TaskerMain::showtags()
 		this->printTaskerInfo("Advice", "You can use `--addtag {tagname}` to define a tag.");
 	}
 }
-bool TaskerMain::addtag(const std::string& _tag)
+bool TaskerMain::addtag(const std::string& _tag, const std::string& strTask) {
+
+	std::string tag = this->trim_gen(trim_copy(_tag), '"');
+	std::string taskListStr;
+	std::vector<int> taskList;
+
+	std::cout << std::endl
+		<< " > Tagging with: "
+		<< this->usecolor() << this->getcolor("tag")
+		<< TASKER_TAG_PREFIX << tag
+		<< this->usecolor() << this->getcolor("reset");
+
+	if (strTask == "") {
+		std::cout << std::endl << std::endl
+			<< "  1. Which task to tag (list of integers): ";
+		std::getline(std::cin, taskListStr);
+		taskListStr = this->trim_gen(trim_copy(taskListStr), '"');
+	} else {
+		taskListStr = this->trim_gen(trim_copy(strTask), '"');
+	}
+
+	//Remove spaces:
+	std::string::iterator end_pos = std::remove(taskListStr.begin(), taskListStr.end(), ' ');
+	taskListStr.erase(end_pos, taskListStr.end());
+
+	//Parse the task list + validate Ids:
+	taskList = this->parseTaskListStr(taskListStr);
+	if (taskList.empty()) {
+		this->printTaskerNotify("Can't tag! The task/s you types are not set or canceled.");
+		this->printTaskerInfo("Advice", "You can use `--listall 2` to list all active tasks.");
+	}
+	//Validate the tag:
+	if (this->thestruct["tags"].size() < 1) return false;
+	int tagindex = this->findDefinedTag(tag);
+
+	int  counter_tags = 0;
+	if (tagindex != -1) {
+		for (const auto &taskid : taskList)
+		{
+			bool addFlag = true;
+			json deftags = this->thestruct["tasks"].at(taskid).at("tagged");
+			if (!deftags.empty()) {
+				for (int i = 0; i < deftags.size(); i++) {
+					if (deftags.at(i) == tag) 
+						addFlag = false;
+				}
+			}
+			if (addFlag) {
+				this->thestruct["tasks"].at(taskid).at("tagged").push_back(tag);
+				counter_tags++;
+			}
+		}
+		//print results:
+		this->printTaskerNotify("Tagged successfully!");
+		this->printTaskerInfo("Info", "Affected: " + std::to_string(counter_tags) + " Tasks.");
+
+	} else {
+		this->printTaskerNotify("Tag `" + (TASKER_TAG_PREFIX + tag) + "` is not defined.");
+		this->printTaskerInfo("Advice", "You can use `--tags` to list all tags defined.");
+	}
+	std::cout << std::endl;
+	return true;
+}
+bool TaskerMain::remtag(const std::string& _tag, const std::string& strTask) {
+	return false;
+}
+bool TaskerMain::newtag(const std::string& _tag)
 {
-	std::string tag = trim_gen(trim_copy(_tag), '"');
+	std::string tag = this->trim_gen(trim_copy(_tag), '"');
 	std::string desc;
 
 	//Remove spaces:
@@ -1170,9 +1255,9 @@ bool TaskerMain::addtag(const std::string& _tag)
 
 	//Print main:
 	std::cout << std::endl
-		<< " > Define tag: "
+		<< " > Define new tag: "
 		<< this->usecolor() << this->getcolor("tag")
-		<< tag
+		<< TASKER_TAG_PREFIX << tag
 		<< this->usecolor() << this->getcolor("reset")
 		<< std::endl;
 
@@ -1196,21 +1281,21 @@ bool TaskerMain::addtag(const std::string& _tag)
 		this->printTaskerInfo("Info", "Tag ID is: " + std::to_string(this->thestruct["tags"].size()));
 
 	} else {
-		this->printTaskerNotify("Tag `" + tag + "` is allready defined!");
-		this->printTaskerInfo("Advice", "You can use `tags` to list all tags defined.");
-		this->printTaskerInfo("Advice", "You can use `updatetag {tagname}` to change tag credentials.");
+		this->printTaskerNotify("Tag `" + (TASKER_TAG_PREFIX + tag) + "` is allready defined!");
+		this->printTaskerInfo("Advice", "You can use `--tags` to list all tags defined.");
+		this->printTaskerInfo("Advice", "You can use `--updatetag {tagname}` to change tag credentials.");
 	}
 	return true;
 }
 bool TaskerMain::deltag(const std::string& _tag)
 {
-	std::string tag = trim_gen(trim_copy(_tag), '"');
+	std::string tag = this->trim_gen(trim_copy(_tag), '"');
 
 	//Print main:
 	std::cout << std::endl
-		<< " > Deleting tag: "
+		<< " > Deleting a defined tag: "
 		<< this->usecolor() << this->getcolor("tag")
-		<< tag
+		<< TASKER_TAG_PREFIX << tag
 		<< this->usecolor() << this->getcolor("reset")
 		<< std::endl;
 
@@ -1243,14 +1328,14 @@ bool TaskerMain::deltag(const std::string& _tag)
 
 	}
 	else {
-		this->printTaskerNotify("Tag `" + tag + "` is not defined.");
+		this->printTaskerNotify("Tag `" + (TASKER_TAG_PREFIX + tag) + "` is not defined.");
 		this->printTaskerInfo("Advice", "You can use `--tags` to list all tags defined.");
 	}
 	std::cout << std::endl;
 	return true;
 }
 bool TaskerMain::updatetag(const std::string& _tag) {
-	std::string tag = trim_gen(trim_copy(_tag), '"');
+	std::string tag = this->trim_gen(trim_copy(_tag), '"');
 	std::string desc;
 	std::string desc_old;
 
@@ -1266,9 +1351,9 @@ bool TaskerMain::updatetag(const std::string& _tag) {
 
 	//Print main:
 	std::cout << std::endl
-		<< " > Update tag: "
+		<< " > Update a defined tag: "
 		<< this->usecolor() << this->getcolor("tag")
-		<< tag
+		<< TASKER_TAG_PREFIX << tag
 		<< this->usecolor() << this->getcolor("reset")
 		<< std::endl;
 
@@ -1276,8 +1361,8 @@ bool TaskerMain::updatetag(const std::string& _tag) {
 	int check = this->findDefinedTag(tag);
 	if (check != -1) {
 
-		desc_old = trim_gen(this->thestruct["tags"].at(check).at(tag).at("desc"), '"');
-		desc_old = trim_gen(desc_old, ' ');
+		desc_old = this->trim_gen(this->thestruct["tags"].at(check).at(tag).at("desc"), '"');
+		desc_old = this->trim_gen(desc_old, ' ');
 
 		//Interactively get all needed:
 		std::cout << std::endl << "  > Tag description: " 
@@ -1289,7 +1374,7 @@ bool TaskerMain::updatetag(const std::string& _tag) {
 		std::getline(std::cin, desc);
 
 		//clean:
-		desc = trim_gen(trim_copy(desc), '"');
+		desc = this->trim_gen(trim_copy(desc), '"');
 
 		//Save to Object:
 		this->thestruct["tags"].at(check).at(tag).at("desc") = desc;
@@ -1299,9 +1384,9 @@ bool TaskerMain::updatetag(const std::string& _tag) {
 		this->printTaskerInfo("Info", "Tag ID is: " + std::to_string(check));
 
 	} else {
-		this->printTaskerNotify("Tag `" + tag + "` is not defined!");
+		this->printTaskerNotify("Tag `" + (TASKER_TAG_PREFIX + tag) + "` is not defined!");
 		this->printTaskerInfo("Advice", "You can use `--tags` to list all tags defined.");
-		this->printTaskerInfo("Advice", "You can use `--addtag {tagname}` to add a new tag.");
+		this->printTaskerInfo("Advice", "You can use `--newtag {tagname}` to define a new tag.");
 	}
 	return true;
 }

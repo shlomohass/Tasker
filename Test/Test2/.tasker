@@ -2,7 +2,18 @@
     "desc": "A great project I created now",
     "name": "Test project 1",
     "note": {},
-    "tags": [],
+    "tags": [
+        {
+            "design": {
+                "desc": "All design work"
+            }
+        },
+        {
+            "bug": {
+                "desc": "mark as a bug killing assignment"
+            }
+        }
+    ],
     "tasker": {
         "allowdelete": true,
         "enableloads": true,
@@ -53,7 +64,8 @@
             ],
             "status": 0.28999999165535,
             "tagged": [
-                ""
+                "",
+                "design"
             ],
             "task": "my first task",
             "updated": "09-12-2017 21:02:42"
@@ -79,7 +91,8 @@
             ],
             "status": 0.379999995231628,
             "tagged": [
-                ""
+                "",
+                "design"
             ],
             "task": "design logo",
             "updated": "09-12-2017 21:05:32"

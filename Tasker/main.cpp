@@ -51,7 +51,6 @@ void setMainArgs(cm::ArgvParser *cmd, bool *run_init, bool *enable_debug, bool *
 	return;
 }
 
-
 int main(int argc, char** argv) {
 
 	#ifdef PLATOTHER
@@ -70,6 +69,11 @@ int main(int argc, char** argv) {
 	bool enable_loads	= true;
 	bool run_init		= false;
 
+	//Additional options struct:
+	struct moreOpt {
+		std::string taskIdStr;
+	} moreopt;
+
 	cmd.addErrorCode(exitCodeOk,	"Success"	);
 	cmd.addErrorCode(exitCodeError, "Error"		);
 	cmd.setIntroductoryDescription("Tasker Manager - version: " + std::string(TASKER_VERSION) + " - By: " + std::string(TASKER_AUTHOR));
@@ -78,19 +82,21 @@ int main(int argc, char** argv) {
 	cmd.defineOption("init",	"Initialize a `Tasker` object in the current path", cm::ArgvParser::NoOptionAttribute);
 	cmd.defineOption("debug",	"Enable debug mode.", cm::ArgvParser::NoOptionAttribute);
 	
-	cmd.defineOption("task",	"Add a new task -> Will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
-	
+	cmd.defineOption("task",	"Add a new task -> Will ask for more options interactivly.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("taskid",  "Defines a task id to target -> is used with several procedures.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("report",	"Report progress to a task -> Will ask for more options and settings interactivly", cm::ArgvParser::OptionRequiresValue);
 	
 	cmd.defineOption("refactor", "Refactor a Task or a report progress of a task Expect integer that represents the task id or a float that represets the report.", cm::ArgvParser::OptionRequiresValue);
 
 	cmd.defineOption("cancel",	"Cancel a task -> Will be reserved and later could be activated.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("enable",	"Enable a canceled task.", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("update",	"Update a task -> Will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("deltask", "Delete a task -> Will completely delete from records", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("update",	"Update a task -> Will ask for more options interactivly.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("deltask", "Delete a task -> Will completely delete from records.", cm::ArgvParser::OptionRequiresValue);
 
 	cmd.defineOption("tags",		"Show all defined tags", cm::ArgvParser::NoOptionAttribute);
-	cmd.defineOption("addtag",		"Add a new tag -> Will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("addtag",		"Tag a task -> Expect a defined tag name, Optional add --taskid {integer}.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("remtag",		"Tag a task -> Expect a defined tag name, Optional add --taskid {integer}.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("newtag",		"Add a new tag -> Will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("deltag",		"Delete a tag -> Will remove the tag from tasks also.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("updatetag",	"Update a tag credentials -> Will ask for more options interactivly.", cm::ArgvParser::OptionRequiresValue);
 
@@ -182,6 +188,13 @@ int main(int argc, char** argv) {
 			//Get local options:
 			Task->parseOptions(cmd.foundOption("discolor"));
 		}
+		//Parse Additional Options:
+		if (cmd.foundOption("taskid")) {
+			//Get a task id string:
+			moreopt.taskIdStr =  cmd.optionValue("taskid");
+		} else {
+			moreopt.taskIdStr = "";
+		}
 		//Handle set tasks:
 		if (cmd.foundOption("task")) {
 			// Write new task:
@@ -269,14 +282,44 @@ int main(int argc, char** argv) {
 		}
 		//Handle tags show:
 		if (cmd.foundOption("tags")) {
-			// Expose the users list:
+			// Expose the tags list:
 			Task->showtags();
 		}
-		//Handle add tag:
+		//Handle add tag to a task:
 		if (cmd.foundOption("addtag")) {
-			// Add new user:
+			// Add a tag to task:
 			std::string tag = cmd.optionValue("addtag");
-			if (!Task->addtag(tag)) {
+			if (!Task->addtag(tag, moreopt.taskIdStr)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Tag could not be found or input is invalid.");
+				exit(exitCodeError);
+			}
+			if (!Task->writeObj(true)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Could not write to Tasker object.");
+				exit(exitCodeError);
+			}
+		}
+		//Handle removing a tag from task:
+		if (cmd.foundOption("remtag")) {
+			// Remove a tag:
+			std::string tag = cmd.optionValue("remtag");
+			if (!Task->remtag(tag, moreopt.taskIdStr)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Tag could not be found or input is invalid.");
+				exit(exitCodeError);
+			}
+			if (!Task->writeObj(true)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Could not write to Tasker object.");
+				exit(exitCodeError);
+			}
+		}
+		//Handle defining a new tag:
+		if (cmd.foundOption("newtag")) {
+			// Add new tag:
+			std::string tag = cmd.optionValue("newtag");
+			if (!Task->newtag(tag)) {
 				Task->printTaskerNotify("Oups!");
 				Task->printTaskerInfo("Error", "Tag name must be at least 2 chars long without spaces and not a reserved name.");
 				Task->printTaskerInfo("Info", "Reserved names: " + Task->getReservedTagNames(", ") + ".");
@@ -360,7 +403,7 @@ int main(int argc, char** argv) {
 		}
 		//Handle update user:
 		if (cmd.foundOption("updateuser")) {
-			// Delete user:
+			// Update user creds:
 			std::string user = cmd.optionValue("updateuser");
 			if (!Task->updateuser(user)) {
 				Task->printTaskerNotify("Oups!");

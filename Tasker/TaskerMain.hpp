@@ -67,6 +67,7 @@ namespace tasker {
 		std::string createDateFromInts(int day, int mon, int year, int hour, int min, int sec);
 		bool isFloat(std::string str);
 		float getFloat(std::string str);
+		std::vector<int> parseTaskListStr(std::string str);
 
 		//colors:
 		std::string getcolor(const std::string& which);
@@ -95,6 +96,7 @@ namespace tasker {
 		int         getLoad(const std::string& err);
 		std::string getStrTag(const std::string& err);
 		std::string getStrVersion(bool& push_plan, bool allowskip, const std::string& versionForSkip);
+
 		//Task Operations:
 		bool setNewTask(const std::string& strTask);
 		bool reportToTask(const std::string& strTask);
@@ -104,7 +106,9 @@ namespace tasker {
 
 		//General Operations:
 		void showtags();
-		bool addtag(const std::string& _tag);
+		bool addtag(const std::string& _tag, const std::string& strTask);
+		bool remtag(const std::string& _tag, const std::string& strTask);
+		bool newtag(const std::string& _tag);
 		bool deltag(const std::string& _tag);
 		bool updatetag(const std::string& _tag);
 
