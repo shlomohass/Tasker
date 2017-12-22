@@ -4,13 +4,13 @@
     "note": {},
     "tags": [
         {
-            "design": {
-                "desc": "All design work"
+            "bug": {
+                "desc": "mark as a bug killing assignment"
             }
         },
         {
-            "bug": {
-                "desc": "mark as a bug killing assignment"
+            "future": {
+                "desc": "all future versions tasks"
             }
         }
     ],
@@ -64,8 +64,8 @@
             ],
             "status": 0.28999999165535,
             "tagged": [
-                "",
-                "design"
+                "bug",
+                "future"
             ],
             "task": "my first task",
             "updated": "09-12-2017 21:02:42"
@@ -91,11 +91,50 @@
             ],
             "status": 0.379999995231628,
             "tagged": [
-                "",
-                "design"
+                "bug",
+                "future"
             ],
             "task": "design logo",
             "updated": "09-12-2017 21:05:32"
+        },
+        {
+            "cancel": false,
+            "created": "22-12-2017 16:11:47",
+            "load": 2,
+            "plan": [
+                {
+                    "date": "22-12-2017 23:59:00",
+                    "user": "shlomi",
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "bug"
+            ],
+            "task": "number three task",
+            "updated": "22-12-2017 16:11:47"
+        },
+        {
+            "cancel": false,
+            "created": "22-12-2017 16:19:44",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "22-12-2017 23:59:00",
+                    "user": "",
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "bug",
+                "future"
+            ],
+            "task": "A number 4 task which i made",
+            "updated": "22-12-2017 16:19:44"
         }
     ],
     "types": {

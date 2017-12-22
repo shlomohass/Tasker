@@ -846,7 +846,7 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 		{ "report",		""					} 
 	};
 	taskObj["tagged"] = json::array();
-	taskObj["tagged"].push_back(tagged_as);
+	if (tagged_as != "") taskObj["tagged"].push_back(tagged_as);
 	taskObj["plan"] = json::array(); 
 	taskObj["plan"].push_back({ 
 		{ "v" ,			trim_copy(plan_version) },
