@@ -91,7 +91,6 @@
             ],
             "status": 0.379999995231628,
             "tagged": [
-                "bug",
                 "future"
             ],
             "task": "design logo",
@@ -119,22 +118,34 @@
         {
             "cancel": false,
             "created": "22-12-2017 16:19:44",
-            "load": 1,
+            "load": 2,
             "plan": [
                 {
                     "date": "22-12-2017 23:59:00",
                     "user": "",
                     "v": "1.0.0"
+                },
+                {
+                    "date": "22-12-2017 23:59:00",
+                    "user": "shlomi",
+                    "v": "1.0.0"
                 }
             ],
-            "report": [],
-            "status": 0.0,
+            "report": [
+                {
+                    "by": "shlomi",
+                    "date": "22-12-2017 21:15:45",
+                    "note": "Its working very good now!!!",
+                    "status": 0.349999994039536
+                }
+            ],
+            "status": 0.349999994039536,
             "tagged": [
-                "bug",
-                "future"
+                "future",
+                "bug"
             ],
             "task": "A number 4 task which i made",
-            "updated": "22-12-2017 16:19:44"
+            "updated": "22-12-2017 21:14:46"
         }
     ],
     "types": {

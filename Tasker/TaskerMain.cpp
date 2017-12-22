@@ -1200,7 +1200,7 @@ bool TaskerMain::addtag(const std::string& _tag, const std::string& strTask) {
 	//Parse the task list + validate Ids:
 	taskList = this->parseTaskListStr(taskListStr);
 	if (taskList.empty()) {
-		this->printTaskerNotify("Can't tag! The task/s you types are not set or canceled.");
+		this->printTaskerNotify("Can't tag! The task/s id's you typed are not set or canceled.");
 		this->printTaskerInfo("Advice", "You can use `--listall 2` to list all active tasks.");
 	}
 	//Validate the tag:
@@ -1236,7 +1236,71 @@ bool TaskerMain::addtag(const std::string& _tag, const std::string& strTask) {
 	return true;
 }
 bool TaskerMain::remtag(const std::string& _tag, const std::string& strTask) {
-	return false;
+
+	std::string tag = this->trim_gen(trim_copy(_tag), '"');
+	std::string taskListStr;
+	std::vector<int> taskList;
+
+	std::cout << std::endl
+		<< " > Removing tag: "
+		<< this->usecolor() << this->getcolor("tag")
+		<< TASKER_TAG_PREFIX << tag
+		<< this->usecolor() << this->getcolor("reset");
+
+	if (strTask == "") {
+		std::cout << std::endl << std::endl
+			<< "  1. Which task to remove tag from (list of integers): ";
+		std::getline(std::cin, taskListStr);
+		taskListStr = this->trim_gen(trim_copy(taskListStr), '"');
+	}
+	else {
+		taskListStr = this->trim_gen(trim_copy(strTask), '"');
+	}
+
+	//Remove spaces:
+	std::string::iterator end_pos = std::remove(taskListStr.begin(), taskListStr.end(), ' ');
+	taskListStr.erase(end_pos, taskListStr.end());
+
+	//Parse the task list + validate Ids:
+	taskList = this->parseTaskListStr(taskListStr);
+	if (taskList.empty()) {
+		this->printTaskerNotify("Can't remove tags! The task/s id's you typed are not set or canceled.");
+		this->printTaskerInfo("Advice", "You can use `--listall 2` to list all active tasks.");
+	}
+	//Validate the tag:
+	if (this->thestruct["tags"].size() < 1) return false;
+	int tagindex = this->findDefinedTag(tag);
+
+	int  counter_tags = 0;
+	if (tagindex != -1) {
+		for (const auto &taskid : taskList)
+		{
+			int remFlag = -1;
+			json deftags = this->thestruct["tasks"].at(taskid).at("tagged");
+			if (!deftags.empty()) {
+				for (int i = 0; i < deftags.size(); i++) {
+					if (deftags.at(i) == tag)
+						remFlag = i;
+				}
+			}
+			if (remFlag > -1) {
+				this->thestruct["tasks"].at(taskid).at("tagged").erase(
+					this->thestruct["tasks"].at(taskid).at("tagged").begin() + remFlag
+				);
+				counter_tags++;
+			}
+		}
+		//print results:
+		this->printTaskerNotify("Removed Tags from tasks successfully!");
+		this->printTaskerInfo("Info", "Affected: " + std::to_string(counter_tags) + " Tasks.");
+
+	}
+	else {
+		this->printTaskerNotify("Tag `" + (TASKER_TAG_PREFIX + tag) + "` is not defined.");
+		this->printTaskerInfo("Advice", "You can use `--tags` to list all tags defined.");
+	}
+	std::cout << std::endl;
+	return true;
 }
 bool TaskerMain::newtag(const std::string& _tag)
 {
@@ -1759,21 +1823,28 @@ bool TaskerMain::updateuser(const std::string& _user)
 	return true;
 }
 
-bool TaskerMain::list(const std::string& level, const std::string& which) {
-	return this->list(level, which, "");
+bool TaskerMain::list(const std::string& _level, const std::string& which) {
+	return this->list(_level, which, "");
 }
-bool TaskerMain::list(const std::string& level, const std::string& which, const std::string& _filter) {
+bool TaskerMain::list(const std::string& _level, const std::string& which, const std::string& _filter) {
 
 	int theLevel = -1;
 	std::vector<std::string> users;
 	std::vector<std::string> tags;
 	std::string filter = trim_copy(_filter);
+	std::string level = trim_copy(_level);
 	int counter_found = 0;
 
-	//Validate the index: 
-	try { theLevel = stoi(level); }
-	catch (...) { return false; }
-	if (theLevel < 1) return false;
+	//Set the default level: 
+	if (level == "" || !this->onlyDigits(level)) {
+		level = TASKER_BASELIST_LEVEL;
+	}
+
+	//Parse the level:
+	theLevel = stoi(level);
+	if (theLevel < 1 || theLevel > 2) {
+		theLevel = stoi(std::string(TASKER_BASELIST_LEVEL));
+	}
 
 	//Print main
 	std::cout << std::endl << " > Listing matched tasks: " << std::endl;

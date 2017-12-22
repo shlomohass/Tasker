@@ -162,6 +162,20 @@ ArgvParser::parse(int _argc, char ** _argv)
 					}
 					value = temp; // assign value
 				}
+				// If its an optional value option:
+				if ((option2attribute.find(key)->second & OptionalValue) && value.empty())
+				{
+					//Make sure we are not missing the value:
+					if (i + 1 < _argc) // are there arguments left?
+					{
+						string temp = _argv[i + 1]; // get the next element
+						if (!isValidOptionString(temp))
+						{
+							++i; // increase counter now that we moved forward
+							value = temp; // assign value
+						}
+					}
+				}
 				// add option-value map entry
 				option2value[key] = value;
 			}
@@ -237,6 +251,19 @@ ArgvParser::parse(int _argc, char ** _argv)
 							// add option-value map entry
 							option2value[key] = temp;
 
+						}
+						else if ((option2attribute.find(key)->second & OptionalValue) && value.empty())
+						{
+							//Make sure we are not missing the value:
+							if (i + 1 < _argc) // are there arguments left?
+							{
+								string temp = _argv[i + 1]; // get the next element
+								if (!isValidOptionString(temp))
+								{
+									++i; // increase counter now that we moved forward
+									option2value[key] = temp;
+								}
+							}
 						}
 						else // no value needed
 						{

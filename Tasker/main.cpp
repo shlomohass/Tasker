@@ -86,6 +86,7 @@ int main(int argc, char** argv) {
 	cmd.defineOption("taskid",  "Defines a task id to target -> is used with several procedures.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("report",	"Report progress to a task -> Will ask for more options and settings interactivly", cm::ArgvParser::OptionRequiresValue);
 	
+	cmd.defineOption("show", "Show in detail a single task information -> Expects task ID.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("refactor", "Refactor a Task or a report progress of a task Expect integer that represents the task id or a float that represets the report.", cm::ArgvParser::OptionRequiresValue);
 
 	cmd.defineOption("cancel",	"Cancel a task -> Will be reserved and later could be activated.", cm::ArgvParser::OptionRequiresValue);
@@ -106,7 +107,8 @@ int main(int argc, char** argv) {
 	cmd.defineOption("deluser",		"Delete a user -> Will remove the user from tasks also.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("updateuser",	"Update a user credentials -> Will ask for more options interactivly.", cm::ArgvParser::OptionRequiresValue);
 
-	cmd.defineOption("listall",		"List all tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listtask",	"List selected tasks -> Expect an integer or a comma separated list of them.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listall",		"List all tasks -> Expect an integer for display level", cm::ArgvParser::OptionalValue);
 	cmd.defineOption("listdone",	"List all closed / finished tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("listcancel",	"List all canceled tasks.", cm::ArgvParser::NoOptionAttribute);
 	cmd.defineOption("listuser",	"List user tasks -> Expects the users string to be shown", cm::ArgvParser::OptionRequiresValue);
@@ -134,7 +136,7 @@ int main(int argc, char** argv) {
 	cmd.defineOptionAlternative("listuser",		"lu");
 	cmd.defineOptionAlternative("listtag",		"ltg");
 	cmd.defineOptionAlternative("listopen",		"lo");
-	cmd.defineOptionAlternative("listtoday",	"lt");
+	cmd.defineOptionAlternative("listtask",		"lt");
 
 	int result = cmd.parse(argc, argv);
 
@@ -234,6 +236,7 @@ int main(int argc, char** argv) {
 				exit(exitCodeError);
 			}
 		}
+
 		//Handle delete tasks:
 		if (cmd.foundOption("deltask")) {
 			std::string taskId = cmd.optionValue("deltask");
@@ -418,7 +421,8 @@ int main(int argc, char** argv) {
 			}
 		}
 		//Handle lists:
-		if (cmd.foundOption("listall")		||
+		if (cmd.foundOption("listtask")		||
+			cmd.foundOption("listall")		||
 			cmd.foundOption("listdone")		||
 			cmd.foundOption("listcancel")	||
 			cmd.foundOption("listuser")		||
@@ -430,6 +434,7 @@ int main(int argc, char** argv) {
 			std::string listlevel; 
 			std::string which;
 			std::string filter = "";
+			//default list level
 			//Grab:
 			if (cmd.foundOption("listall")) {
 				listlevel = cmd.optionValue("listall");

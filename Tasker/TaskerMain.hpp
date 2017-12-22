@@ -117,8 +117,8 @@ namespace tasker {
 		bool adduser(const std::string& _user);
 		bool deluser(const std::string& _user);
 		bool updateuser(const std::string& _user);
-		bool list(const std::string& level, const std::string& which);
-		bool list(const std::string& level, const std::string& which, const std::string& filter);
+		bool list(const std::string& _level, const std::string& which);
+		bool list(const std::string& _level, const std::string& which, const std::string& filter);
 
 		virtual ~TaskerMain();
 	};

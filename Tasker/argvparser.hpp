@@ -88,7 +88,8 @@ namespace CommandLineProcessing
 		{
 			NoOptionAttribute = 0x00,
 			OptionRequiresValue = 0x01,
-			OptionRequired = 0x02
+			OptionRequired = 0x02,
+			OptionalValue = 0x04
 		};
 		/** Return values of the parser. */
 		enum

@@ -36,6 +36,13 @@
 #define TASKER_OBJNAME ".tasker"
 #endif
 
+#ifndef TASKER_BASELIST_LEVEL
+/**
+* Set Default list view depth level -> 1,2
+*/
+#define TASKER_BASELIST_LEVEL "2" 
+#endif
+
 #ifndef TASKER_NAMES_PREFIX
 /**
 * Set Default obj name
