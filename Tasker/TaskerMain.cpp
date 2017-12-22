@@ -1829,8 +1829,7 @@ bool TaskerMain::list(const std::string& _level, const std::string& which) {
 bool TaskerMain::list(const std::string& _level, const std::string& which, const std::string& _filter) {
 
 	int theLevel = -1;
-	std::vector<std::string> users;
-	std::vector<std::string> tags;
+	std::vector<std::string> filterCon;
 	std::string filter = trim_copy(_filter);
 	std::string level = trim_copy(_level);
 	int counter_found = 0;
@@ -1850,30 +1849,18 @@ bool TaskerMain::list(const std::string& _level, const std::string& which, const
 	std::cout << std::endl << " > Listing matched tasks: " << std::endl;
 
 	//Before start check if we want to parse a filter first:
-	if (which == "user") {
-		std::string theusersstr = filter;
-		std::string deli = TASKER_SPLIT_DELI;
-		size_t pos = 0;
-		std::string token;
-		while ((pos = theusersstr.find(deli)) != std::string::npos) {
-			token = theusersstr.substr(0, pos);
-			theusersstr.erase(0, pos + deli.length());
-			users.push_back(token);
+	if (which == "task" || which == "user" || which == "tag") {
+		std::string filterstr = filter;
+		std::string filterdeli = TASKER_SPLIT_DELI;
+		size_t		filterstrpos = 0;
+		std::string tokenfound;
+		while ((filterstrpos = filterstr.find(filterdeli)) != std::string::npos) {
+			tokenfound = filterstr.substr(0, filterstrpos);
+			filterstr.erase(0, filterstrpos + filterdeli.length());
+			filterCon.push_back(tokenfound);
 		}
-		if (users.size() == 0 || theusersstr.length() > 0)
-			users.push_back(theusersstr);
-	} else if (which == "tag") {
-		std::string thetagsstr = filter;
-		std::string deli = TASKER_SPLIT_DELI;
-		size_t pos = 0;
-		std::string token;
-		while ((pos = thetagsstr.find(deli)) != std::string::npos) {
-			token = thetagsstr.substr(0, pos);
-			thetagsstr.erase(0, pos + deli.length());
-			tags.push_back(token);
-		}
-		if (tags.size() == 0 || thetagsstr.length() > 0)
-			tags.push_back(thetagsstr);
+		if (filterCon.size() == 0 || filterstr.length() > 0)
+			filterCon.push_back(filterstr);
 	}
 	//Print tasks
 	for (unsigned i = 0; i < this->thestruct["tasks"].size(); i++) {
@@ -1903,11 +1890,15 @@ bool TaskerMain::list(const std::string& _level, const std::string& which, const
 				}
 			}
 		}
+		if (which == "task") {
+			std::string strid = std::to_string((i + 1));
+			if (std::find(filterCon.begin(), filterCon.end(), strid) == filterCon.end()) {
+				continue;
+			}
+		}
 		if (which == "user") {
 			std::string theuser = this->thestruct["tasks"].at(i).at("plan").back().at("user");
-			if (std::find(users.begin(), users.end(), theuser) != users.end()) {
-
-			} else {
+			if (std::find(filterCon.begin(), filterCon.end(), theuser) == filterCon.end()) {
 				continue;
 			}
 		}
@@ -1919,7 +1910,7 @@ bool TaskerMain::list(const std::string& _level, const std::string& which, const
 				t << it.value();
 				ts = t.str();
 				ts.erase(std::remove(ts.begin(), ts.end(), '"'), ts.end());
-				if (std::find(tags.begin(), tags.end(), ts) != tags.end())
+				if (std::find(filterCon.begin(), filterCon.end(), ts) != filterCon.end())
 					tagtest = true;
 			}
 			if (!tagtest) {

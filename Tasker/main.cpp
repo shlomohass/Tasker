@@ -109,12 +109,12 @@ int main(int argc, char** argv) {
 
 	cmd.defineOption("listtask",	"List selected tasks -> Expect an integer or a comma separated list of them.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("listall",		"List all tasks -> Expect an integer for display level", cm::ArgvParser::OptionalValue);
-	cmd.defineOption("listdone",	"List all closed / finished tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listdone",	"List all closed / finished tasks -> Expect an integer for display level", cm::ArgvParser::OptionalValue);
 	cmd.defineOption("listcancel",	"List all canceled tasks.", cm::ArgvParser::NoOptionAttribute);
 	cmd.defineOption("listuser",	"List user tasks -> Expects the users string to be shown", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("listtag",		"List tagged tasks -> Expects the tags string to be shown", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("listopen",	"List all open tasks -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("listtoday",	"List tasks that are due to today -> Expect an integer for display level", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listopen",	"List all open tasks -> Expect an integer for display level", cm::ArgvParser::OptionalValue);
+	cmd.defineOption("listtoday",	"List tasks that are due to today -> Expect an integer for display level", cm::ArgvParser::OptionalValue);
 	
 	cmd.defineOption("discolor",		"Disable colored console text for one execution only.", cm::ArgvParser::NoOptionAttribute);
 	cmd.defineOption("set_optcolor",	"Set option whether use colored console text. Expect true|false OR 1|0", cm::ArgvParser::OptionRequiresValue);
@@ -434,9 +434,13 @@ int main(int argc, char** argv) {
 			std::string listlevel; 
 			std::string which;
 			std::string filter = "";
-			//default list level
+
 			//Grab:
-			if (cmd.foundOption("listall")) {
+			if (cmd.foundOption("listtask")) {
+				listlevel = "2";
+				filter = cmd.optionValue("listtask");
+				which = "task";
+			} else if (cmd.foundOption("listall")) {
 				listlevel = cmd.optionValue("listall");
 				which = "all";
 			} else if (cmd.foundOption("listdone")) {
