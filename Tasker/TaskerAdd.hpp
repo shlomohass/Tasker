@@ -19,8 +19,17 @@ namespace tasker
 
 	enum ExecCodes { SUCCESS, GENEROOR };
 
-	const std::vector<std::string> reserve_user_names = { "default", "unknown" };
-	const std::vector<std::string> reserve_tag_names  = { "default", "not tagged" };
+	const std::vector<std::string> reserve_user_names = { "default", "unknown", "?", "@", "#" };
+	const std::vector<std::string> reserve_tag_names  = { "default", "not tagged", "?", "@", "#" };
+
+	struct moreOpt {
+		std::string taskIdStr;
+		bool showclosed;
+		bool use_colors;
+		bool enable_loads;
+		bool del_items;
+		std::string detailsLevel;
+	};
 }
 
 #endif /* TaskerAdd_hpp */

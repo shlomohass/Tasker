@@ -38,7 +38,14 @@ inline void _pclose(FILE* file) {
 
 namespace cm = CommandLineProcessing;
 
-void setMainArgs(cm::ArgvParser *cmd, bool *run_init, bool *enable_debug, bool *use_colors) {
+void setMainArgs(
+	cm::ArgvParser *cmd, 
+	bool *run_init, 
+	bool *enable_debug, 
+	bool *use_colors, 
+	bool *showclosed, 
+	bool *enable_loads
+) {
 	if (cmd->foundOption("debug")) {
 		*enable_debug = true;
 	}
@@ -48,6 +55,16 @@ void setMainArgs(cm::ArgvParser *cmd, bool *run_init, bool *enable_debug, bool *
 	if (cmd->foundOption("discolor")) {
 		*use_colors = false;
 	}
+	else {
+		*use_colors = true;
+	}
+	if (cmd->foundOption("showclosed")) {
+		*showclosed = true;
+	}
+	else {
+		*showclosed = false;
+	}
+	*enable_loads = true;
 	return;
 }
 
@@ -65,14 +82,10 @@ int main(int argc, char** argv) {
 	std::string filepath = "";
 	cm::ArgvParser cmd;
 	bool enable_debug	= TASKER_DEBUG;
-	bool use_colors		= true;
-	bool enable_loads	= true;
 	bool run_init		= false;
 
 	//Additional options struct:
-	struct moreOpt {
-		std::string taskIdStr;
-	} moreopt;
+	tasker::moreOpt moreopt;
 
 	cmd.addErrorCode(exitCodeOk,	"Success"	);
 	cmd.addErrorCode(exitCodeError, "Error"		);
@@ -107,15 +120,17 @@ int main(int argc, char** argv) {
 	cmd.defineOption("deluser",		"Delete a user -> Will remove the user from tasks also.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("updateuser",	"Update a user credentials -> Will ask for more options interactivly.", cm::ArgvParser::OptionRequiresValue);
 
-	cmd.defineOption("listtask",	"List selected tasks -> Expect an integer or a comma separated list of them.", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("listall",		"List all tasks -> Expect an integer for display level", cm::ArgvParser::OptionalValue);
-	cmd.defineOption("listdone",	"List all closed / finished tasks -> Expect an integer for display level", cm::ArgvParser::OptionalValue);
-	cmd.defineOption("listcancel",	"List all canceled tasks.", cm::ArgvParser::NoOptionAttribute);
-	cmd.defineOption("listuser",	"List user tasks -> Expects the users string to be shown", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("listtag",		"List tagged tasks -> Expects the tags string to be shown", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("listopen",	"List all open tasks -> Expect an integer for display level", cm::ArgvParser::OptionalValue);
-	cmd.defineOption("listtoday",	"List tasks that are due to today -> Expect an integer for display level", cm::ArgvParser::OptionalValue);
+	cmd.defineOption("listtask",	"List selected tasks -> Expect an integer or a comma separated list of them. Combine with --details {0,1,2}", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listall",		"List all tasks -> Expect an integer for details level {0,1,2}", cm::ArgvParser::OptionalValue);
+	cmd.defineOption("listdone",	"List all closed / finished tasks -> Expect an integer for details level", cm::ArgvParser::OptionalValue);
+	cmd.defineOption("listcancel",	"List all canceled tasks. Combine with --details {0,1,2}", cm::ArgvParser::NoOptionAttribute);
+	cmd.defineOption("listuser",	"List user tasks -> Expects the users string to be shown. Combine with --details {0,1,2}", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listtag",		"List tagged tasks -> Expects the tags string to be shown. Combine with --details {0,1,2}", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("listopen",	"List all open tasks -> Expect an integer for display level {0,1,2}", cm::ArgvParser::OptionalValue);
+	cmd.defineOption("listtoday",	"List tasks that are due to today -> Expect an integer for display level {0,1,2}", cm::ArgvParser::OptionalValue);
+	cmd.defineOption("details",		"List details level	-> Expect an integer for details display level {0,1,2}", cm::ArgvParser::OptionalValue);
 	
+	cmd.defineOption("showclosed",		"Dont filter out canceled or closed tasks.", cm::ArgvParser::NoOptionAttribute);
 	cmd.defineOption("discolor",		"Disable colored console text for one execution only.", cm::ArgvParser::NoOptionAttribute);
 	cmd.defineOption("set_optcolor",	"Set option whether use colored console text. Expect true|false OR 1|0", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("set_optdelete",	"Set option whether to allow task delete. Expect true|false OR 1|0", cm::ArgvParser::OptionRequiresValue);
@@ -130,6 +145,7 @@ int main(int argc, char** argv) {
 	cmd.defineOptionAlternative("enable",		"e"	);
 	cmd.defineOptionAlternative("update",		"u");
 	cmd.defineOptionAlternative("deltask",		"dt");
+	cmd.defineOptionAlternative("details",		"d");
 	cmd.defineOptionAlternative("listall",		"la");
 	cmd.defineOptionAlternative("listdone",		"ld");
 	cmd.defineOptionAlternative("listcancel",	"lc");
@@ -151,7 +167,14 @@ int main(int argc, char** argv) {
 		}
 		exitCode = 1;
 	} else {
-		setMainArgs(&cmd, &run_init, &enable_debug, &use_colors);
+		setMainArgs(
+			&cmd, 
+			&run_init, 
+			&enable_debug, 
+			&moreopt.use_colors, 
+			&moreopt.showclosed, 
+			&moreopt.enable_loads
+		);
 	}
 
 	//Help is requested?
@@ -159,8 +182,24 @@ int main(int argc, char** argv) {
 		exit(exitCode);
 	}
 
+	//Parse Additional Options - does it has a task id predefined ?
+	if (cmd.foundOption("taskid")) {
+		//Get a task id string:
+		moreopt.taskIdStr = cmd.optionValue("taskid");
+	}
+	else {
+		moreopt.taskIdStr = "";
+	} // does it has a detail predefined ?
+	if (cmd.foundOption("details")) {
+		//Get the details level string:
+		moreopt.detailsLevel = cmd.optionValue("details");
+	}
+	else {
+		moreopt.detailsLevel = "";
+	}
+
 	//Main Tasker Object:
-	tasker::TaskerMain* Task = new tasker::TaskerMain(use_colors);
+	tasker::TaskerMain* Task = new tasker::TaskerMain(moreopt);
 	Task->setPath();
 	bool hasobj = Task->loadBase();
 
@@ -189,13 +228,6 @@ int main(int argc, char** argv) {
 		} else {
 			//Get local options:
 			Task->parseOptions(cmd.foundOption("discolor"));
-		}
-		//Parse Additional Options:
-		if (cmd.foundOption("taskid")) {
-			//Get a task id string:
-			moreopt.taskIdStr =  cmd.optionValue("taskid");
-		} else {
-			moreopt.taskIdStr = "";
 		}
 		//Handle set tasks:
 		if (cmd.foundOption("task")) {
@@ -251,7 +283,7 @@ int main(int argc, char** argv) {
 				exit(exitCodeError);
 			}
 		}
-		//Handle update tasks:
+		//Handle refactor tasks:
 		if (cmd.foundOption("refactor")) {
 			std::string taskId = cmd.optionValue("refactor");
 			if (!Task->refactorTask(taskId)) {
@@ -465,7 +497,10 @@ int main(int argc, char** argv) {
 				listlevel = cmd.optionValue("listtoday");
 				which = "today";
 			}
-			
+			//OverWrite list level if set:
+			if (moreopt.detailsLevel != "") {
+				listlevel = moreopt.detailsLevel;
+			}
 			//Expose the list:
 			if (!Task->list(listlevel, which, filter)) {
 				Task->printTaskerNotify("Oups!");

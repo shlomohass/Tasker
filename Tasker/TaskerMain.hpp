@@ -9,9 +9,12 @@
 #ifndef TaskerMain_hpp
 #define TaskerMain_hpp
 
-#include "json.hpp"
+#include "TaskerAdd.hpp"
+#include "json3.4.0.hpp"
 #include <string>
 #include <vector>
+#include <iomanip>      // std::get_time
+#include <time.h>
 
 namespace tasker {
 
@@ -25,10 +28,8 @@ namespace tasker {
 	};
 	class TaskerMain
 	{
-		//Flags:
-		bool color;
-		bool load;
-		bool delitems;
+		//Options:
+		tasker::moreOpt opt;
 
 		//Containers:
 		std::string  basepath;
@@ -37,7 +38,7 @@ namespace tasker {
 
 	public:
 
-		TaskerMain(bool _color);
+		TaskerMain(tasker::moreOpt moreopt);
 		void setPath();
 		void _basepath(std::string path);
 		void _fullpath(std::string path);
@@ -78,23 +79,27 @@ namespace tasker {
 
 		//Helpers
 		float normalizeStatus(std::string str);
+		std::string getUserString(std::vector<std::string>& users, std::string prefix, bool addNotAssigned);
 		std::time_t getEpochTime(const std::wstring& dateTime);
+		bool findDefinedUser(const std::string& user, bool multi);
 		int findDefinedUser(const std::string& user);
+		bool findDefinedTag(const std::string& tag, bool multi);
 		int findDefinedTag(const std::string& tag);
 		std::string getDefindUserName(int index);
 		std::string getReservedUserNames(const std::string& deli);
 		std::string getReservedTagNames(const std::string& deli);
 		std::string trim_gen(const std::string& str, const char rem);
+		void cleanString(std::string& str, const std::vector<char>& rem);
 		std::vector<std::string> splitString(const std::string &text, char sep);
 		exists findRow(const std::string& strId);
 		bool onlyDigits(const std::string str);
 
 		//Console get:
-		std::string getUserName(bool& push_plan, bool allowskip, int taskIdForSkip, const std::string& userFixStr);
+		std::vector<std::string> getUserName(bool& push_plan, bool allowskip, int taskIdForSkip, const std::string& userFixStr);
 		std::string getStrMessage(const std::string& err);
 		std::string getStrDate(const std::string& err, bool allowSkip);
 		int         getLoad(const std::string& err);
-		std::string getStrTag(const std::string& err);
+		std::vector<std::string> getTags(const std::string& err);
 		std::string getStrVersion(bool& push_plan, bool allowskip, const std::string& versionForSkip);
 
 		//Task Operations:

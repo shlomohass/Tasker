@@ -10,7 +10,7 @@
 #include "SETTASKER.hpp"
 #include "TaskerAdd.hpp"
 
-#include <time.h>
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -78,9 +78,9 @@ static inline std::string trim_copy(std::string s) {
 }
 
 
-TaskerMain::TaskerMain(bool _color)
+TaskerMain::TaskerMain(tasker::moreOpt moreopt)
 {
-	this->color = _color;
+	this->opt = moreopt;
 	this->basepath = "notset";
 	this->fullpath = "notset";
 }
@@ -137,13 +137,13 @@ void TaskerMain::parseOptions(bool colors_override)
 {
 	//Set color mode:
 	if (!colors_override) {
-		this->color = this->thestruct["tasker"].at("usecolors");
+		this->opt.use_colors = this->thestruct["tasker"].at("usecolors");
 	}
 	//Set load modes:
-	this->load = this->thestruct["tasker"].at("enableloads");
+	this->opt.enable_loads = this->thestruct["tasker"].at("enableloads");
 
 	//Set delete flag:
-	this->delitems = this->thestruct["tasker"].at("allowdelete");
+	this->opt.del_items = this->thestruct["tasker"].at("allowdelete");
 }
 bool TaskerMain::setOption(const std::string& which, const std::string& state)
 {
@@ -408,7 +408,7 @@ std::string TaskerMain::getcolor(const std::string& which, float fvalue)
 }
 std::string TaskerMain::getcolor(const std::string& which, float value, const std::string& svalue)
 {
-	if (!this->color) return "";
+	if (!this->opt.use_colors) return "";
 	if (which == "reset") {
 		return TASKER_COLOR_RESET;
 	}
@@ -467,7 +467,7 @@ std::string TaskerMain::getcolor(const std::string& which, float value, const st
 }
 char TaskerMain::usecolor()
 {
-	if (!this->color) return '\0';
+	if (!this->opt.use_colors) return '\0';
 	return '\033';
 }
 
@@ -482,6 +482,26 @@ float TaskerMain::normalizeStatus(std::string str) {
 	}
 	return task_status_num;
 }
+
+std::string TaskerMain::getUserString(std::vector<std::string>& users, std::string prefix, bool addNotAssigned) {
+
+	std::stringstream users_string;
+	std::string return_string;
+	for (auto it = users.begin(); it != users.end(); ++it)
+	{
+		users_string << prefix << *it;
+		if (std::next(it) != users.end()) // last element
+			users_string << ", ";
+	}
+
+	return_string = users_string.str();
+	return_string.erase(remove(return_string.begin(), return_string.end(), '\"'), return_string.end());
+	if (return_string == "" && addNotAssigned) { 
+		return TASKER_USER_NOT_ASSIGNED;
+	}
+	return return_string;
+}
+
 std::time_t TaskerMain::getEpochTime(const std::wstring& dateTime)
 {
 	// Let's consider we are getting all the input in
@@ -504,6 +524,16 @@ std::time_t TaskerMain::getEpochTime(const std::wstring& dateTime)
 	// Convert the tm structure to time_t value and return.
 	return std::mktime(&dt);
 }
+bool TaskerMain::findDefinedUser(const std::string& user, bool multi) {
+	std::vector<std::string> users_candid = this->splitString(user, TASKER_SPLIT_DELI_CHAR);
+	int check = 0;
+	for (auto &i : users_candid) {
+		if (this->findDefinedUser(i) == -1) {
+			return false;
+		}
+	}
+	return true;
+}
 int TaskerMain::findDefinedUser(const std::string& user) {
 	bool check = 0;
 	int  index = 0;
@@ -515,6 +545,16 @@ int TaskerMain::findDefinedUser(const std::string& user) {
 		index++;
 	}
 	return -1;
+}
+bool TaskerMain::findDefinedTag(const std::string& tag, bool multi) {
+	std::vector<std::string> tags_candid = this->splitString(tag, TASKER_SPLIT_DELI_CHAR);
+	int check = 0;
+	for (auto &i : tags_candid) {
+		if (this->findDefinedTag(i) == -1) {
+			return false;
+		}
+	}
+	return true;
 }
 int TaskerMain::findDefinedTag(const std::string& tag) {
 	bool check = 0;
@@ -561,6 +601,12 @@ std::string TaskerMain::trim_gen(const std::string& str, const char rem)
 	if (std::string::npos == first) return str;
 	size_t last = str.find_last_not_of(rem);
 	return str.substr(first, (last - first + 1));
+}
+void TaskerMain::cleanString(std::string& str, const std::vector<char>& rem)
+{
+	for (auto &i : rem) {
+		str.erase(std::remove(str.begin(), str.end(), i), str.end());
+	}
 }
 std::vector<std::string> TaskerMain::splitString(const std::string &text, char sep) {
 	std::vector<std::string> tokens;
@@ -620,7 +666,7 @@ exists TaskerMain::findRow(const std::string& strId) {
 	return ret;
 }
 
-std::string TaskerMain::getUserName(bool& push_plan, bool allowskip, int taskIdForSkip, const std::string& userFixStr) {
+std::vector<std::string> TaskerMain::getUserName(bool& push_plan, bool allowskip, int taskIdForSkip, const std::string& userFixStr) {
 	bool showAdvice = true;
 	bool reloop = true;
 	std::string userStr = "";
@@ -648,24 +694,58 @@ std::string TaskerMain::getUserName(bool& push_plan, bool allowskip, int taskIdF
 				userStr = this->thestruct["tasks"].at(taskIdForSkip).at("plan").back().at("user").get<std::string>();
 			}
 			reloop = false;
+
+			//Clean name:
+			this->cleanString(userStr, {' ','"','\'','@','#'});
 			break;
 		}
-		else if (this->findDefinedUser(userStr) == -1) {
-			this->printTaskerInfo("Error", "The user name you typed can't be found.");
-			if (showAdvice) {
-				this->printTaskerInfo("Advice", "Leave empty and press ENTER for not assigned.");
-				this->printTaskerInfo("Advice", "Type `default` and press ENTER for auto assign default user.");
-				if (allowskip) this->printTaskerInfo("Advice", "Type `skip` and press ENTER to not change the user.");
-				this->printTaskerInfo("Advice", "Run `--users` to see all users defined.");
-				showAdvice = false;
+		else if (userStr == "?") {
+			int i = 0;
+			int tot = (int)this->thestruct["users"].size();
+			this->printTaskerInfo("Help", " Type one of those or several of them seperated by a single space.");
+			std::cout << "             " << this->usecolor() << this->getcolor("faded");
+			if (tot < 1) {
+				std::cout << "No users created!";
 			}
+			else {
+				for (json::iterator it = this->thestruct["users"].begin(); it != this->thestruct["users"].end(); ++it) {
+					for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
+						i++;
+						std::cout << ite.key();
+						if (i < tot) {
+							std::cout << ", ";
+						}
+					}
+				}
+			}
+			std::cout << this->usecolor() << this->getcolor("reset") << std::endl;
 			std::cout << "\tType: ";
+		}
+		else if (userStr.length() > 1) {
+
+			//Clean name:
+			this->cleanString(userStr, {' ','"','\'','@','#'});
+			//check defined:
+			if (!this->findDefinedUser(userStr, true)) {
+				this->printTaskerInfo("Error", "The user name you typed can't be found.");
+				if (showAdvice) {
+					this->printTaskerInfo("Advice", "Leave empty and press ENTER for not assigned.");
+					this->printTaskerInfo("Advice", "Type `default` and press ENTER for auto assign default user.");
+					if (allowskip) this->printTaskerInfo("Advice", "Type `skip` and press ENTER to not change the user.");
+					this->printTaskerInfo("Advice", "Type `?` to see all users defined or `tasker --users`.");
+					showAdvice = false;
+				}
+				std::cout << "\tType: ";
+			} else {
+				reloop = false;
+			}
 		}
 		else {
 			reloop = false;
 		}
 	}
-	return userStr;
+	//Create vector of user names:
+	return userStr.length() > 0 ? this->splitString(userStr, TASKER_SPLIT_DELI_CHAR) : std::vector<std::string>();
 }
 std::string TaskerMain::getStrMessage(const std::string& err) {
 	std::string mes;
@@ -749,7 +829,7 @@ int TaskerMain::getLoad(const std::string& err) {
 	}
 	return loadint;
 }
-std::string TaskerMain::getStrTag(const std::string& err) {
+std::vector<std::string> TaskerMain::getTags(const std::string& err) {
 	bool reloop		 = true;
 	bool showAdvice = true;
 	std::string tagStr;
@@ -762,20 +842,53 @@ std::string TaskerMain::getStrTag(const std::string& err) {
 			reloop = false;
 			break;
 		}
-		else if (this->findDefinedTag(tagStr) == -1) {
-			this->printTaskerInfo("Error", err);
-			if (showAdvice) {
-				this->printTaskerInfo("Advice", "Leave empty and press ENTER for not tagged.");
-				this->printTaskerInfo("Advice", "Run `--tags` to see all tags defined.");
-				showAdvice = false;
+		else if (tagStr == "?") {
+			int i = 0;
+			int tot = (int)this->thestruct["tags"].size();
+			this->printTaskerInfo("Help", " Type one of those or several of them seperated by a single space.");
+			std::cout << "             " << this->usecolor() << this->getcolor("faded");
+			if (tot < 1) {
+				std::cout << "No tags defined!";
 			}
+			else {
+				for (json::iterator it = this->thestruct["tags"].begin(); it != this->thestruct["tags"].end(); ++it) {
+					for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
+						i++;
+						std::cout << ite.key();
+						if (i < tot) {
+							std::cout << ", ";
+						}
+					}
+				}
+			}
+			std::cout << this->usecolor() << this->getcolor("reset") << std::endl;
 			std::cout << "\tType: ";
+		}
+		else if (this->findDefinedTag(tagStr) == -1) {
+
+			//Clean name:
+			this->cleanString(tagStr, { ' ','"','\'','@','#' });
+
+			if (!this->findDefinedTag(tagStr, true)) {
+				this->printTaskerInfo("Error", err);
+				if (showAdvice) {
+					this->printTaskerInfo("Advice", "Leave empty and press ENTER for not tagged.");
+					this->printTaskerInfo("Advice", "Type `?` to see all tags defined.");
+					this->printTaskerInfo("Advice", "Run `--tags` to see all tags defined.");
+					showAdvice = false;
+				}
+				std::cout << "\tType: ";
+			}
+			else {
+				reloop = false;
+			}
 		}
 		else {
 			reloop = false;
 		}
 	}
-	return tagStr;
+	//Create vector of tags:
+	return tagStr.length() > 0 ? this->splitString(tagStr, TASKER_SPLIT_DELI_CHAR) : std::vector<std::string>();
 }
 std::string TaskerMain::getStrVersion(bool& push_plan, bool allowskip, const std::string& versionForSkip) {
 	std::string version;
@@ -792,27 +905,27 @@ std::string TaskerMain::getStrVersion(bool& push_plan, bool allowskip, const std
 
 bool TaskerMain::setNewTask(const std::string& strTask)
 {	
-	std::string plan_user			= "";
-	std::string tagged_as			= "";
-	std::string plan_currentversion = this->thestruct["version"];
-	std::string plan_version		= "";
-	std::string plan_duedate		= "";
-	std::string task_created		= this->getcurdatetime();
-	std::string task_status			= "";
-	int			loadint				= 1;
-	bool        push_plan			= false;
+	std::vector<std::string> plan_user;
+	std::vector<std::string> tagged_as;
+	std::string plan_currentversion		= this->thestruct["version"];
+	std::string plan_version			= "";
+	std::string plan_duedate			= "";
+	std::string task_created			= this->getcurdatetime();
+	std::string task_status				= "";
+	int			loadint					= 1;
+	bool        push_plan				= false;
 	float		task_status_num;
 
 	//Interactively get all needed:
 	std::cout << std::endl << " > New task: ";
 
 	//Assign a user name:
-	std::cout << std::endl << "  1. Assign to user (empty for none): ";
+	std::cout << std::endl << "  1. Assign to user/s (empty, ?, default): ";
 	plan_user = this->getUserName(push_plan, false, 0, "");
 
 	//Tag the task:
-	std::cout << "  2. Tag the task (empty for none): ";
-	tagged_as = this->getStrTag("The Tag you typed can't be found.");
+	std::cout << "  2. Tag the task (empty): ";
+	tagged_as = this->getTags("The Tag you typed can't be found.");
 
 	//Set the planned version:
 	std::cout << "  3. Planned for version (empty for current): ";
@@ -828,32 +941,34 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 	task_status_num = this->normalizeStatus(task_status);
 
 	//Set load of task if enabled:
-	if (this->load) {
+	if (this->opt.enable_loads) {
 		std::cout << "  6. Set load units of this task (use an integer): ";
 		loadint = this->getLoad("Bad input - Please enter a positive integer only.");
 	}
 
 	//Create finall Object:
 	json taskObj = {
-		{ "plan",		""					},
-		{ "created",	task_created		},
-		{ "updated",	task_created		},
+		{ "plan",		
+				json::array({{
+					{ "v" ,			trim_copy(plan_version) },
+					{ "user" ,		plan_user },
+					{ "date" ,		plan_duedate }
+				}})
+		},
+		{ "created",	task_created			},
+		{ "updated",	task_created			},
 		{ "task",		this->trim_gen(trim_copy(strTask), '"')	},
-		{ "status",		task_status_num		},
-		{ "cancel",		false				},
-		{ "load",		loadint				},
-		{ "tagged",		""					},
-		{ "report",		""					} 
+		{ "status",		task_status_num			},
+		{ "cancel",		false					},
+		{ "load",		loadint					},
+		{ "tagged",		tagged_as				},
+		{ "report",		json::array()			}
 	};
-	taskObj["tagged"] = json::array();
-	if (tagged_as != "") taskObj["tagged"].push_back(tagged_as);
-	taskObj["plan"] = json::array(); 
 	taskObj["plan"].push_back({ 
 		{ "v" ,			trim_copy(plan_version) },
 		{ "user" ,		plan_user				},
 		{ "date" ,		plan_duedate			}
 	});
-	taskObj["report"] = json::array();
 
 	//Save
 	this->thestruct["tasks"].push_back(taskObj);
@@ -867,6 +982,7 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 bool TaskerMain::reportToTask(const std::string& strTask) {
 
 	int theTask = -1;
+
 	//Validate the index: 
 	try { theTask = stoi(strTask) - 1; }
 	catch (...) { return false; }
@@ -878,16 +994,17 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 	//Does the task enabled:
 	if (this->thestruct["tasks"].at(theTask).at("cancel") == true) { return false; }
 
-	std::string rep_date = this->getcurdatetime();
-	std::string rep_user = "";
-	std::string rep_note = "";
-	std::string rep_status = "";
-	std::string owner = this->thestruct["tasks"].at(theTask).at("plan").back().at("user");
+	std::string rep_date			= this->getcurdatetime();
+	std::vector<std::string>		rep_user;
+	std::string rep_note			= "";
+	std::string rep_status			= "";
+	std::vector<std::string> owner	= this->thestruct["tasks"].at(theTask).at("plan").back().at("user");
 	float		rep_status_num;
-	bool		push_plan = true;
+	bool		push_plan	= true;
 	
 	//Set percision:
 	std::cout << std::setprecision(2) << std::fixed;
+
 	//Interactively get all needed:
 	std::cout << std::endl << " > Report to task: " << strTask;
 
@@ -902,12 +1019,15 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 	//Normalize progress status:
 	rep_status_num = this->normalizeStatus(rep_status);
 
+	//prep user string to show:
+	std::string users_str = this->getUserString(owner, TASKER_USER_PREFIX, true);
+
 	//Get the user who made the report:
 	std::cout << "  2. Progress of user (assigned to "; 
 	std::cout << usecolor() << getcolor("user");
-	std::cout << ((owner == "") ? "not assigned" : TASKER_USER_PREFIX + owner);
+	std::cout << users_str;
 	std::cout << usecolor() << getcolor("reset");
-	std::cout << " - Empty for unknown" << "): ";
+	std::cout << " - empty, ?, default" << "): ";
 	rep_user = this->getUserName(push_plan, false, 0, "");
 	
 	//Get the report note:
@@ -919,7 +1039,7 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 		{"date",		this->trim_gen(rep_date, '"')			 },
 		{"status",		rep_status_num							 },
 		{"note",		this->trim_gen(trim_copy(rep_note), '"') },
-		{"by",			this->trim_gen(trim_copy(rep_user), '"') }
+		{"by",			rep_user }
 	});
 
 	//Update parent status:
@@ -940,14 +1060,14 @@ bool TaskerMain::refactorTask(const std::string& strTask) {
 	else if (theRow.type == 1) {
 
 		//Refactor Task:
-		std::string new_task_title = "";
-		std::string plan_user = "";
-		std::string plan_version = "";
-		std::string plan_duedate = "";
-		std::string task_updated = this->getcurdatetime();
-		std::string task_load = "1";
-		int			loadint		= 1;
-		bool        push_plan	= false;
+		std::string new_task_title			= "";
+		std::vector<std::string> plan_user;
+		std::string plan_version			= "";
+		std::string plan_duedate			= "";
+		std::string task_updated			= this->getcurdatetime();
+		std::string task_load				= "1";
+		int			loadint					= 1;
+		bool        push_plan				= false;
 
 		//Interactively update all needed:
 		std::cout << std::endl << " > Refactor Task: ";
@@ -963,7 +1083,7 @@ bool TaskerMain::refactorTask(const std::string& strTask) {
 			this->trim_gen(trim_copy(new_task_title), '"');
 
 		//Change assigned user:
-		std::cout << "  2. Change user (empty = none | 'skip' = skip): ";
+		std::cout << "  2. Change user (empty, skip, default, ?): ";
 		plan_user = this->getUserName(push_plan, true, theRow.taskId, "");
 
 		//Update the planned version:
@@ -987,7 +1107,7 @@ bool TaskerMain::refactorTask(const std::string& strTask) {
 		}
 
 		//Update Load if enabled:
-		if (this->load) {
+		if (this->opt.enable_loads) {
 			int prevLoadSet = this->thestruct["tasks"].at(theRow.taskId).at("load").get<int>();
 			std::cout << "  5. Update load units of this task (use an integer) - Currently `"
 				<< this->usecolor() << this->getcolor("notify")
@@ -1063,7 +1183,7 @@ bool TaskerMain::refactorTask(const std::string& strTask) {
 		std::cout << ((theObjOld["by"].get<std::string>() == "") ? "not assigned" : TASKER_USER_PREFIX + theObjOld["by"].get<std::string>());
 		std::cout << usecolor() << getcolor("reset");
 		std::cout << " - Expects empty for unknown | `skip` | `default`" << "): ";
-		theObjOld["by"] = this->trim_gen(trim_copy(this->getUserName(push_plan, true, -1, theObjOld["by"].get<std::string>())), '"');
+		theObjOld["by"] = this->getUserName(push_plan, true, -1, theObjOld["by"].get<std::string>());
 
 		//Get the report note:
 		std::cout << "  3. Update task report note (Type `skip` to skip): ";
@@ -1126,7 +1246,7 @@ bool TaskerMain::deleteTask(const std::string& strTask)
 	if ((int)this->thestruct["tasks"].size() <= theTask) { return false; }
 	
 	//Validate allowed delete:
-	if (this->delitems == false) {
+	if (this->opt.del_items == false) {
 		this->printTaskerNotify("Task delete Prevented!");
 		this->printTaskerInfo("Info", "You can't delete tasks because a global option was set tp prevent that - you may want to `--cancel {id}` insted.");
 	} else {
@@ -1518,7 +1638,7 @@ bool TaskerMain::showstats(const std::string& type)
 			}
 		}
 		//Add not assigned
-		container.insert(std::pair<std::string, statobj>("not assigned", statobj()));
+		container.insert(std::pair<std::string, statobj>(TASKER_USER_NOT_ASSIGNED, statobj()));
 	} else {
 		//Build tags:
 		for (json::iterator it = this->thestruct["tags"].begin(); it != this->thestruct["tags"].end(); ++it) {
@@ -1527,17 +1647,19 @@ bool TaskerMain::showstats(const std::string& type)
 			}
 		}
 		//Add not tagged
-		container.insert(std::pair<std::string, statobj>("not tagged", statobj()));
+		container.insert(std::pair<std::string, statobj>(TASKER_TAG_NOT_TAGGED, statobj()));
 	}
 
 	//Calculate and collect:
 	for (unsigned i = 0; i < this->thestruct["tasks"].size(); i++) {
 		//Skip cancel:
 		if (this->thestruct["tasks"].at(i).at("cancel")) continue;
+
 		//Calculate this task:
 		float _workunitsleft = (float(1.0) - (float)this->thestruct["tasks"].at(i).at("status")) * float(100.0);
 		float _loadbase		 = (float)this->thestruct["tasks"].at(i).at("load");
 		float _loadunitsleft = _loadbase * (float(1.0) - (float)this->thestruct["tasks"].at(i).at("status"));
+
 		//Set total:
 		total.workunits += 100;
 		total.workunitsleft += _workunitsleft;
@@ -1546,13 +1668,24 @@ bool TaskerMain::showstats(const std::string& type)
 
 		//Set object:
 		if (type == "users") {
+
 			//Get assigned:
-			std::string user = this->thestruct["tasks"].at(i).at("plan").back().at("user");
-			user = (user == "") ? "not assigned" : user;
-			container[user].loadunits += _loadbase;
-			container[user].loadunitsleft += _loadunitsleft;
-			container[user].workunitsleft += _workunitsleft;
-			container[user].workunits += 100;
+			std::vector<std::string> users = this->thestruct["tasks"].at(i).at("plan").back().at("user");
+			if (users.size() > 0) {
+				for (auto it = users.begin(); it != users.end(); ++it) {
+					container[*it].loadunits		+= _loadbase;
+					container[*it].loadunitsleft	+= _loadunitsleft;
+					container[*it].workunitsleft	+= _workunitsleft;
+					container[*it].workunits		+= 100;
+				}
+			} else {
+				//set not assigned:
+				container[TASKER_USER_NOT_ASSIGNED].loadunits		+= _loadbase;
+				container[TASKER_USER_NOT_ASSIGNED].loadunitsleft	+= _loadunitsleft;
+				container[TASKER_USER_NOT_ASSIGNED].workunitsleft	+= _workunitsleft;
+				container[TASKER_USER_NOT_ASSIGNED].workunits		+= 100;
+			}
+
 		} else {
 			//Get tagged:
 			unsigned int tagged_size = (unsigned int)this->thestruct["tasks"].at(i).at("tagged").size();
@@ -1560,17 +1693,18 @@ bool TaskerMain::showstats(const std::string& type)
 				for (unsigned int j = 0; j < tagged_size; j++) {
 					std::string _tag = this->thestruct["tasks"].at(i).at("tagged").at(j);
 					if (this->findDefinedTag(_tag) != -1) {
-						container[_tag].loadunits += _loadbase;
-						container[_tag].loadunitsleft += _loadunitsleft;
-						container[_tag].workunitsleft += _workunitsleft;
-						container[_tag].workunits += 100;
+						container[_tag].loadunits		+= _loadbase;
+						container[_tag].loadunitsleft	+= _loadunitsleft;
+						container[_tag].workunitsleft	+= _workunitsleft;
+						container[_tag].workunits		+= 100;
 					}
 				}
 			} else {
-				container["not tagged"].loadunits += _loadbase;
-				container["not tagged"].loadunitsleft += _loadunitsleft;
-				container["not tagged"].workunitsleft += _workunitsleft;
-				container["not tagged"].workunits += 100;
+				//set not tagged:
+				container[TASKER_TAG_NOT_TAGGED].loadunits		+= _loadbase;
+				container[TASKER_TAG_NOT_TAGGED].loadunitsleft	+= _loadunitsleft;
+				container[TASKER_TAG_NOT_TAGGED].workunitsleft	+= _workunitsleft;
+				container[TASKER_TAG_NOT_TAGGED].workunits		+= 100;
 			}
 		}
 	}
@@ -1721,11 +1855,11 @@ bool TaskerMain::deluser(const std::string& _user)
 	std::cout << std::endl
 		<< " > Deleting user: "
 		<< this->usecolor() << this->getcolor("user")
-		<< user
+		<< TASKER_USER_PREFIX << user
 		<< this->usecolor() << this->getcolor("reset")
 		<< std::endl;
 
-	//validate first:
+	//validate first - must be atleast one user:
 	if (this->thestruct["users"].size() < 2) {
 		return false;
 	}
@@ -1738,20 +1872,30 @@ bool TaskerMain::deluser(const std::string& _user)
 
 		//Remove user:
 		this->thestruct["users"].erase(index);
+
 		//Remove from assignments:
 		for (unsigned i = 0; i < this->thestruct["tasks"].size(); i++) {
+
 			//Remove from main
 			for (unsigned j = 0; j < this->thestruct["tasks"].at(i).at("plan").size(); j++) {
-				if (this->thestruct["tasks"].at(i).at("plan").at(j).at("user") == user) {
-					this->thestruct["tasks"].at(i).at("plan").at(j).at("user") = "";
+				std::vector<std::string> plan_users = this->thestruct["tasks"].at(i).at("plan").at(j).at("user");
+				auto itusers = std::find(plan_users.begin(), plan_users.end(), user);
+				if (itusers != plan_users.end()) {
+					plan_users.erase(itusers);
 					counter_tasks++;
+					this->thestruct["tasks"].at(i).at("plan").at(j).at("user") = plan_users;
 				}
 			}
+
 			//Remove from reports:
 			for (unsigned j = 0; j < this->thestruct["tasks"].at(i).at("report").size(); j++) {
-				if (this->thestruct["tasks"].at(i).at("report").at(j).at("by") == user) {
-					this->thestruct["tasks"].at(i).at("report").at(j).at("by") = "";
+
+				std::vector<std::string> report_users = this->thestruct["tasks"].at(i).at("report").at(j).at("by");
+				auto itusers = std::find(report_users.begin(), report_users.end(), user);
+				if (itusers != report_users.end()) {
+					report_users.erase(itusers);
 					counter_reports++;
+					this->thestruct["tasks"].at(i).at("report").at(j).at("by") = report_users;
 				}
 			}
 		}
@@ -1775,7 +1919,7 @@ bool TaskerMain::updateuser(const std::string& _user)
 	std::cout << std::endl
 		<< " > Updating user: "
 		<< this->usecolor() << this->getcolor("user")
-		<< user
+		<< TASKER_USER_PREFIX << user
 		<< this->usecolor() << this->getcolor("reset")
 		<< std::endl
 		<< "   - "
@@ -1841,7 +1985,7 @@ bool TaskerMain::list(const std::string& _level, const std::string& which, const
 
 	//Parse the level:
 	theLevel = stoi(level);
-	if (theLevel < 1 || theLevel > 2) {
+	if (theLevel < 0 || theLevel > 2) {
 		theLevel = stoi(std::string(TASKER_BASELIST_LEVEL));
 	}
 
@@ -1897,8 +2041,15 @@ bool TaskerMain::list(const std::string& _level, const std::string& which, const
 			}
 		}
 		if (which == "user") {
-			std::string theuser = this->thestruct["tasks"].at(i).at("plan").back().at("user");
-			if (std::find(filterCon.begin(), filterCon.end(), theuser) == filterCon.end()) {
+			std::vector<std::string> users = this->thestruct["tasks"].at(i).at("plan").back().at("user");
+			bool userfiltertest = false;
+			for (auto itu = users.begin(); itu != users.end(); ++itu) {
+				if (std::find(filterCon.begin(), filterCon.end(), *itu) != filterCon.end()) {
+					userfiltertest = true;
+					break;
+				}
+			}
+			if (!userfiltertest) {
 				continue;
 			}
 		}
@@ -1917,9 +2068,21 @@ bool TaskerMain::list(const std::string& _level, const std::string& which, const
 				continue;
 			}
 		}
+
+		//Filter Closed & Cancel:
+		if (!this->opt.showclosed && (which == "user" || which == "tag")) {
+			if ((float)this->thestruct["tasks"].at(i).at("status") > 0.99) {
+				continue;
+			}
+			if (this->thestruct["tasks"].at(i).at("cancel") == true) {
+				continue;
+			}
+		}
+
 		//Print main row:
 		counter_found++;
-		std::string user = this->thestruct["tasks"].at(i).at("plan").back().at("user");
+		std::vector<std::string> usersvec = this->thestruct["tasks"].at(i).at("plan").back().at("user");
+		std::string users_str = this->getUserString(usersvec, TASKER_USER_PREFIX, true);
 		std::string target = this->thestruct["tasks"].at(i).at("plan").back().at("date");
 		std::string created = this->thestruct["tasks"].at(i).at("created");
 		std::stringstream tagged;
@@ -1931,17 +2094,11 @@ bool TaskerMain::list(const std::string& _level, const std::string& which, const
 		}
 		tagged_str = tagged.str();
 		tagged_str.erase(remove(tagged_str.begin(), tagged_str.end(), '\"'), tagged_str.end());
-
-		if (user == "" || user == "\"\"") {
-			user = "not assigned";
-		}
-		else {
-			user = TASKER_USER_PREFIX + user;
-		}
+	
 		if (target == "" || target == "\"\"") {
 			target = "not set";
 		}
-		user.erase(std::remove(user.begin(), user.end(), '"'), user.end());
+
 		target.erase(std::remove(target.begin(), target.end(), '"'), target.end());
 		created.erase(std::remove(created.begin(), created.end(), '"'), created.end());
 
@@ -1952,44 +2109,47 @@ bool TaskerMain::list(const std::string& _level, const std::string& which, const
 			<< ") : ["
 			<< this->usecolor() << this->getcolor("status", (float)this->thestruct["tasks"].at(i).at("status"))
 			<< std::to_string(
-					(int)((float)this->thestruct["tasks"].at(i).at("status") * 100)
-				).substr(0, 3)
+			(int)((float)this->thestruct["tasks"].at(i).at("status") * 100)
+			).substr(0, 3)
 			<< "%"
 			<< this->usecolor() << this->getcolor("reset")
 			<< "] -> "
 			<< this->usecolor() << ((which == "cancel") ? this->getcolor("error") : this->getcolor("reset"))
 			<< ((which == "cancel") ? "CANCELED / " : "")
 			<< this->usecolor() << this->getcolor("reset")
-			<< this->thestruct["tasks"].at(i).at("task") 
-			<< std::endl
-			<< this->usecolor() << this->getcolor("faded")
-			<< "\t* Due Date: "
-			<< this->usecolor() << this->getcolor("target")
-			<< target
-			<< this->usecolor() << this->getcolor("faded")
-			<< " , Created: "
-			<< this->usecolor() << this->getcolor("hour")
-			<< created
-			<< this->usecolor() << this->getcolor("faded")
-			<< " , Assigned To: "
-			<< this->usecolor() << this->getcolor("user")
-			<< user
-			<< this->usecolor() << this->getcolor("reset")
-			<< std::endl
-			<< this->usecolor() << this->getcolor("faded")
-			<< "\t* Tags: "
-			<< this->usecolor() << this->getcolor("tag")
-			<< (tagged_str.size() > 1 ? tagged_str : "not tagged")
-			<< this->usecolor() << this->getcolor("reset")
+			<< this->thestruct["tasks"].at(i).at("task")
 			<< std::endl;
 
-		if (theLevel == 2) {
+			
+		if (theLevel > 0) {
+			std::cout << this->usecolor() << this->getcolor("faded")
+				<< "\t* Due Date: "
+				<< this->usecolor() << this->getcolor("target")
+				<< target
+				<< this->usecolor() << this->getcolor("faded")
+				<< " , Created: "
+				<< this->usecolor() << this->getcolor("hour")
+				<< created
+				<< this->usecolor() << this->getcolor("faded")
+				<< " , Assigned To: "
+				<< this->usecolor() << this->getcolor("user")
+				<< users_str
+				<< this->usecolor() << this->getcolor("reset")
+				<< std::endl
+				<< this->usecolor() << this->getcolor("faded")
+				<< "\t* Tags: "
+				<< this->usecolor() << this->getcolor("tag")
+				<< (tagged_str.size() > 1 ? tagged_str : "not tagged")
+				<< this->usecolor() << this->getcolor("reset")
+				<< std::endl;
+		}
+		if (theLevel > 1) {
 			//Will print task notes
 			for (unsigned j = 0; j < this->thestruct["tasks"].at(i).at("report").size(); j++) {
 
 				//Prepare for print:
-				std::string byuser = this->thestruct["tasks"].at(i).at("report").at(j).at("by");
-				byuser.erase(std::remove(byuser.begin(), byuser.end(), '"'), byuser.end());
+				std::vector<std::string> users = this->thestruct["tasks"].at(i).at("report").at(j).at("by");
+				std::string byuser = this->getUserString(users, TASKER_USER_PREFIX, true);
 
 				std::string dateout = this->thestruct["tasks"].at(i).at("report").at(j).at("date");
 				dateout.erase(std::remove(dateout.begin(), dateout.end(), '"'), dateout.end());
@@ -2017,7 +2177,7 @@ bool TaskerMain::list(const std::string& _level, const std::string& which, const
 					<< this->thestruct["tasks"].at(i).at("report").at(j).at("note")
 					<< ", by "
 					<< this->usecolor() << this->getcolor("user")
-					<< (byuser == "" ? "unknown" : (TASKER_USER_PREFIX + byuser) )
+					<< byuser
 					<< this->usecolor() << this->getcolor("reset")
 					<< std::endl;
 			}

@@ -123,7 +123,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="argvparser.hpp" />
-    <ClInclude Include="json.hpp" />
+    <ClInclude Include="json3.4.0.hpp" />
+    <ClInclude Include="json2.1.1.hpp" />
     <ClInclude Include="SETTASKER.hpp" />
     <ClInclude Include="TaskerMain.hpp" />
     <ClInclude Include="TaskerAdd.hpp" />

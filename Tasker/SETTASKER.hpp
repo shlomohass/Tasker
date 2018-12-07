@@ -18,7 +18,7 @@
     #define PLATOTHER
 #endif
 
-#define TASKER_VERSION "1.0.0"
+#define TASKER_VERSION "1.0.3"
 #define TASKER_AUTHOR "Shlomi Hassid"
 
 #ifndef TASKER_DEBUG
@@ -48,7 +48,9 @@
 * Set Default obj name
 */
 #define TASKER_USER_PREFIX "@"
+#define TASKER_USER_NOT_ASSIGNED "not assigned"
 #define TASKER_TAG_PREFIX "#"
+#define TASKER_TAG_NOT_TAGGED "not tagged"
 #endif
 
 #ifndef TASKER_SPLIT_DELI
@@ -56,6 +58,7 @@
 * Set the list delimeter for inputs:
 */
 #define TASKER_SPLIT_DELI ","
+#define TASKER_SPLIT_DELI_CHAR ','
 #endif
 
 /**

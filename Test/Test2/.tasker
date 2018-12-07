@@ -28,35 +28,41 @@
             "plan": [
                 {
                     "date": "02-12-2017 23:59:00",
-                    "user": "shlomi",
+                    "user": [],
                     "v": "1.0.0"
                 },
                 {
                     "date": "02-12-2017 23:59:00",
-                    "user": "",
+                    "user": [],
                     "v": "1.0.0"
                 },
                 {
                     "date": "02-12-2017 23:59:00",
-                    "user": "shlomi",
+                    "user": [],
                     "v": "1.0.0"
                 }
             ],
             "report": [
                 {
-                    "by": "shlomi",
+                    "by": [
+                        "shlomi"
+                    ],
                     "date": "02-12-2017 22:15:19",
                     "note": "Added basic notes and comments",
                     "status": 0.0599999986588955
                 },
                 {
-                    "by": "shlomi",
+                    "by": [
+                        "shlomi"
+                    ],
                     "date": "02-12-2017 22:20:56",
                     "note": "Now supports hebrew",
                     "status": 0.119999997317791
                 },
                 {
-                    "by": "shlomi",
+                    "by": [
+                        "shlomi"
+                    ],
                     "date": "09-12-2017 21:01:36",
                     "note": "new buttons with shades",
                     "status": 0.28999999165535
@@ -77,13 +83,15 @@
             "plan": [
                 {
                     "date": "09-12-2017 23:59:00",
-                    "user": "shlomi",
+                    "user": [],
                     "v": "1.0.0"
                 }
             ],
             "report": [
                 {
-                    "by": "shlomi",
+                    "by": [
+                        "shlomi"
+                    ],
                     "date": "09-12-2017 22:05:41",
                     "note": "created basic color template",
                     "status": 0.379999995231628
@@ -103,7 +111,7 @@
             "plan": [
                 {
                     "date": "22-12-2017 23:59:00",
-                    "user": "shlomi",
+                    "user": [],
                     "v": "1.0.0"
                 }
             ],
@@ -122,18 +130,22 @@
             "plan": [
                 {
                     "date": "22-12-2017 23:59:00",
-                    "user": "",
+                    "user": [],
                     "v": "1.0.0"
                 },
                 {
                     "date": "22-12-2017 23:59:00",
-                    "user": "shlomi",
+                    "user": [
+                        "shlomi"
+                    ],
                     "v": "1.0.0"
                 }
             ],
             "report": [
                 {
-                    "by": "shlomi",
+                    "by": [
+                        "shlomi"
+                    ],
                     "date": "22-12-2017 21:15:45",
                     "note": "Its working very good now!!!",
                     "status": 0.349999994039536
@@ -146,6 +158,510 @@
             ],
             "task": "A number 4 task which i made",
             "updated": "22-12-2017 21:14:46"
+        },
+        {
+            "cancel": false,
+            "created": "01-12-2018 21:15:57",
+            "load": 2,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "bug"
+            ],
+            "task": "add some new features",
+            "updated": "01-12-2018 21:15:57"
+        },
+        {
+            "cancel": false,
+            "created": "01-12-2018 21:52:16",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [],
+            "task": "add some new features testing 2",
+            "updated": "01-12-2018 21:52:16"
+        },
+        {
+            "cancel": false,
+            "created": "01-12-2018 22:00:54",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [],
+            "task": "add some new features hsdhjasd 23453453",
+            "updated": "01-12-2018 22:00:54"
+        },
+        {
+            "cancel": false,
+            "created": "01-12-2018 22:02:13",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [],
+            "task": "add some new features hsdhjasd 234534539876987987",
+            "updated": "01-12-2018 22:02:13"
+        },
+        {
+            "cancel": false,
+            "created": "01-12-2018 22:03:36",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [],
+            "task": "add some new features762378632 983",
+            "updated": "01-12-2018 22:03:36"
+        },
+        {
+            "cancel": false,
+            "created": "01-12-2018 22:05:54",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [],
+            "task": "add some new shlomix 63",
+            "updated": "01-12-2018 22:05:54"
+        },
+        {
+            "cancel": false,
+            "created": "01-12-2018 22:21:07",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [],
+            "task": "now with multi users",
+            "updated": "01-12-2018 22:21:07"
+        },
+        {
+            "cancel": false,
+            "created": "01-12-2018 22:32:51",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [],
+            "task": "now with multi users 723498724",
+            "updated": "01-12-2018 22:32:51"
+        },
+        {
+            "cancel": false,
+            "created": "01-12-2018 22:53:28",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi",
+                        "shob"
+                    ],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [
+                {
+                    "by": [
+                        "shlomi"
+                    ],
+                    "date": "03-12-2018 22:28:38",
+                    "note": "just a test",
+                    "status": 0.5
+                },
+                {
+                    "by": [
+                        "shlomi",
+                        "shob"
+                    ],
+                    "date": "03-12-2018 22:29:33",
+                    "note": "more progress",
+                    "status": 0.6499999761581421
+                },
+                {
+                    "by": [
+                        ""
+                    ],
+                    "date": "03-12-2018 22:30:48",
+                    "note": "yeppps",
+                    "status": 0.8100000023841858
+                }
+            ],
+            "status": 0.8100000023841858,
+            "tagged": [],
+            "task": "now with multi users 52222222",
+            "updated": "01-12-2018 22:53:28"
+        },
+        {
+            "cancel": false,
+            "created": "03-12-2018 22:34:15",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "bug"
+            ],
+            "task": "example empty",
+            "updated": "03-12-2018 22:34:15"
+        },
+        {
+            "cancel": false,
+            "created": "03-12-2018 22:41:54",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shob"
+                    ],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [],
+            "task": "example empty",
+            "updated": "03-12-2018 22:41:54"
+        },
+        {
+            "cancel": false,
+            "created": "03-12-2018 22:42:53",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [
+                {
+                    "by": [],
+                    "date": "03-12-2018 22:43:21",
+                    "note": "progress test not assigned",
+                    "status": 0.25
+                },
+                {
+                    "by": [
+                        "shlomi",
+                        "shob"
+                    ],
+                    "date": "03-12-2018 22:48:54",
+                    "note": "just another test",
+                    "status": 0.3700000047683716
+                }
+            ],
+            "status": 0.3700000047683716,
+            "tagged": [],
+            "task": "example empty 2342345",
+            "updated": "03-12-2018 22:42:53"
+        },
+        {
+            "cancel": false,
+            "created": "03-12-2018 22:47:54",
+            "load": 3,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.0"
+                },
+                {
+                    "date": "",
+                    "user": [
+                        "shob"
+                    ],
+                    "v": "1.0.0"
+                },
+                {
+                    "date": "",
+                    "user": [
+                        "shob"
+                    ],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [
+                {
+                    "by": [],
+                    "date": "03-12-2018 23:49:21",
+                    "note": "a good work",
+                    "status": 0.15000000596046448
+                },
+                {
+                    "by": [
+                        "shob"
+                    ],
+                    "date": "03-12-2018 23:49:43",
+                    "note": "just working",
+                    "status": 0.27000001072883606
+                }
+            ],
+            "status": 0.27000001072883606,
+            "tagged": [],
+            "task": "example empty 7865757698098809809809",
+            "updated": "03-12-2018 23:48:32"
+        },
+        {
+            "cancel": false,
+            "created": "05-12-2018 21:07:01",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shob"
+                    ],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "bug",
+                "future"
+            ],
+            "task": "multi tags",
+            "updated": "05-12-2018 21:07:01"
+        },
+        {
+            "cancel": false,
+            "created": "05-12-2018 21:19:17",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi",
+                        "shob"
+                    ],
+                    "v": "1.0.0"
+                },
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi",
+                        "shob"
+                    ],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "bug",
+                "future"
+            ],
+            "task": "better layout",
+            "updated": "05-12-2018 21:19:17"
+        },
+        {
+            "cancel": false,
+            "created": "05-12-2018 21:35:24",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.0"
+                },
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [],
+            "task": "test new name clean",
+            "updated": "05-12-2018 21:35:24"
+        },
+        {
+            "cancel": false,
+            "created": "07-12-2018 16:45:32",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.0"
+                },
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "bug",
+                "future"
+            ],
+            "task": "testing naming of tags",
+            "updated": "07-12-2018 16:45:32"
+        },
+        {
+            "cancel": false,
+            "created": "07-12-2018 16:53:48",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi",
+                        "shob"
+                    ],
+                    "v": "1.0.0"
+                },
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi",
+                        "shob"
+                    ],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "future"
+            ],
+            "task": "testing more tasks",
+            "updated": "07-12-2018 16:53:48"
+        },
+        {
+            "cancel": false,
+            "created": "07-12-2018 16:54:50",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.0"
+                },
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "bug"
+            ],
+            "task": "testing naming of tags 2",
+            "updated": "07-12-2018 16:54:50"
+        },
+        {
+            "cancel": false,
+            "created": "07-12-2018 16:56:41",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi",
+                        "shob"
+                    ],
+                    "v": "1.0.0"
+                },
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi",
+                        "shob"
+                    ],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "bug",
+                "future"
+            ],
+            "task": "testing naming of tags 3",
+            "updated": "07-12-2018 16:56:41"
         }
     ],
     "types": {
@@ -159,6 +675,12 @@
             "shlomi": {
                 "desc": "The project manager",
                 "mail": "shlomi@gmail.com"
+            }
+        },
+        {
+            "shob": {
+                "desc": "a new user",
+                "mail": "hgfd@hsgdf.com"
             }
         }
     ],
