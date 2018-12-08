@@ -34,9 +34,10 @@ namespace tasker {
 		//Containers:
 		std::string  basepath;
 		std::string  fullpath;
-		json thestruct;
 
 	public:
+
+		json thestruct;
 
 		TaskerMain(tasker::moreOpt moreopt);
 		void setPath();
@@ -55,7 +56,7 @@ namespace tasker {
 		bool checkWriteObj(bool dir);
 		bool checkWriteObj(std::string& path);
 		bool writeObj(bool newobj);
-		bool loadObj();
+		int loadObj(std::string& version);
 
 		void printTaskerNotify(const std::string& mes);
 		void printTaskerInfo(const std::string& type, const std::string& mes);

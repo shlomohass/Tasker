@@ -1,0 +1,29 @@
+{
+    "name": [],
+    "note": "corrupt notes container",
+    "tags": [],
+    "tasker": {
+        "allowdelete": true,
+        "enableloads": true,
+        "usecolors": true,
+        "version": "1.0.1"
+    },
+    "tasks": [],
+    "types": {
+        "task": [
+            "desc",
+            "simple task"
+        ]
+    },
+    "users": [
+        {
+            "shlomi": {
+                "desc": "shlomi thae man",
+                "mail": "jgfsd@gsfd.com"
+            }
+        }
+    ],
+    "version": [
+        "1.0.1"
+    ]
+}

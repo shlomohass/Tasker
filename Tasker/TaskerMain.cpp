@@ -189,7 +189,7 @@ void TaskerMain::createEmpty()
 	this->thestruct["types"] = {{"task",{"desc","simple task"}}};
 	this->thestruct["tasks"] = json::array();
 	this->thestruct["tags"]	 = json::array();
-	this->thestruct["note"]	 = json::object();
+	this->thestruct["note"]	 = json::array();
 	std::string projName;
 	std::string projDesc;
 	std::string projVersion;
@@ -215,7 +215,7 @@ void TaskerMain::createEmpty()
 	//Finish:
 	this->thestruct["name"]		= projName;
 	this->thestruct["desc"]		= projDesc;
-	this->thestruct["version"]	= projVersion;
+	this->thestruct["version"] = json::array({ projVersion });
 	this->thestruct["users"].push_back({ { userName, {{"desc",userDesc },{"mail",userEmail }}} });
 }
 void TaskerMain::createEmpty(json structure) 
@@ -259,7 +259,7 @@ bool TaskerMain::writeObj(bool newobj)
 	} 
 	return false;
 }
-bool TaskerMain::loadObj()
+int TaskerMain::loadObj(std::string& version)
 {
 	if (this->checkWriteObj(true)) {
 		std::ifstream ifs(this->fullpath);
@@ -267,10 +267,21 @@ bool TaskerMain::loadObj()
 							(std::istreambuf_iterator<char>()));
 		ifs.close();
 		this->thestruct = json::parse(content.c_str());
-		return true;
+
+		//Check version:
+		if (this->thestruct["tasker"]["version"] == TASKER_VERSION) {
+			return 0;
+		} else {
+			version = this->thestruct["tasker"]["version"];
+			return 2;
+		}
 	}
-	return false;
+	return 1; 
+	// 0 ok run
+	// 1 no permission.
+	// 2 version 
 }
+
 
 //Prints:
 void TaskerMain::printTaskerNotify(const std::string& mes)

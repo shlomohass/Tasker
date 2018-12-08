@@ -120,6 +120,7 @@
     <ClCompile Include="argvparser.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TaskerMain.cpp" />
+    <ClCompile Include="TaskerUpgrade.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="argvparser.hpp" />
@@ -128,6 +129,7 @@
     <ClInclude Include="SETTASKER.hpp" />
     <ClInclude Include="TaskerMain.hpp" />
     <ClInclude Include="TaskerAdd.hpp" />
+    <ClInclude Include="TaskerUpgrade.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

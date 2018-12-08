@@ -21,7 +21,7 @@
 #include "SETTASKER.hpp"
 #include "TaskerAdd.hpp"
 #include "TaskerMain.hpp"
-
+#include "TaskerUpgrade.hpp"
 /*
 #ifndef _WIN32
 inline int _pipe(int fildes[2], unsigned psize, int textmode) {
@@ -41,6 +41,7 @@ namespace cm = CommandLineProcessing;
 void setMainArgs(
 	cm::ArgvParser *cmd, 
 	bool *run_init, 
+	bool *run_upgrade,
 	bool *enable_debug, 
 	bool *use_colors, 
 	bool *showclosed, 
@@ -51,6 +52,9 @@ void setMainArgs(
 	}
 	if (cmd->foundOption("init")) {
 		*run_init = true;
+	}
+	if (cmd->foundOption("upgrade")) {
+		*run_upgrade = true;
 	}
 	if (cmd->foundOption("discolor")) {
 		*use_colors = false;
@@ -83,7 +87,7 @@ int main(int argc, char** argv) {
 	cm::ArgvParser cmd;
 	bool enable_debug	= TASKER_DEBUG;
 	bool run_init		= false;
-
+	bool run_upgrade	= false;
 	//Additional options struct:
 	tasker::moreOpt moreopt;
 
@@ -93,6 +97,7 @@ int main(int argc, char** argv) {
 	
 	cmd.setHelpOption("h",		"help", "Print this help page");
 	cmd.defineOption("init",	"Initialize a `Tasker` object in the current path", cm::ArgvParser::NoOptionAttribute);
+	cmd.defineOption("upgrade", "Try upgrade a Tasker object to current version", cm::ArgvParser::NoOptionAttribute);
 	cmd.defineOption("debug",	"Enable debug mode.", cm::ArgvParser::NoOptionAttribute);
 	
 	cmd.defineOption("task",	"Add a new task -> Will ask for more options interactivly.", cm::ArgvParser::OptionRequiresValue);
@@ -170,6 +175,7 @@ int main(int argc, char** argv) {
 		setMainArgs(
 			&cmd, 
 			&run_init, 
+			&run_upgrade,
 			&enable_debug, 
 			&moreopt.use_colors, 
 			&moreopt.showclosed, 
@@ -217,18 +223,33 @@ int main(int argc, char** argv) {
 			Task->printTaskerInfo("Advice", "You can run '--destroy' to completely remove the instance.");
 			exit(exitCodeOk);
 		}
-	} else
+	}
+	else
 	//Handle Operations:
 	if (hasobj) {
 		//Load current obj:
-		if (!Task->loadObj()) {
+		std::string fileversion = "";
+		int loadParse = Task->loadObj(fileversion);
+		if (loadParse == 1) { //permissions
 			Task->printTaskerNotify("Oups!");
-			Task->printTaskerInfo("Error", "Can't load Tasker object make sure you ran `--init` in this directory before.");
+			Task->printTaskerInfo("Error", "Can't Read the Tasker object check permissions please.");
 			exit(exitCodeError);
-		} else {
-			//Get local options:
+		}
+		else if (run_upgrade) {
+			tasker::TaskerUpgrade TaskerUp = tasker::TaskerUpgrade(&Task->thestruct);
+			int upgradeCode = TaskerUp.run();
+			exit(exitCodeOk);
+		}
+		else if (loadParse == 2) { //Version mismatch
+			Task->printTaskerNotify("Version Mismatch!");
+			Task->printTaskerInfo("Error", "The tasker file you are targeting is not compatible with this version.");
+			Task->printTaskerInfo("Info", std::string("File Version: ") + fileversion + std::string(" != Tasker Version: ") + std::string(TASKER_VERSION));
+			Task->printTaskerInfo("Advice", "You can run '--upgrade' to try repare the Tasker object file.");
+			exit(exitCodeError);
+		} else { // Ok load options:
 			Task->parseOptions(cmd.foundOption("discolor"));
 		}
+
 		//Handle set tasks:
 		if (cmd.foundOption("task")) {
 			// Write new task:
