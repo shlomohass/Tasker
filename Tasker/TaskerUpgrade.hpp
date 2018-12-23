@@ -9,8 +9,8 @@
 #ifndef TaskerUpgrade_hpp
 #define TaskerUpgrade_hpp
 
-#include "TaskerAdd.hpp"
-#include "json3.4.0.hpp"
+#include "TaskerBase.hpp"
+
 #include <string>
 #include <vector>
 
@@ -18,7 +18,7 @@ namespace tasker {
 
 	using json = nlohmann::json;
 
-	class TaskerUpgrade
+	class TaskerUpgrade : TaskerBase
 	{
 		json* thestruct;
 	public:

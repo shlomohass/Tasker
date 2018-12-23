@@ -1,7 +1,29 @@
 {
     "name": [],
     "note": "corrupt notes container",
-    "tags": [],
+    "tags": [
+        {
+            "parser": {
+                "desc": "the c++ parser of the exams"
+            }
+        },
+		"test tag",
+        {
+            "frontend": {
+                "desc": "the web frontend dev"
+            }
+        },
+        {
+            "backend": {
+                "desc": "all the web base backend"
+            }
+        },
+        {
+            "admin": {
+                "desc": "administration tools development"
+            }
+        }
+    ],
     "tasker": {
         "allowdelete": true,
         "enableloads": true,

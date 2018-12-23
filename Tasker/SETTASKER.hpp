@@ -47,6 +47,7 @@
 /**
 * Set Default obj name
 */
+#define TASKER_NAME_MIN_LEN 2
 #define TASKER_USER_PREFIX "@"
 #define TASKER_USER_NOT_ASSIGNED "not assigned"
 #define TASKER_TAG_PREFIX "#"

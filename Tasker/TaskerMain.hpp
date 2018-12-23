@@ -9,12 +9,10 @@
 #ifndef TaskerMain_hpp
 #define TaskerMain_hpp
 
-#include "TaskerAdd.hpp"
-#include "json3.4.0.hpp"
+#include "TaskerBase.hpp"
+
 #include <string>
 #include <vector>
-#include <iomanip>      // std::get_time
-#include <time.h>
 
 namespace tasker {
 
@@ -26,7 +24,7 @@ namespace tasker {
 		int taskId;
 		int reportId;
 	};
-	class TaskerMain
+	class TaskerMain : TaskerBase
 	{
 		//Options:
 		tasker::moreOpt opt;
@@ -61,47 +59,7 @@ namespace tasker {
 		void printTaskerNotify(const std::string& mes);
 		void printTaskerInfo(const std::string& type, const std::string& mes);
 
-
-		std::string getcurdatetime();
-		std::string getcurdatetime(const std::string& format);
-		int parseDateParts(const std::string& datestr, int& day, int& month, int& year, int& hours, int& minutes, int& seconds);
-		int parseDateParts(const std::string& datestr, const std::string& format, int& day, int& month, int& year, int& hours, int& minutes, int& seconds);
-		std::string createDateFromInts(int day, int mon, int year, int hour, int min, int sec);
-		bool isFloat(std::string str);
-		float getFloat(std::string str);
-		std::vector<int> parseTaskListStr(std::string str);
-
-		//colors:
-		std::string getcolor(const std::string& which);
-		std::string getcolor(const std::string& which, const std::string& svalue);
-		std::string getcolor(const std::string& which, float fvalue);
-		std::string getcolor(const std::string& which, float fvalue, const std::string& svalue);
-		char usecolor();
-
-		//Helpers
-		float normalizeStatus(std::string str);
-		std::string getUserString(std::vector<std::string>& users, std::string prefix, bool addNotAssigned);
-		std::time_t getEpochTime(const std::wstring& dateTime);
-		bool findDefinedUser(const std::string& user, bool multi);
-		int findDefinedUser(const std::string& user);
-		bool findDefinedTag(const std::string& tag, bool multi);
-		int findDefinedTag(const std::string& tag);
-		std::string getDefindUserName(int index);
-		std::string getReservedUserNames(const std::string& deli);
-		std::string getReservedTagNames(const std::string& deli);
-		std::string trim_gen(const std::string& str, const char rem);
-		void cleanString(std::string& str, const std::vector<char>& rem);
-		std::vector<std::string> splitString(const std::string &text, char sep);
 		exists findRow(const std::string& strId);
-		bool onlyDigits(const std::string str);
-
-		//Console get:
-		std::vector<std::string> getUserName(bool& push_plan, bool allowskip, int taskIdForSkip, const std::string& userFixStr);
-		std::string getStrMessage(const std::string& err);
-		std::string getStrDate(const std::string& err, bool allowSkip);
-		int         getLoad(const std::string& err);
-		std::vector<std::string> getTags(const std::string& err);
-		std::string getStrVersion(bool& push_plan, bool allowskip, const std::string& versionForSkip);
 
 		//Task Operations:
 		bool setNewTask(const std::string& strTask);

@@ -119,6 +119,7 @@
   <ItemGroup>
     <ClCompile Include="argvparser.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TaskerBase.cpp" />
     <ClCompile Include="TaskerMain.cpp" />
     <ClCompile Include="TaskerUpgrade.cpp" />
   </ItemGroup>
@@ -127,6 +128,7 @@
     <ClInclude Include="json3.4.0.hpp" />
     <ClInclude Include="json2.1.1.hpp" />
     <ClInclude Include="SETTASKER.hpp" />
+    <ClInclude Include="TaskerBase.hpp" />
     <ClInclude Include="TaskerMain.hpp" />
     <ClInclude Include="TaskerAdd.hpp" />
     <ClInclude Include="TaskerUpgrade.hpp" />

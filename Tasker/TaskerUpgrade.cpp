@@ -7,8 +7,6 @@
 //
 
 #include "TaskerUpgrade.hpp"
-#include "SETTASKER.hpp"
-#include "TaskerAdd.hpp"
 
 namespace tasker {
 
@@ -39,9 +37,6 @@ namespace tasker {
 		this->check_tags();
 
 		/*
-		if (this->thestruct->count("tags") == 1) {
-
-		}
 		if (this->thestruct->count("types") == 1) {
 
 		}
@@ -266,7 +261,8 @@ namespace tasker {
 	}
 	bool TaskerUpgrade::check_tags() {
 
-		//check users container:
+		json container = json::array();
+		//check tags container:
 		if (this->thestruct->count("tags") == 1) {
 			if (!this->thestruct->at("tags").is_array()) {
 				if (this->promptUser("  >>> Project tags container is not compatible - do you want to fix it ? (data will be lost):")) {
@@ -278,36 +274,38 @@ namespace tasker {
 			}
 			else {
 				//Check defined tags:
-				for (auto &it : this->thestruct->at("tags")) {
+				std::vector<int> toremove;
+				for (auto &it : this->thestruct->at("tags").items()) {
+					if (it.value().is_object()) {
+						for (auto &ite : it.value().items()) {
+							if (ite.value().is_object() && ite.key()) {
+								std::cout << "good value: " << ite.value() << '\n';
+							} else {
 
-					// "it" is of type json::reference and has no key() member
-					std::cout << "value: " << it << '\n';
+							}
+						}
+					}
+					else {
+						std::cout << "found bad value: " << it.value() <<  " deleting..." << '\n';
+						toremove.push_back(std::stoi(it.key()));
+					}
 				}
-				for (json::iterator it )
-				std::cout << "  >>> Project Tags is OK." << std::endl;
+				//delete if any:
+				for (int &it : toremove) {
+					this->thestruct->at("tags").erase(
+						this->thestruct->at("tags").begin() + it);
+				}
 			}
 		} else {
 			//create Tags:
 			this->thestruct->emplace("tags", json::array());
 			std::cout << "  >>> Project Tags container is missing -> created new container." << std::endl;
 		}
-		if (emptyUsers) {
 
-			//get default user:
-			std::string userName = this->getFromUser("    > set default user name: ");
-			std::string userDesc = this->getFromUser("    > set user description: ");
-			std::string userMail = this->getFromUser("    > set user Email address: ");
-
-			//store:
-			this->thestruct->at("users").push_back(
-				{
-					userName,{
-						{ "desc", userDesc },
-				{ "mail", userMail }
-				}
-				}
-			);
-			std::cout << "  >>> Project Users is fixed." << std::endl;
+		//checks...
+		//Check defined tags:
+		for (auto &it : this->thestruct->at("tags").items()) {
+			std::cout << "found value: " << it.value() << '\n';
 		}
 		return true;
 	}
