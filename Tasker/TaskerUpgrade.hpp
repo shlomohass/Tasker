@@ -18,12 +18,13 @@ namespace tasker {
 
 	using json = nlohmann::json;
 
-	class TaskerUpgrade : TaskerBase
+	class TaskerUpgrade : public TaskerBase
 	{
-		json* thestruct;
+
 	public:
 
-		TaskerUpgrade(json* _thestruct);
+		TaskerUpgrade();
+
 		int run();
 		
 		//Procedures:
@@ -32,10 +33,14 @@ namespace tasker {
 		bool check_note();
 		bool check_taskersys();
 		bool check_users();
-		bool check_tags();
+		int  check_tags();
+		bool check_version();
+		bool check_types();
+		int  check_tasks();
+		bool check_tasks_meta();
+
 		//Helpers:
 		std::string getFromUser(const std::string& mes);
-		bool promptUser(const std::string& mes);
 		virtual ~TaskerUpgrade();
 	};
 

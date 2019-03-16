@@ -52,7 +52,13 @@ namespace tasker {
 
 	class TaskerBase
 	{
+
 		public:
+
+			static json thestruct;
+
+			//Options:
+			tasker::moreOpt opt;
 
 			//Validation stuff:
 			bool checkValidUserName(const std::string& name);
@@ -75,6 +81,11 @@ namespace tasker {
 			std::string getcolor(const std::string& which, float fvalue, const std::string& svalue);
 			char usecolor();
 
+			//Printing:
+			void printTaskerNotify(const std::string& mes);
+			void printTaskerInfo(const std::string& type, const std::string& mes);
+			std::string getTagsAsStr();
+
 			//Console get:
 			std::vector<std::string> getUserName(bool& push_plan, bool allowskip, int taskIdForSkip, const std::string& userFixStr);
 			std::string getStrMessage(const std::string& err);
@@ -82,7 +93,10 @@ namespace tasker {
 			int         getLoad(const std::string& err);
 			std::vector<std::string> getTags(const std::string& err);
 			std::string getStrVersion(bool& push_plan, bool allowskip, const std::string& versionForSkip);
+			bool promptUser(const std::string& mes);
 
+			//Basic Op:
+			exists findRow(const std::string& strId);
 
 			//Helpers
 			bool isFloat(std::string str);
@@ -96,7 +110,15 @@ namespace tasker {
 			std::string getDefindUserName(int index);
 			std::string getReservedUserNames(const std::string& deli);
 			std::string getReservedTagNames(const std::string& deli);
+
 			std::string trim_gen(const std::string& str, const char rem);
+			void ltrim(std::string &s);
+			void rtrim(std::string &s);
+			void trim(std::string &s);
+			std::string ltrim_copy(std::string s);
+			std::string rtrim_copy(std::string s);
+			std::string trim_copy(std::string s);
+
 			void cleanString(std::string& str, const std::vector<char>& rem);
 			std::vector<std::string> splitString(const std::string &text, char sep);
 			std::vector<int> parseTaskListStr(std::string str);

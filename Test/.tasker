@@ -14,7 +14,7 @@
             }
         },
         {
-            "backend": {
+            "default": {
                 "desc": "all the web base backend"
             }
         },
@@ -30,7 +30,38 @@
         "usecolors": true,
         "version": "1.0.1"
     },
-    "tasks": [],
+    "tasks": [
+		{
+			"statusy" : "cancel"
+		},
+		[ "shlomi" ],
+		{
+            "cancel": "test",
+            "created": "09-12-2017 21:05:32",
+            "load": "shlomi",
+            "plan": [
+                {
+                    "date": "09-12-2017 23:59:00",
+                    "user": [],
+                    "v": "1.0.0"
+                }
+            ],
+            "report": [
+                {
+                    "by": [
+                        "shlomi"
+                    ],
+                    "date": "09-12-2017 22:05:41",
+                    "note": "created basic color template",
+                    "status": 0.379999995231628
+                }
+            ],
+            "status": 0.379999995231628,
+            "tagged": "future",
+            "task": "design logo",
+            "updated": "09-12-2017 21:05:32"
+        }
+	],
     "types": {
         "task": [
             "desc",

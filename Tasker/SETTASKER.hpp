@@ -62,6 +62,15 @@
 #define TASKER_SPLIT_DELI_CHAR ','
 #endif
 
+#ifndef TASKER_BASIC_ELE
+/**
+* Set some default objects:
+*/
+#define TASKER_BASIC_TYPE_NAME "task"
+#define TASKER_BASIC_TYPE_DESC "basic task"
+#define TASKER_FIXED_EMPTY_TASK_DESC "missing task description"
+#endif
+
 /**
 * Set the list delimeter for inputs:
 */

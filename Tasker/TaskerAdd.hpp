@@ -30,6 +30,13 @@ namespace tasker
 		bool del_items;
 		std::string detailsLevel;
 	};
+
+	struct exists {
+		int type; // 0 - notset, 1 - task, 2 - report, 3 - note
+		float id;
+		int taskId;
+		int reportId;
+	};
 }
 
 #endif /* TaskerAdd_hpp */

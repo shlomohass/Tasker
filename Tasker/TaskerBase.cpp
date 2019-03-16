@@ -10,6 +10,9 @@
 
 namespace tasker {
 
+	json TaskerBase::thestruct;
+
+	//Validation stuff:
 	bool TaskerBase::checkValidUserName(const std::string& name) {
 		if (name.length() < TASKER_NAME_MIN_LEN) { return false; } /* name must be atleast * chars long */
 		if (std::find(RESERVE_USER_NAMES.begin(), RESERVE_USER_NAMES.end(), name) != RESERVE_USER_NAMES.end()) {
@@ -193,6 +196,55 @@ namespace tasker {
 		return '\033';
 	}
 
+	//Printing:
+	void TaskerBase::printTaskerNotify(const std::string& mes)
+	{
+		std::cout
+			<< " * "
+			<< this->usecolor() << this->getcolor("notify")
+			<< "Tasker said"
+			<< this->usecolor() << this->getcolor("reset")
+			<< " : "
+			<< trim_copy(mes)
+			<< std::endl;
+	}
+	void TaskerBase::printTaskerInfo(const std::string& type, const std::string& mes) // Types Error, Advice, Note
+	{
+		std::string useColor = "note";
+		if (type == "Error") {
+			useColor = "error";
+		}
+		else if (type == "Advice") {
+			useColor = "advice";
+		}
+		std::cout
+			<< "     "
+			<< this->usecolor() << this->getcolor(useColor)
+			<< type
+			<< " -> "
+			<< this->usecolor() << this->getcolor("reset")
+			<< trim_copy(mes) << std::endl;
+	}
+	std::string TaskerBase::getTagsAsStr() {
+		int i = 0;
+		std::stringstream sstr;
+
+		int tot = (int)TaskerBase::thestruct["tags"].size();
+		if (tot < 1) {
+			return "";
+		}
+		else {
+			for (json::iterator it = TaskerBase::thestruct["tags"].begin(); it != TaskerBase::thestruct["tags"].end(); ++it) {
+				for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
+					i++;
+					sstr << ite.key();
+					if (i < tot) sstr << ", ";
+				}
+			}
+		}
+		return std::string(sstr.str());
+	}
+
 	//Console get:
 	std::vector<std::string> TaskerBase::getUserName(bool& push_plan, bool allowskip, int taskIdForSkip, const std::string& userFixStr) {
 		bool showAdvice = true;
@@ -219,7 +271,7 @@ namespace tasker {
 					userStr = userFixStr;
 				}
 				else {
-					userStr = this->thestruct["tasks"].at(taskIdForSkip).at("plan").back().at("user").get<std::string>();
+					userStr = TaskerBase::thestruct["tasks"].at(taskIdForSkip).at("plan").back().at("user").get<std::string>();
 				}
 				reloop = false;
 
@@ -229,14 +281,14 @@ namespace tasker {
 			}
 			else if (userStr == "?") {
 				int i = 0;
-				int tot = (int)this->thestruct["users"].size();
+				int tot = (int)TaskerBase::thestruct["users"].size();
 				this->printTaskerInfo("Help", " Type one of those or several of them seperated by a single space.");
 				std::cout << "             " << this->usecolor() << this->getcolor("faded");
 				if (tot < 1) {
 					std::cout << "No users created!";
 				}
 				else {
-					for (json::iterator it = this->thestruct["users"].begin(); it != this->thestruct["users"].end(); ++it) {
+					for (json::iterator it = TaskerBase::thestruct["users"].begin(); it != TaskerBase::thestruct["users"].end(); ++it) {
 						for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
 							i++;
 							std::cout << ite.key();
@@ -374,23 +426,13 @@ namespace tasker {
 				break;
 			}
 			else if (tagStr == "?") {
-				int i = 0;
-				int tot = (int)this->thestruct["tags"].size();
+				std::string tagsString = this->getTagsAsStr();
 				this->printTaskerInfo("Help", " Type one of those or several of them seperated by a single space.");
 				std::cout << "             " << this->usecolor() << this->getcolor("faded");
-				if (tot < 1) {
+				if (tagsString == "") {
 					std::cout << "No tags defined!";
-				}
-				else {
-					for (json::iterator it = this->thestruct["tags"].begin(); it != this->thestruct["tags"].end(); ++it) {
-						for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
-							i++;
-							std::cout << ite.key();
-							if (i < tot) {
-								std::cout << ", ";
-							}
-						}
-					}
+				} else {
+					std::cout << tagsString;
 				}
 				std::cout << this->usecolor() << this->getcolor("reset") << std::endl;
 				std::cout << "\tType: ";
@@ -423,7 +465,7 @@ namespace tasker {
 	}
 	std::string TaskerBase::getStrVersion(bool& push_plan, bool allowskip, const std::string& versionForSkip) {
 		std::string version;
-		std::string currentversion = this->thestruct["version"];
+		std::string currentversion = TaskerBase::thestruct["version"];
 		std::getline(std::cin, version);
 		if (version == "skip" && allowskip) {
 			version = versionForSkip;
@@ -433,6 +475,57 @@ namespace tasker {
 			version = this->trim_gen((version != "" ? version : currentversion), '"');
 		}
 		return version;
+	}
+	bool TaskerBase::promptUser(const std::string& mes) {
+		std::string buffer = "";
+		std::cout << mes;
+		std::getline(std::cin, buffer);
+		return buffer == "y" || buffer == "yes" || buffer == "ok" || buffer == "go";
+	}
+
+	//Basic op
+	/* Finds a row base on a string [23 | 23.3 ...]
+	 * Returns an exists object that identify wich type it is and what is the correct id.
+	 * note: will ignore cancels....
+	*/
+	exists TaskerBase::findRow(const std::string& strId) {
+		exists ret;
+		ret.type = 0;
+		std::vector<std::string> parts = this->splitString(strId, '.');
+		if (parts.size() == 1 && this->onlyDigits(parts.at(0))) {
+			//Target a task row:
+			ret.type = 1;
+			ret.taskId = stoi(parts.at(0)) - 1;
+			ret.id = stof(parts.at(0));
+			//Validate Id
+			if (ret.taskId < 0
+				|| (int)TaskerBase::thestruct["tasks"].size() <= ret.taskId
+				|| TaskerBase::thestruct["tasks"].at(ret.taskId).at("cancel") == true
+				) {
+				ret.type = 0;
+				return ret;
+			};
+		}
+		else if (parts.size() == 2 && this->onlyDigits(parts.at(0)) && this->onlyDigits(parts.at(1))) {
+			//Target a report row:
+			ret.type = 2;
+			ret.taskId = stoi(parts.at(0)) - 1;
+			ret.reportId = stoi(parts.at(1)) - 1;
+			ret.id = stof(parts.at(0) + "." + parts.at(1));
+			//Validate Id
+			if (ret.taskId < 0
+				|| (int)TaskerBase::thestruct["tasks"].size() <= ret.taskId
+				|| TaskerBase::thestruct["tasks"].at(ret.taskId).at("cancel") == true
+				|| (int)TaskerBase::thestruct["tasks"].at(ret.taskId).at("report").size() <= ret.reportId
+				) {
+				ret.type = 0;
+				return ret;
+			};
+		}
+		else {
+			return ret;
+		}
+		return ret;
 	}
 
 	//Helpers:
@@ -489,7 +582,7 @@ namespace tasker {
 	int TaskerBase::findDefinedUser(const std::string& user) {
 		bool check = 0;
 		int  index = 0;
-		for (json::iterator it = this->thestruct["users"].begin(); it != this->thestruct["users"].end(); ++it) {
+		for (json::iterator it = TaskerBase::thestruct["users"].begin(); it != TaskerBase::thestruct["users"].end(); ++it) {
 			for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
 				if (ite.key() == user)
 					return index;
@@ -511,7 +604,7 @@ namespace tasker {
 	int TaskerBase::findDefinedTag(const std::string& tag) {
 		bool check = 0;
 		int  index = 0;
-		for (json::iterator it = this->thestruct["tags"].begin(); it != this->thestruct["tags"].end(); ++it) {
+		for (json::iterator it = TaskerBase::thestruct["tags"].begin(); it != TaskerBase::thestruct["tags"].end(); ++it) {
 			for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
 				if (ite.key() == tag)
 					return index;
@@ -521,10 +614,10 @@ namespace tasker {
 		return -1;
 	}
 	std::string TaskerBase::getDefindUserName(int index) {
-		for (unsigned i = 0; i < this->thestruct["users"].size(); i++) {
+		for (unsigned i = 0; i < TaskerBase::thestruct["users"].size(); i++) {
 			if (i == index) {
-				for (json::iterator ite = this->thestruct["users"].at(i).begin();
-					ite != this->thestruct["users"].at(i).end();
+				for (json::iterator ite = TaskerBase::thestruct["users"].at(i).begin();
+					ite != TaskerBase::thestruct["users"].at(i).end();
 					++ite
 					) {
 					return ite.key();
@@ -536,14 +629,14 @@ namespace tasker {
 	std::string TaskerBase::getReservedUserNames(const std::string& deli)
 	{
 		std::string reserved_names_str;
-		for (auto value : tasker::reserve_user_names)
+		for (auto value : RESERVE_USER_NAMES)
 			reserved_names_str += value + deli;
 		return reserved_names_str.substr(0, reserved_names_str.size() - deli.size());
 	}
 	std::string TaskerBase::getReservedTagNames(const std::string& deli)
 	{
 		std::string reserved_names_str;
-		for (auto value : tasker::reserve_tag_names)
+		for (auto value : RESERVE_TAG_NAMES)
 			reserved_names_str += value + deli;
 		return reserved_names_str.substr(0, reserved_names_str.size() - deli.size());
 	}
@@ -553,6 +646,38 @@ namespace tasker {
 		if (std::string::npos == first) return str;
 		size_t last = str.find_last_not_of(rem);
 		return str.substr(first, (last - first + 1));
+	}
+	// trim from start (in place)
+	void TaskerBase::ltrim(std::string &s) {
+		s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+			return !std::isspace(ch);
+		}));
+	}
+	// trim from end (in place)
+	void TaskerBase::rtrim(std::string &s) {
+		s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+			return !std::isspace(ch);
+		}).base(), s.end());
+	}
+	// trim from both ends (in place)
+	void TaskerBase::trim(std::string &s) {
+		ltrim(s);
+		rtrim(s);
+	}
+	// trim from start (copying)
+	std::string TaskerBase::ltrim_copy(std::string s) {
+		ltrim(s);
+		return s;
+	}
+	// trim from end (copying)
+	std::string TaskerBase::rtrim_copy(std::string s) {
+		rtrim(s);
+		return s;
+	}
+	// trim from both ends (copying)
+	std::string TaskerBase::trim_copy(std::string s) {
+		trim(s);
+		return s;
 	}
 	void TaskerBase::cleanString(std::string& str, const std::vector<char>& rem)
 	{

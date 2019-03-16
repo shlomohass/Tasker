@@ -236,7 +236,7 @@ int main(int argc, char** argv) {
 			exit(exitCodeError);
 		}
 		else if (run_upgrade) {
-			tasker::TaskerUpgrade TaskerUp = tasker::TaskerUpgrade(&Task->thestruct);
+			tasker::TaskerUpgrade TaskerUp = tasker::TaskerUpgrade();
 			int upgradeCode = TaskerUp.run();
 			exit(exitCodeOk);
 		}
