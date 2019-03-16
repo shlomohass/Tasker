@@ -84,6 +84,7 @@ namespace tasker {
 			//Printing:
 			void printTaskerNotify(const std::string& mes);
 			void printTaskerInfo(const std::string& type, const std::string& mes);
+			void printTaskerHighlighted(const std::string& mes, const std::string& value, std::size_t startneedle, bool loopall);
 			std::string getTagsAsStr();
 
 			//Console get:

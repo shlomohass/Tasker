@@ -188,6 +188,9 @@ namespace tasker {
 		if (which == "note") {
 			return TASKER_COLOR_CYAN;
 		}
+		if (which == "high") {
+			return TASKER_COLOR_HIGHLIGHT;
+		}
 		return "";
 	}
 	char TaskerBase::usecolor()
@@ -224,6 +227,19 @@ namespace tasker {
 			<< " -> "
 			<< this->usecolor() << this->getcolor("reset")
 			<< trim_copy(mes) << std::endl;
+	}
+	//Printing:
+	void TaskerBase::printTaskerHighlighted(const std::string& mes, const std::string& value, std::size_t startneedle, bool loopall)
+	{
+		std::string print = mes;
+		while (startneedle != std::string::npos) {
+			std::cout << print.substr(0, startneedle) << this->usecolor() << this->getcolor("high");
+			std::cout << print.substr(startneedle, value.length()) << this->usecolor() << this->getcolor("reset");
+			print = print.substr(startneedle + value.length(), print.length() - (startneedle + value.length()));
+			startneedle = print.find(value);
+			if (!loopall) break;
+		}
+		std::cout << print << this->usecolor() << this->getcolor("reset") << std::endl;
 	}
 	std::string TaskerBase::getTagsAsStr() {
 		int i = 0;

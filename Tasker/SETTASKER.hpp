@@ -119,6 +119,7 @@
 #define TASKER_COLOR_MAGENTA	"[0;1;35m"
 #define TASKER_COLOR_BLUE		"[0;1;34m"
 #define TASKER_COLOR_CYAN		"[0;1;36m"
+#define TASKER_COLOR_HIGHLIGHT  "[0;1;43m"
 #endif
 
 #endif	/* SETTASKER_H */

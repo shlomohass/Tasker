@@ -67,6 +67,8 @@ namespace tasker {
 		bool adduser(const std::string& _user);
 		bool deluser(const std::string& _user);
 		bool updateuser(const std::string& _user);
+		bool searchvalue(const std::string& _value);
+		int searchAndPrint(const std::string& str, const std::string& value, const std::string& rowindex, int searchtype);
 		bool list(const std::string& _level, const std::string& which);
 		bool list(const std::string& _level, const std::string& which, const std::string& filter);
 

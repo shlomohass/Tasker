@@ -105,6 +105,8 @@ int main(int argc, char** argv) {
 	cmd.defineOption("report",	"Report progress to a task -> Will ask for more options and settings interactivly", cm::ArgvParser::OptionRequiresValue);
 	
 	cmd.defineOption("show", "Show in detail a single task information -> Expects task ID.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("search", "Search related taskd -> Expects task ID.", cm::ArgvParser::OptionRequiresValue);
+
 	cmd.defineOption("refactor", "Refactor a Task or a report progress of a task Expect integer that represents the task id or a float that represets the report.", cm::ArgvParser::OptionRequiresValue);
 
 	cmd.defineOption("cancel",	"Cancel a task -> Will be reserved and later could be activated.", cm::ArgvParser::OptionRequiresValue);
@@ -151,6 +153,7 @@ int main(int argc, char** argv) {
 	cmd.defineOptionAlternative("update",		"u");
 	cmd.defineOptionAlternative("deltask",		"dt");
 	cmd.defineOptionAlternative("details",		"d");
+	cmd.defineOptionAlternative("search",		"s");
 	cmd.defineOptionAlternative("listall",		"la");
 	cmd.defineOptionAlternative("listdone",		"ld");
 	cmd.defineOptionAlternative("listcancel",	"lc");
@@ -470,6 +473,19 @@ int main(int argc, char** argv) {
 			if (!Task->writeObj(true)) {
 				Task->printTaskerNotify("Oups!");
 				Task->printTaskerInfo("Error", "Could not write to Tasker object.");
+				exit(exitCodeError);
+			}
+		}
+		//Handle report to task:
+		if (cmd.foundOption("search")) {
+			// Write new task report:
+			std::string searchVal = cmd.optionValue("search");
+			if (!Task->searchvalue(searchVal)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Task could not be found or input is invalid. Task may also be canceled.");
+				Task->printTaskerInfo("Info", "You can run `--listall {level 1,2}` to see all listed tasks");
+				Task->printTaskerInfo("Info", "You can run `--listcancel` to see all canceled tasks");
+				Task->printTaskerInfo("Info", "You can enable a task again by running `--enabletask {id}`");
 				exit(exitCodeError);
 			}
 		}

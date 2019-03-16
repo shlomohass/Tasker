@@ -1139,7 +1139,7 @@ bool TaskerMain::showstats(const std::string& type)
 }
 bool TaskerMain::adduser(const std::string& _user)
 {
-	std::string user = trim_gen(trim_copy(_user), '"');
+	std::string user = this->trim_gen(this->trim_copy(_user), '"');
 	std::string desc;
 	std::string mail;
 
@@ -1310,6 +1310,73 @@ bool TaskerMain::updateuser(const std::string& _user)
 	return true;
 }
 
+bool TaskerMain::searchvalue(const std::string& _value) {
+
+	//Clean the term  
+	std::string value = this->trim_gen(this->trim_copy(_value), '"');
+	int foundcountintasks = 0;
+	int foundcountinreports = 0;
+	//searchtype-> 1 end with, 2 begin with, 3 any match
+	int searchtype = (value.find("*") == 0) ? 1 : 0;
+	searchtype = ((value.find("*") == (value.length() - 1)) && searchtype == 0) ? 2 : searchtype;
+	searchtype = (searchtype == 0) ? 3 : searchtype;
+	value = this->trim_gen(this->trim_copy(value), '*');
+	
+	//Print header
+	this->printTaskerInfo("Searching in Tasks", value);
+
+	//loop defined tasks:
+	for (auto &it : TaskerBase::thestruct["tasks"].items()) {
+		std::string row = (std::string)it.value().at("task");
+		foundcountintasks += this->searchAndPrint(row, value, std::to_string((std::stoi(it.key()) + 1)), searchtype);
+	}
+	if (foundcountintasks == 0) {
+		std::cout << "        > No matches found in task titles" << std::endl << std::endl;
+	}
+	else { std::cout << std::endl; }
+
+	//Print header
+	this->printTaskerInfo("Searching in Reports", value);
+	//loop defined tasks:
+	for (auto &it : TaskerBase::thestruct["tasks"].items()) {
+		for (auto &ite : it.value().at("report").items()) {
+			std::string row = (std::string)ite.value().at("note");
+			foundcountinreports += this->searchAndPrint(
+				row, 
+				value, 
+				std::to_string((std::stoi(it.key()) + 1)) + "." + std::to_string((std::stoi(ite.key()) + 1)), 
+				searchtype
+			);
+		}
+	}
+	if (foundcountinreports == 0) {
+		std::cout << "        > No matches found in task reports" << std::endl << std::endl;
+	}
+	else { std::cout << std::endl; }
+
+	this->printTaskerNotify("Found " + std::to_string(foundcountinreports + foundcountintasks) + " Results.");
+	
+	return true;
+}
+int TaskerMain::searchAndPrint(const std::string& str, const std::string& value, const std::string& rowindex, int searchtype) {
+	std::size_t needle = (searchtype == 1) ? str.rfind(value) : str.find(value);
+	if (searchtype == 3 && needle != std::string::npos) {
+		std::cout << "        (" << rowindex << ") -> ";
+		this->printTaskerHighlighted(str, value, needle, true);
+	}
+	else if (searchtype == 2 && needle == 0) {
+		std::cout << "        (" << rowindex << ") -> ";
+		this->printTaskerHighlighted(str, value, needle, false);
+	}
+	else if (searchtype == 1 && needle == (str.length() - value.length())) {
+		std::cout << "        (" << rowindex << ") -> ";
+		this->printTaskerHighlighted(str, value, needle, false);
+	}
+	else {
+		return 0;
+	}
+	return 1;
+}
 bool TaskerMain::list(const std::string& _level, const std::string& which) {
 	return this->list(_level, which, "");
 }
