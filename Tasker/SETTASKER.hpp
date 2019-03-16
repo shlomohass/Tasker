@@ -43,6 +43,13 @@
 #define TASKER_BASELIST_LEVEL "2" 
 #endif
 
+#ifndef TASKER_RESULT_LIMIT
+/**
+* Set Result limits
+*/
+#define TASKER_RESULT_LIMIT 100 
+#endif
+
 #ifndef TASKER_NAMES_PREFIX
 /**
 * Set Default obj name

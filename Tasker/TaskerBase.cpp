@@ -32,6 +32,21 @@ namespace tasker {
 		if (str == "") return false;
 		return str.find_first_not_of("0123456789") == std::string::npos;
 	}
+	bool TaskerBase::isInteger(const std::string str) {
+		if (str == "") return false;
+		return str.find_first_not_of("0123456789") == std::string::npos;
+	}
+	bool TaskerBase::isNumber(const std::string str) {
+		if (str == "") return false;
+		return str.find_first_not_of("0123456789.") == std::string::npos;
+	}
+	bool TaskerBase::isFloat(std::string str) {
+		std::istringstream iss(str);
+		float f;
+		iss >> std::noskipws >> f; // noskipws considers leading whitespace invalid
+								   // Check the entire string was consumed and if either failbit or badbit is set
+		return iss.eof() && !iss.fail();
+	}
 
 	//Time related:
 	std::string TaskerBase::getcurdatetime() {
@@ -545,13 +560,6 @@ namespace tasker {
 	}
 
 	//Helpers:
-	bool TaskerBase::isFloat(std::string str) {
-		std::istringstream iss(str);
-		float f;
-		iss >> std::noskipws >> f; // noskipws considers leading whitespace invalid
-								   // Check the entire string was consumed and if either failbit or badbit is set
-		return iss.eof() && !iss.fail();
-	}
 	float TaskerBase::getFloat(std::string str)
 	{
 		return std::stof(str);

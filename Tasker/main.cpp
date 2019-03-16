@@ -104,8 +104,9 @@ int main(int argc, char** argv) {
 	cmd.defineOption("taskid",  "Defines a task id to target -> is used with several procedures.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("report",	"Report progress to a task -> Will ask for more options and settings interactivly", cm::ArgvParser::OptionRequiresValue);
 	
-	cmd.defineOption("show", "Show in detail a single task information -> Expects task ID.", cm::ArgvParser::OptionRequiresValue);
-	cmd.defineOption("search", "Search related taskd -> Expects task ID.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("show",	"Show in detail a single task information -> Expects task ID.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("search",  "Search related taskd -> Expects a search term.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("limit",   "Limit the number of results that will be returned -> Expects a number.", cm::ArgvParser::OptionRequiresValue);
 
 	cmd.defineOption("refactor", "Refactor a Task or a report progress of a task Expect integer that represents the task id or a float that represets the report.", cm::ArgvParser::OptionRequiresValue);
 
@@ -154,6 +155,7 @@ int main(int argc, char** argv) {
 	cmd.defineOptionAlternative("deltask",		"dt");
 	cmd.defineOptionAlternative("details",		"d");
 	cmd.defineOptionAlternative("search",		"s");
+	cmd.defineOptionAlternative("limit",		"lim");
 	cmd.defineOptionAlternative("listall",		"la");
 	cmd.defineOptionAlternative("listdone",		"ld");
 	cmd.defineOptionAlternative("listcancel",	"lc");
@@ -205,6 +207,14 @@ int main(int argc, char** argv) {
 	}
 	else {
 		moreopt.detailsLevel = "";
+	}
+	// does it has a limit predefined ?
+	if (cmd.foundOption("limit") && tasker::TaskerBase::isInteger(cmd.optionValue("limit"))) {
+		//Get the limit integer string:
+		moreopt.limit = std::stoi(cmd.optionValue("limit"));
+	}
+	else {
+		moreopt.limit = TASKER_RESULT_LIMIT;
 	}
 
 	//Main Tasker Object:

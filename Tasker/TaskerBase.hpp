@@ -64,6 +64,9 @@ namespace tasker {
 			bool checkValidUserName(const std::string& name);
 			bool checkValidTagName(const std::string& name);
 			bool onlyDigits(const std::string str);
+			static bool isInteger(const std::string str);
+			static bool isNumber(const std::string str);
+			static bool isFloat(std::string str);
 
 			//Time related
 			std::string getcurdatetime();
@@ -100,7 +103,6 @@ namespace tasker {
 			exists findRow(const std::string& strId);
 
 			//Helpers
-			bool isFloat(std::string str);
 			float getFloat(std::string str);
 			float normalizeStatus(std::string str);
 			std::string getUserString(std::vector<std::string>& users, std::string prefix, bool addNotAssigned);

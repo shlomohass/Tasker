@@ -29,6 +29,7 @@ namespace tasker
 		bool enable_loads;
 		bool del_items;
 		std::string detailsLevel;
+		int limit;
 	};
 
 	struct exists {
