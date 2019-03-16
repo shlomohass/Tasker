@@ -482,10 +482,9 @@ int main(int argc, char** argv) {
 			std::string searchVal = cmd.optionValue("search");
 			if (!Task->searchvalue(searchVal)) {
 				Task->printTaskerNotify("Oups!");
-				Task->printTaskerInfo("Error", "Task could not be found or input is invalid. Task may also be canceled.");
-				Task->printTaskerInfo("Info", "You can run `--listall {level 1,2}` to see all listed tasks");
-				Task->printTaskerInfo("Info", "You can run `--listcancel` to see all canceled tasks");
-				Task->printTaskerInfo("Info", "You can enable a task again by running `--enabletask {id}`");
+				Task->printTaskerInfo("Error", "No search term found.");
+				Task->printTaskerInfo("Info", "Try typing `--search \"value\"` to perform a search.");
+				Task->printTaskerInfo("Info", "You can limit the results by adding `--limit 10`.");
 				exit(exitCodeError);
 			}
 		}

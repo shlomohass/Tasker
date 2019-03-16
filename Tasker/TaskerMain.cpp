@@ -1316,6 +1316,10 @@ bool TaskerMain::searchvalue(const std::string& _value) {
 	std::string value = this->trim_gen(this->trim_copy(_value), '"');
 	int foundcountintasks = 0;
 	int foundcountinreports = 0;
+
+	//Early exit:
+	if (value.length() < 1) return false;
+
 	//searchtype-> 1 end with, 2 begin with, 3 any match
 	int searchtype = (value.find("*") == 0) ? 1 : 0;
 	searchtype = ((value.find("*") == (value.length() - 1)) && searchtype == 0) ? 2 : searchtype;
