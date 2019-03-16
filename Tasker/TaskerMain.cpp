@@ -1316,7 +1316,7 @@ bool TaskerMain::searchvalue(const std::string& _value) {
 	std::string value = this->trim_gen(this->trim_copy(_value), '"');
 	int foundcountintasks = 0;
 	int foundcountinreports = 0;
-
+	int limit = 0;
 	//Early exit:
 	if (value.length() < 1) return false;
 
@@ -1333,6 +1333,11 @@ bool TaskerMain::searchvalue(const std::string& _value) {
 	for (auto &it : TaskerBase::thestruct["tasks"].items()) {
 		std::string row = (std::string)it.value().at("task");
 		foundcountintasks += this->searchAndPrint(row, value, std::to_string((std::stoi(it.key()) + 1)), searchtype);
+		limit = foundcountintasks;
+		if (limit == this->opt.limit) {
+			std::cout << "        > Limit reached!" << std::endl << std::endl;
+			goto limitreached_one;
+		}
 	}
 	if (foundcountintasks == 0) {
 		std::cout << "        > No matches found in task titles" << std::endl << std::endl;
@@ -1345,10 +1350,15 @@ bool TaskerMain::searchvalue(const std::string& _value) {
 	for (auto &it : TaskerBase::thestruct["tasks"].items()) {
 		for (auto &ite : it.value().at("report").items()) {
 			std::string row = (std::string)ite.value().at("note");
+			limit = foundcountintasks + foundcountinreports;
+			if (limit == this->opt.limit) {
+				std::cout << "        > Limit reached!" << std::endl << std::endl;
+				goto limitreached_one;
+			}
 			foundcountinreports += this->searchAndPrint(
-				row, 
-				value, 
-				std::to_string((std::stoi(it.key()) + 1)) + "." + std::to_string((std::stoi(ite.key()) + 1)), 
+				row,
+				value,
+				std::to_string((std::stoi(it.key()) + 1)) + "." + std::to_string((std::stoi(ite.key()) + 1)),
 				searchtype
 			);
 		}
@@ -1358,6 +1368,7 @@ bool TaskerMain::searchvalue(const std::string& _value) {
 	}
 	else { std::cout << std::endl; }
 
+	limitreached_one:
 	this->printTaskerNotify("Found " + std::to_string(foundcountinreports + foundcountintasks) + " Results.");
 	
 	return true;
