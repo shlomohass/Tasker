@@ -1,6 +1,6 @@
 {
-    "desc": "the basic new project",
-    "name": "Base project",
+    "desc": "the description is that this is an awesome app",
+    "name": "shlomi project",
     "note": [],
     "tags": [
         {
@@ -57,7 +57,7 @@
         {
             "cancel": false,
             "created": "30-03-2019 18:37:59",
-            "load": 5,
+            "load": 6,
             "plan": [
                 {
                     "date": "",
@@ -66,26 +66,101 @@
                         "shira"
                     ],
                     "v": "1.0.0"
+                },
+                {
+                    "date": "1.0.0",
+                    "user": [
+                        "shlomi",
+                        "shira"
+                    ],
+                    "v": ""
+                },
+                {
+                    "date": "1.0.3",
+                    "user": [
+                        "shlomi",
+                        "lior",
+                        "shira"
+                    ],
+                    "v": "1.0.0"
+                },
+                {
+                    "date": "31-03-2019 23:59:00",
+                    "user": [
+                        "shlomi",
+                        "lior"
+                    ],
+                    "v": "1.0.1"
                 }
             ],
-            "report": [],
-            "status": 0.0,
+            "report": [
+                {
+                    "by": [
+                        "shlomi"
+                    ],
+                    "date": "30-03-2019 23:52:37",
+                    "note": "made some minor changes",
+                    "status": 0.1599999964237213
+                }
+            ],
+            "status": 0.1599999964237213,
             "tagged": [
                 "c++",
                 "bug"
             ],
             "task": "basic UI crop and prepared for our meeting",
-            "updated": "30-03-2019 18:37:59"
+            "updated": "31-03-2019 00:29:31"
+        },
+        {
+            "cancel": false,
+            "created": "31-03-2019 00:30:48",
+            "load": 4,
+            "plan": [
+                {
+                    "date": "31-03-2019 23:59:00",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "design",
+                "feature"
+            ],
+            "task": "a great logo to start with...",
+            "updated": "31-03-2019 00:30:48"
+        },
+        {
+            "cancel": false,
+            "created": "31-03-2019 00:35:26",
+            "load": 3,
+            "plan": [
+                {
+                    "date": "31-03-2019 23:59:00",
+                    "user": [
+                        "shira"
+                    ],
+                    "v": "1.0.1"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "bug",
+                "c++"
+            ],
+            "task": "Fix the la error regarding plan",
+            "updated": "31-03-2019 00:35:26"
         }
     ],
     "types": [
-        [
-            "task",
-            [
-                "desc",
-                "basic task"
-            ]
-        ]
+        {
+            "desc": "basic task",
+            "name": "task"
+        }
     ],
     "users": [
         {
@@ -108,6 +183,6 @@
         }
     ],
     "version": [
-        "1.0.0"
+        "1.0.1"
     ]
 }

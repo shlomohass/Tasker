@@ -88,7 +88,6 @@ namespace tasker {
 			void printTaskerNotify(const std::string& mes);
 			void printTaskerInfo(const std::string& type, const std::string& mes);
 			void printTaskerHighlighted(const std::string& mes, const std::string& value, std::size_t startneedle, bool loopall);
-			std::string getTagsAsStr();
 
 			//Console get:
 			std::vector<std::string> getUserName(bool& push_plan, bool allowskip, int taskIdForSkip, const std::string& userFixStr);
@@ -103,6 +102,8 @@ namespace tasker {
 			json::object_t getBaseTaskPlan();
 			json::object_t getBaseTaskPlan(std::string& date);
 			json::object_t getBaseTaskPlan(std::string& date, std::string& version);
+			json::array_t getBaseTypesContainer();
+			json::object_t getBaseSystemContainer();
 
 			//Basic Op:
 			exists findRow(const std::string& strId);
@@ -110,7 +111,11 @@ namespace tasker {
 			//Helpers
 			float getFloat(std::string str);
 			float normalizeStatus(std::string str);
-			std::string getUserString(std::vector<std::string>& users, std::string prefix, bool addNotAssigned);
+			
+			std::string getAssignedUserString(std::vector<std::string>& users, std::string prefix, bool addNotAssigned);
+			std::string getAllTagsStr();
+			std::string getAllUsersStr();
+
 			bool findDefinedUser(const std::string& user, bool multi);
 			int findDefinedUser(const std::string& user);
 			bool findDefinedTag(const std::string& tag, bool multi);
@@ -129,10 +134,32 @@ namespace tasker {
 
 			void cleanString(std::string& str, const std::vector<char>& rem);
 			std::vector<std::string> splitString(const std::string &text, char sep);
+			std::string implodeVecStr(const std::vector<std::string>& vec, const std::string& delim);
+			std::string implodeVecStr(const std::vector<std::string>& vec, const char delim);
+			std::string implodeVecStr(const std::vector<std::string>& vec, const char* delim);
 			std::vector<int> parseTaskListStr(std::string str);
+			std::string lowercase(const std::string& s);
+			std::string uppercase(const std::string& s);
+
+			
+			template <class VECALL> std::vector<VECALL> filterOutNonPresent(std::vector<VECALL>& vecA, std::vector<VECALL>& vecB);
+			//std::vector<std::string> filterOutNonPresent(std::vector<std::string>& vecA, std::vector<std::string>& vecB);
 
 			virtual ~TaskerBase();
 	};
+
+	
+	template <class VECALL> std::vector<VECALL> TaskerBase::filterOutNonPresent(std::vector<VECALL>& vecA, std::vector<VECALL>& vecB) {
+		std::vector<VECALL> res;
+		// copy only shared elements:
+		std::copy_if(
+			vecA.begin(),
+			vecA.end(),
+			std::back_inserter(res),
+			[&vecB](VECALL e) { return std::find(vecB.begin(), vecB.end(), e) != vecB.end(); }
+		);
+		return res;
+	}
 
 }
 #endif /* TaskerBase_hpp */

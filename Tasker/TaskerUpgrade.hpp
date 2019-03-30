@@ -26,7 +26,8 @@ namespace tasker {
 		TaskerUpgrade();
 
 		int run(int &removedTags, int &removedTasks);
-		
+		bool fix(const std::string& attributesStr);
+
 		//Procedures:
 		bool check_name();
 		bool check_desc();

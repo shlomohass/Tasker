@@ -55,6 +55,74 @@ namespace tasker {
 		return 0;
 	}
 
+	bool TaskerUpgrade::fix(const std::string& attributesStr) {
+
+		bool madeChanges = false;
+		std::string input = attributesStr;
+		this->cleanString(input, { ' ','"','\'','@','#', '_', '-' });
+		std::vector<std::string> candid_attr = this->splitString(input, ',');
+		std::vector<std::string> allowed_attr = OBJECT_ATTR;
+		std::vector<std::string> attributes = this->filterOutNonPresent(candid_attr, allowed_attr);
+
+		if (attributes.empty()) {
+			this->printTaskerNotify("You must type attributes - Seperate them with by " + std::string() + TASKER_SPLIT_DELI_CHAR);
+			this->printTaskerInfo("Info", "Attributes you can fix: ");
+			std::cout << "             " << this->usecolor() << this->getcolor("faded") << this->implodeVecStr(OBJECT_ATTR, TASKER_SPLIT_DELI_CHAR_SPACE);
+			std::cout << this->usecolor() << this->getcolor("reset") << std::endl;
+		} else {
+			for (auto const& a : attributes) {
+				bool change = false;
+				//name,description,note,system,users,tags,version,types,tasks
+				std::string lower_a = this->lowercase(a);
+				if (lower_a == "name") {
+					std::cout << "1. Fixing Project Name:" << std::endl;
+					change = this->check_name();
+				}
+				else if (lower_a == "description") {
+					std::cout << std::endl << "2. Fixing Project Description:" << std::endl;
+					change = this->check_desc();
+				}
+				else if (lower_a == "note") {
+					std::cout << std::endl << "2. Fixing Project Notes:" << std::endl;
+					change = this->check_note();
+				}
+				else if (lower_a == "system") {
+					std::cout << std::endl << "2. Fixing Project Tasker system info:" << std::endl;
+					change = this->check_taskersys();
+				}
+				else if (lower_a == "users") {
+					std::cout << std::endl << "2. Fixing Project Users:" << std::endl;
+					change = this->check_users();
+				}
+				else if (lower_a == "tags") {
+					std::cout << std::endl << "2. Fixing Project Tags:" << std::endl;
+					int tagsRemoved = this->check_tags();
+					if (tagsRemoved > 0)
+						this->printTaskerInfo("Info", "Tasker had to remove -> " + std::to_string(tagsRemoved) + " Tags.");
+					change = tagsRemoved > 0;
+				}
+				else if (lower_a == "version") {
+					std::cout << std::endl << "2. Fixing Project Version Container:" << std::endl;
+					change = this->check_version();
+				}
+				else if (lower_a == "types") {
+					std::cout << std::endl << "2. Fixing Project Types Container:" << std::endl;
+					change = this->check_types();
+				}
+				else if (lower_a == "tasks") {
+					std::cout << std::endl << "2. Fixing Project Tasks Container:" << std::endl;
+					int tasksRemoved = this->check_tasks();
+					if (tasksRemoved > 0)
+						this->printTaskerInfo("Info", "Tasker had to remove -> " + std::to_string(tasksRemoved) + " Tasks.");
+					change = tasksRemoved > 0;
+					change = this->check_tasks_meta() ? true : change;
+				}
+				if (!madeChanges) madeChanges = change;
+			}
+		}
+		return madeChanges;
+	}
+
 	//Validate & fix procedures:
 	bool TaskerUpgrade::check_name() {
 		//Check name is present:
@@ -66,6 +134,7 @@ namespace tasker {
 			}
 			else {
 				std::cout << "  >>> Project name is OK." << std::endl;
+				return false;
 			}
 		}
 		else {
@@ -84,6 +153,7 @@ namespace tasker {
 			}
 			else {
 				std::cout << "  >>> Project description is OK." << std::endl;
+				return false;
 			}
 		}
 		else {
@@ -103,10 +173,12 @@ namespace tasker {
 				}
 				else {
 					std::cout << "  >>> Skipped project notes." << std::endl;
+					return false;
 				}
 			}
 			else {
 				std::cout << "  >>> Project Notes is OK." << std::endl;
+				return false;
 			}
 		}
 		else {
@@ -166,10 +238,13 @@ namespace tasker {
 					TaskerBase::thestruct["tasker"].emplace("allowdelete", true);
 					madeSysChanges = true;
 				}
-				if (madeSysChanges)
+				if (madeSysChanges) {
 					std::cout << "  >>> Project tasker SYSTEM object fixed." << std::endl;
-				else
+				}
+				else {
 					std::cout << "  >>> Project tasker SYSTEM object is OK." << std::endl;
+					return false;
+				}
 			}
 			else {
 				newCreateTaskerSys = true;
@@ -203,6 +278,7 @@ namespace tasker {
 				}
 				else {
 					std::cout << "  >>> Skipped project USERS." << std::endl;
+					return false;
 				}
 			}
 			else if (TaskerBase::thestruct["users"].is_array() && TaskerBase::thestruct["users"].size() == 0) {
@@ -211,6 +287,7 @@ namespace tasker {
 			}
 			else {
 				std::cout << "  >>> Project Users is OK." << std::endl;
+				return false;
 			}
 		}
 		else {
@@ -290,40 +367,54 @@ namespace tasker {
 		if (!toremove.empty()) {
 			std::cout << "  >>> Erased " << toremove.size() << " non compatible tags. " << std::endl;
 		}
-		std::string tagsStr = this->getTagsAsStr();
+		std::string tagsStr = this->getAllTagsStr();
 		std::cout << "  >>> Defined tags: " << (tagsStr == "" ? "None" : tagsStr) << std::endl;
 		return (int)toremove.size();
 	}
 	bool TaskerUpgrade::check_version() {
 		//Check version is present:
-		if (TaskerBase::thestruct.count("version") == 1 || !TaskerBase::thestruct["version"].is_array()) {
-			std::string version = this->getFromUser("  >>> Project VERSION is not set correctly. Enter the current version: ");
-			TaskerBase::thestruct["version"] = json::array();
+		int count = TaskerBase::thestruct.count("version");
+		bool test = TaskerBase::thestruct["version"].is_array();
+		if (TaskerBase::thestruct.count("version") == 1) {
+			if (!TaskerBase::thestruct["version"].is_array()) {
+				std::string version = this->getFromUser("  >>> Project VERSION is not set correctly. Enter the current version: ");
+				TaskerBase::thestruct["version"] = json::array();
+				TaskerBase::thestruct["version"].push_back(version);
+				std::cout << "  >>> Project VERSION fixed." << std::endl;
+			} else {
+				std::cout << "  >>> Project VERSION is OK." << std::endl;
+				return false;
+			}
+		} else {
+			std::string version = this->getFromUser("  >>> Project VERSION is can't be found. Enter the current version: ");
+			TaskerBase::thestruct.emplace("version", json::array());
 			TaskerBase::thestruct["version"].push_back(version);
 			std::cout << "  >>> Project VERSION fixed." << std::endl;
-		}
-		else {
-			std::cout << "  >>> Project VERSION is OK." << std::endl;
+			
 		}
 		return true;
 	}
 	bool TaskerUpgrade::check_types() {
 		//Check types is present:
-		if (TaskerBase::thestruct.count("types") == 1 || !TaskerBase::thestruct["types"].is_array()) {
-			if (this->promptUser("  >>> Project TYPES is not set correctly. Type yes to fix it: ")) {
-				TaskerBase::thestruct["types"] = json::array();
-				json newtype = json::object();
-				newtype.emplace("name", TASKER_BASIC_TYPE_NAME);
-				newtype.emplace("desc", TASKER_BASIC_TYPE_DESC);
-				TaskerBase::thestruct["types"].push_back(newtype);
+		if (TaskerBase::thestruct.count("types") == 1) {
+			if (!TaskerBase::thestruct["types"].is_array()) {
+				if (this->promptUser("  >>> Project TYPES is not set correctly. Type yes to fix it: ")) {
+					TaskerBase::thestruct["types"] = this->getBaseTypesContainer();
+					std::cout << "  >>> Project TYPES fixed." << std::endl;
+				} else {
+					std::cout << "  >>> Skipped fixing Project TYPES." << std::endl;
+					return false;
+				}
+			} else {
+				std::cout << "  >>> Project TYPES is OK." << std::endl;
+				return false;
+			}
+		} else {
+			if (this->promptUser("  >>> Project TYPES can't be found. Type yes to fix it: ")) {
+				TaskerBase::thestruct.emplace("types", this->getBaseTypesContainer());
 				std::cout << "  >>> Project TYPES fixed." << std::endl;
 			}
-			else {
-				std::cout << "  >>> Skipped fixing Project TYPES." << std::endl;
-			}
-			return true;
 		}
-		std::cout << "  >>> Project TYPES is OK." << std::endl;
 		return true;
 	}
 	int TaskerUpgrade::check_tasks() {
@@ -375,6 +466,7 @@ namespace tasker {
 	}
 	bool TaskerUpgrade::check_tasks_meta() {
 		//loop defined tasks:
+		bool madeChange = false;
 		for (auto &it : TaskerBase::thestruct["tasks"].items()) {
 			bool f_cancel	= false,
 				f_created	= false,
@@ -385,27 +477,32 @@ namespace tasker {
 				f_tagged	= false,
 				f_task		= false,
 				f_updated	= false;
+
 			std::vector<std::string> remove_keys;
 
 			for (auto &ite : it.value().items()) {
 				//ite.key() / property name;
 				//ite.value() / value
+				bool change = false;
 				if (ite.key() == "cancel") {
 					f_cancel = true;
 					if (!ite.value().is_boolean()) {
 						ite.value() = false;
+						madeChange = true;
 					}
 				}
 				else if (ite.key() == "created") {
 					f_created = true;
 					if (!ite.value().is_string()) {
 						ite.value() = this->getcurdatetime();
+						madeChange = true;
 					}
 				}
 				else if (ite.key() == "load") {
 					f_load = true;
 					if (!ite.value().is_number()) {
 						ite.value() = 1;
+						madeChange = true;
 					}
 				}
 				else if (ite.key() == "plan") {
@@ -413,18 +510,21 @@ namespace tasker {
 					if (!ite.value().is_array() || ite.value().empty()) {
 						ite.value() = json::array();
 						ite.value().push_back(this->getBaseTaskPlan());
+						madeChange = true;
 					}
 				}
 				else if (ite.key() == "report") {
 					f_report = true;
 					if (!ite.value().is_array()) {
 						ite.value() = json::array();
+						madeChange = true;
 					}
 				}
 				else if (ite.key() == "status") {
 					f_status = true;
 					if (!ite.value().is_number()) {
 						ite.value() = 0.0;
+						madeChange = true;
 					}
 				}
 				else if (ite.key() == "tagged") {
@@ -436,23 +536,27 @@ namespace tasker {
 						} else {
 							ite.value() = json::array();
 						}
+						madeChange = true;
 					}
 				}
 				else if (ite.key() == "task") {
 					f_task = true;
 					if (!ite.value().is_string()) {
 						ite.value() = TASKER_FIXED_EMPTY_TASK_DESC;
+						madeChange = true;
 					}
 				}
 				else if (ite.key() == "updated") {
 					f_updated = true;
 					if (!ite.value().is_string()) {
 						ite.value() = this->getcurdatetime();
+						madeChange = true;
 					}
 				}
 				else {
 					//unknown property delete it.
 					remove_keys.push_back(ite.key());
+					madeChange = true;
 				}
 			}
 
@@ -464,36 +568,44 @@ namespace tasker {
 			//Add missing properties:
 			if (!f_cancel) {
 				it.value()["cancel"] = false;
+				madeChange = true;
 			}
 			if (!f_created) {
 				it.value()["created"] = this->getcurdatetime();
+				madeChange = true;
 			}
 			if (!f_load) {
 				it.value()["load"] = 1;
+				madeChange = true;
 			}
 			if (!f_plan) {
 				it.value()["plan"] = json::array();
 				it.value()["plan"].push_back(this->getBaseTaskPlan());
+				madeChange = true;
 			}
 			if (!f_report) {
 				it.value()["report"] = json::array();
+				madeChange = true;
 			}
 			if (!f_status) {
 				it.value()["status"] = 0.0;
+				madeChange = true;
 			}
 			if (!f_tagged) {
 				it.value()["tagged"] = json::array();
+				madeChange = true;
 			}
 			if (!f_task) {
 				it.value()["task"] = TASKER_FIXED_EMPTY_TASK_DESC;
+				madeChange = true;
 			}
 			if (!f_updated) {
 				it.value()["updated"] = this->getcurdatetime();
+				madeChange = true;
 			}
-			//std::cout << std::endl << it.value() << std::endl;
 		}
 
-		return true;
+		return madeChange;
 	}
 
 	//Helpers:

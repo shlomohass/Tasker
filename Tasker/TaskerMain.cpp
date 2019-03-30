@@ -143,18 +143,12 @@ bool TaskerMain::setOption(const std::string& which, const std::string& state)
 void TaskerMain::createEmpty()
 {	
 	//Sets :
-	TaskerBase::thestruct["tasker"] = {
-		{ "version",			TASKER_VERSION	},
-		{ "usecolors",			true			},
-		{ "enableloads",		true			},
-		{ "allowdelete",		true			}
-	};
-	TaskerBase::thestruct["users"] = json::array();
-	TaskerBase::thestruct["types"] = json::array();
-	TaskerBase::thestruct["types"].push_back({ TASKER_BASIC_TYPE_NAME , {"desc", TASKER_BASIC_TYPE_DESC }});
-	TaskerBase::thestruct["tasks"] = json::array();
-	TaskerBase::thestruct["tags"]	 = json::array();
-	TaskerBase::thestruct["note"]	 = json::array();
+	TaskerBase::thestruct["tasker"]		= this->getBaseSystemContainer();
+	TaskerBase::thestruct["users"]		= json::array();
+	TaskerBase::thestruct["types"]		= this->getBaseTypesContainer();
+	TaskerBase::thestruct["tasks"]		= json::array();
+	TaskerBase::thestruct["tags"]		= json::array();
+	TaskerBase::thestruct["note"]		= json::array();
 	std::string projName;
 	std::string projDesc;
 	std::string projVersion;
@@ -268,7 +262,7 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 	plan_user = this->getUserName(push_plan, false, 0, "");
 
 	//Tag the task:
-	std::cout << "  2. Tag the task (empty): ";
+	std::cout << "  2. Tag the task (empty, ?): ";
 	tagged_as = this->getTags("The Tag you typed can't be found.");
 
 	//Set the planned version:
@@ -290,23 +284,21 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 		loadint = this->getLoad("Bad input - Please enter a positive integer only.");
 	}
 
+	//Set plan:
+	json::object_t plan_object = this->getBaseTaskPlan(plan_duedate, trim_copy(plan_version));
+	plan_object["user"] = plan_user;
+
 	//Create finall Object:
 	json taskObj = {
-		{ "plan",		
-				json::array({{
-					{ "v" ,			trim_copy(plan_version) },
-					{ "user" ,		plan_user },
-					{ "date" ,		plan_duedate }
-				}})
-		},
-		{ "created",	task_created			},
-		{ "updated",	task_created			},
+		{ "plan",		json::array({ plan_object })},
+		{ "created",	task_created				},
+		{ "updated",	task_created				},
 		{ "task",		this->trim_gen(trim_copy(strTask), '"')	},
-		{ "status",		task_status_num			},
-		{ "cancel",		false					},
-		{ "load",		loadint					},
-		{ "tagged",		tagged_as				},
-		{ "report",		json::array()			}
+		{ "status",		task_status_num							},
+		{ "cancel",		false									},
+		{ "load",		loadint									},
+		{ "tagged",		tagged_as								},
+		{ "report",		json::array()							}
 	};
 
 	//Save
@@ -359,7 +351,7 @@ bool TaskerMain::reportToTask(const std::string& strTask) {
 	rep_status_num = this->normalizeStatus(rep_status);
 
 	//prep user string to show:
-	std::string users_str = this->getUserString(owner, TASKER_USER_PREFIX, true);
+	std::string users_str = this->getAssignedUserString(owner, TASKER_USER_PREFIX, true);
 
 	//Get the user who made the report:
 	std::cout << "  2. Progress of user (assigned to "; 
@@ -422,7 +414,7 @@ bool TaskerMain::refactorTask(const std::string& strTask) {
 			this->trim_gen(trim_copy(new_task_title), '"');
 
 		//Change assigned user:
-		std::cout << "  2. Change user (empty, skip, default, ?): ";
+		std::cout << "  2. Change user (skip|empty, clear, default, ?): ";
 		plan_user = this->getUserName(push_plan, true, theRow.taskId, "");
 
 		//Update the planned version:
@@ -468,13 +460,11 @@ bool TaskerMain::refactorTask(const std::string& strTask) {
 			{ "tagged",		TaskerBase::thestruct["tasks"].at(theRow.taskId).at("tagged") },
 			{ "report",		TaskerBase::thestruct["tasks"].at(theRow.taskId).at("report") }
 		};
+
 		//Add plan if needed:
 		if (push_plan) {
-			taskObj["plan"].push_back({
-				{ "v" ,			trim_copy(plan_version)			  },
-				{ "user" ,		plan_user						  },
-				{ "date" ,		plan_duedate					  }
-			});
+			taskObj["plan"].push_back(this->getBaseTaskPlan(plan_duedate, trim_copy(plan_version)));
+			taskObj["plan"].back().at("user") = plan_user;
 		}
 
 		//Save
@@ -484,7 +474,7 @@ bool TaskerMain::refactorTask(const std::string& strTask) {
 		this->printTaskerNotify("Task Updated successfully!");
 		this->printTaskerInfo("Info", "Task ID is: " + std::to_string(theRow.taskId + 1));
 		std::cout << std::endl;
-	}
+	} 
 	else {
 
 		//Refactor Report:
@@ -1501,7 +1491,7 @@ bool TaskerMain::list(const std::string& _level, const std::string& which, const
 		//Print main row:
 		counter_found++;
 		std::vector<std::string> usersvec = TaskerBase::thestruct["tasks"].at(i).at("plan").back().at("user");
-		std::string users_str = this->getUserString(usersvec, TASKER_USER_PREFIX, true);
+		std::string users_str = this->getAssignedUserString(usersvec, TASKER_USER_PREFIX, true);
 		std::string target = TaskerBase::thestruct["tasks"].at(i).at("plan").back().at("date");
 		std::string created = TaskerBase::thestruct["tasks"].at(i).at("created");
 		std::stringstream tagged;
@@ -1568,7 +1558,7 @@ bool TaskerMain::list(const std::string& _level, const std::string& which, const
 
 				//Prepare for print:
 				std::vector<std::string> users = TaskerBase::thestruct["tasks"].at(i).at("report").at(j).at("by");
-				std::string byuser = this->getUserString(users, TASKER_USER_PREFIX, true);
+				std::string byuser = this->getAssignedUserString(users, TASKER_USER_PREFIX, true);
 
 				std::string dateout = TaskerBase::thestruct["tasks"].at(i).at("report").at(j).at("date");
 				dateout.erase(std::remove(dateout.begin(), dateout.end(), '"'), dateout.end());

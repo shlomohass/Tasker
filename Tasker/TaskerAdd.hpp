@@ -22,6 +22,8 @@ namespace tasker
 	const std::vector<std::string> RESERVE_USER_NAMES = { "default", "unknown", "?", "@", "#" };
 	const std::vector<std::string> RESERVE_TAG_NAMES = { "default", "not tagged", "?", "@", "#" };
 
+	const std::vector<std::string> OBJECT_ATTR = { "name", "description", "note", "system", "users", "tags", "version", "types", "tasks" };
+
 	struct moreOpt {
 		std::string taskIdStr;
 		bool showclosed;

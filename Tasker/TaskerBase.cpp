@@ -243,7 +243,6 @@ namespace tasker {
 			<< this->usecolor() << this->getcolor("reset")
 			<< trim_copy(mes) << std::endl;
 	}
-	//Printing:
 	void TaskerBase::printTaskerHighlighted(const std::string& mes, const std::string& value, std::size_t startneedle, bool loopall)
 	{
 		std::string print = mes;
@@ -256,25 +255,7 @@ namespace tasker {
 		}
 		std::cout << print << this->usecolor() << this->getcolor("reset") << std::endl;
 	}
-	std::string TaskerBase::getTagsAsStr() {
-		int i = 0;
-		std::stringstream sstr;
-
-		int tot = (int)TaskerBase::thestruct["tags"].size();
-		if (tot < 1) {
-			return "";
-		}
-		else {
-			for (json::iterator it = TaskerBase::thestruct["tags"].begin(); it != TaskerBase::thestruct["tags"].end(); ++it) {
-				for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
-					i++;
-					sstr << ite.key();
-					if (i < tot) sstr << ", ";
-				}
-			}
-		}
-		return std::string(sstr.str());
-	}
+	
 
 	//Console get:
 	std::vector<std::string> TaskerBase::getUserName(bool& push_plan, bool allowskip, int taskIdForSkip, const std::string& userFixStr) {
@@ -283,7 +264,7 @@ namespace tasker {
 		std::string userStr = "";
 		while (reloop) {
 			std::getline(std::cin, userStr);
-			userStr = this->trim_gen(trim_copy(userStr), '"');
+			userStr = this->trim_gen(this->trim_copy(userStr), '"');
 			std::string::iterator end_pos = std::remove(userStr.begin(), userStr.end(), ' ');
 			userStr.erase(end_pos, userStr.end());
 			if (userStr == "default") {
@@ -292,42 +273,32 @@ namespace tasker {
 				push_plan = true;
 				break;
 			}
-			else if (userStr == "") {
+			else if (userStr == "clear") {
 				reloop = false;
 				push_plan = true;
 				break;
 			}
-			else if (userStr == "skip" && allowskip) {
+			else if ((userStr == "skip" || userStr == "") && allowskip) {
 				if (taskIdForSkip == -1) {
 					userStr = userFixStr;
-				}
-				else {
-					userStr = TaskerBase::thestruct["tasks"].at(taskIdForSkip).at("plan").back().at("user").get<std::string>();
+				} else {
+					std::vector<std::string> userVec = TaskerBase::thestruct["tasks"].at(taskIdForSkip).at("plan").back().at("user").get<std::vector<std::string>>();
+					userStr = this->implodeVecStr(userVec, TASKER_SPLIT_DELI_CHAR);
 				}
 				reloop = false;
 
 				//Clean name:
 				this->cleanString(userStr, { ' ','"','\'','@','#' });
 				break;
-			}
-			else if (userStr == "?") {
+			} else if (userStr == "?") {
 				int i = 0;
 				int tot = (int)TaskerBase::thestruct["users"].size();
-				this->printTaskerInfo("Help", " Type one of those or several of them seperated by a single space.");
+				this->printTaskerInfo("Help", " Type one of those or several of them seperated by a comma.");
 				std::cout << "             " << this->usecolor() << this->getcolor("faded");
 				if (tot < 1) {
 					std::cout << "No users created!";
-				}
-				else {
-					for (json::iterator it = TaskerBase::thestruct["users"].begin(); it != TaskerBase::thestruct["users"].end(); ++it) {
-						for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
-							i++;
-							std::cout << ite.key();
-							if (i < tot) {
-								std::cout << ", ";
-							}
-						}
-					}
+				} else {
+					std::cout << this->getAllUsersStr();
 				}
 				std::cout << this->usecolor() << this->getcolor("reset") << std::endl;
 				std::cout << "\tType: ";
@@ -357,7 +328,7 @@ namespace tasker {
 			}
 		}
 		//Create vector of user names:
-		return userStr.length() > 0 ? this->splitString(userStr, TASKER_SPLIT_DELI_CHAR) : std::vector<std::string>();
+		return this->splitString(userStr, TASKER_SPLIT_DELI_CHAR);
 	}
 	std::string TaskerBase::getStrMessage(const std::string& err) {
 		std::string mes;
@@ -457,8 +428,8 @@ namespace tasker {
 				break;
 			}
 			else if (tagStr == "?") {
-				std::string tagsString = this->getTagsAsStr();
-				this->printTaskerInfo("Help", " Type one of those or several of them seperated by a single space.");
+				std::string tagsString = this->getAllTagsStr();
+				this->printTaskerInfo("Help", " Type one of those or several of them seperated by a single comma.");
 				std::cout << "             " << this->usecolor() << this->getcolor("faded");
 				if (tagsString == "") {
 					std::cout << "No tags defined!";
@@ -492,7 +463,7 @@ namespace tasker {
 			}
 		}
 		//Create vector of tags:
-		return tagStr.length() > 0 ? this->splitString(tagStr, TASKER_SPLIT_DELI_CHAR) : std::vector<std::string>();
+		return this->splitString(tagStr, TASKER_SPLIT_DELI_CHAR);
 	}
 	
 	bool TaskerBase::promptUser(const std::string& mes) {
@@ -529,7 +500,22 @@ namespace tasker {
 		basePlan.emplace("v", version);
 		return basePlan;
 	}
-
+	json::array_t TaskerBase::getBaseTypesContainer() {
+		json::array_t ret = json::array();
+		json::object_t newtype = json::object();
+		newtype.emplace("name", TASKER_BASIC_TYPE_NAME);
+		newtype.emplace("desc", TASKER_BASIC_TYPE_DESC);
+		ret.push_back(newtype);
+		return ret;
+	}
+	json::object_t TaskerBase::getBaseSystemContainer() {
+		json::object_t ret = json::object();
+		ret.emplace("version", TASKER_VERSION); 
+		ret.emplace("usecolors", true);
+		ret.emplace("enableloads", true);
+		ret.emplace("allowdelete", true);
+		return ret;
+	}
 	//Basic op
 	/* Finds a row base on a string [23 | 23.3 ...]
 	 * Returns an exists object that identify wich type it is and what is the correct id.
@@ -591,7 +577,8 @@ namespace tasker {
 		}
 		return task_status_num;
 	}
-	std::string TaskerBase::getUserString(std::vector<std::string>& users, std::string prefix, bool addNotAssigned) {
+	
+	std::string TaskerBase::getAssignedUserString(std::vector<std::string>& users, std::string prefix, bool addNotAssigned) {
 
 		std::stringstream users_string;
 		std::string return_string;
@@ -609,6 +596,37 @@ namespace tasker {
 		}
 		return return_string;
 	}
+	std::string TaskerBase::getAllTagsStr() {
+		int i = 0;
+		std::stringstream sstr;
+
+		int tot = (int)TaskerBase::thestruct["tags"].size();
+		if (tot < 1) return "";
+
+		for (json::iterator it = TaskerBase::thestruct["tags"].begin(); it != TaskerBase::thestruct["tags"].end(); ++it) {
+			for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
+				i++;
+				sstr << ite.key();
+				if (i < tot) sstr << ", ";
+			}
+		}
+		return std::string(sstr.str());
+	}
+	std::string TaskerBase::getAllUsersStr() {
+		int i = 0;
+		std::stringstream sstr;
+		int tot = (int)TaskerBase::thestruct["users"].size();
+		if (tot < 1) return "";
+		for (json::iterator it = TaskerBase::thestruct["users"].begin(); it != TaskerBase::thestruct["users"].end(); ++it) {
+			for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
+				i++;
+				sstr << ite.key();
+				if (i < tot) sstr << ", ";
+			}
+		}
+		return std::string(sstr.str());
+	}
+	
 	bool TaskerBase::findDefinedUser(const std::string& user, bool multi) {
 		std::vector<std::string> users_candid = this->splitString(user, TASKER_SPLIT_DELI_CHAR);
 		int check = 0;
@@ -728,6 +746,7 @@ namespace tasker {
 	std::vector<std::string> TaskerBase::splitString(const std::string &text, char sep) {
 		std::vector<std::string> tokens;
 		std::size_t start = 0, end = 0;
+		if (text == "") return tokens;
 		while ((end = text.find(sep, start)) != std::string::npos) {
 			if (end != start) {
 				tokens.push_back(text.substr(start, end - start));
@@ -738,6 +757,20 @@ namespace tasker {
 			tokens.push_back(text.substr(start));
 		}
 		return tokens;
+	}
+	std::string TaskerBase::implodeVecStr(const std::vector<std::string>& vec, const std::string& delim) {
+		std::stringstream sstr;
+		if (vec.empty()) return "";
+		for (std::vector<std::string>::const_iterator e = vec.begin(); e != vec.end(); ++e) {
+			sstr << *e << ((e != vec.end() - 1) ? delim : "");
+		}
+		return sstr.str();
+	}
+	std::string TaskerBase::implodeVecStr(const std::vector<std::string>& vec, const char delim) {
+		return implodeVecStr(vec, std::string() + delim);
+	}
+	std::string TaskerBase::implodeVecStr(const std::vector<std::string>& vec, const char* delim) {
+		return implodeVecStr(vec, std::string(delim));
 	}
 	std::vector<int> TaskerBase::parseTaskListStr(std::string str) {
 		std::string deli = TASKER_SPLIT_DELI;
@@ -758,7 +791,29 @@ namespace tasker {
 		}
 		return ret;
 	}
-
+	std::string TaskerBase::lowercase(const std::string& s)
+	{
+		int i = 0;
+		std::stringstream sstr;
+		while (s[i] != '\0') {
+			if (s[i] >= 'A' && s[i] <= 'Z') sstr << (char)(s[i] + 32);
+			else  sstr << (char)s[i];
+			++i;
+		}
+		return sstr.str();
+	}
+	std::string TaskerBase::uppercase(const std::string& s)
+	{
+		int i = 0;
+		std::stringstream sstr;
+		while (s[i] != '\0') {
+			if (s[i] >= 'a' && s[i] <= 'z') sstr << (char)(s[i] - 32);
+			else  sstr << (char)s[i];
+			++i;
+		}
+		return sstr.str();
+	}
+	
 	TaskerBase::~TaskerBase()
 	{
 	}

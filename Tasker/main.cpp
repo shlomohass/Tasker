@@ -98,6 +98,7 @@ int main(int argc, char** argv) {
 	cmd.setHelpOption("h",		"help", "Print this help page");
 	cmd.defineOption("init",	"Initialize a `Tasker` object in the current path", cm::ArgvParser::NoOptionAttribute);
 	cmd.defineOption("upgrade", "Try upgrade a Tasker object to current version", cm::ArgvParser::NoOptionAttribute);
+	cmd.defineOption("fix",		"Fix a specific object container -> ''|correct attribute", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("debug",	"Enable debug mode.", cm::ArgvParser::NoOptionAttribute);
 	
 	cmd.defineOption("task",	"Add a new task -> Will ask for more options interactivly.", cm::ArgvParser::OptionRequiresValue);
@@ -240,6 +241,7 @@ int main(int argc, char** argv) {
 	else
 	//Handle Operations:
 	if (hasobj) {
+
 		//Load current obj:
 		std::string fileversion = "";
 		int loadParse = Task->loadObj(fileversion);
@@ -274,6 +276,19 @@ int main(int argc, char** argv) {
 			Task->parseOptions(cmd.foundOption("discolor"));
 		}
 
+		if (cmd.foundOption("fix")) {
+			// Write new task:
+			std::string objectfix = cmd.optionValue("fix");
+			tasker::TaskerUpgrade TaskerUp = tasker::TaskerUpgrade();
+			bool madeChanges = TaskerUp.fix(objectfix);
+			if (madeChanges && !Task->writeObj(true)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Could not write to Tasker object.");
+				exit(exitCodeError);
+			} else {
+				Task->printTaskerNotify("Finished!");
+			}
+		}
 		//Handle set tasks:
 		if (cmd.foundOption("task")) {
 			// Write new task:
