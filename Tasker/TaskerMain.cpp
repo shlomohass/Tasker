@@ -252,7 +252,6 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 {	
 	std::vector<std::string> plan_user;
 	std::vector<std::string> tagged_as;
-	std::string plan_currentversion		= TaskerBase::thestruct["version"];
 	std::string plan_version			= "";
 	std::string plan_duedate			= "";
 	std::string task_created			= this->getcurdatetime();
@@ -309,11 +308,6 @@ bool TaskerMain::setNewTask(const std::string& strTask)
 		{ "tagged",		tagged_as				},
 		{ "report",		json::array()			}
 	};
-	taskObj["plan"].push_back({ 
-		{ "v" ,			trim_copy(plan_version) },
-		{ "user" ,		plan_user				},
-		{ "date" ,		plan_duedate			}
-	});
 
 	//Save
 	TaskerBase::thestruct["tasks"].push_back(taskObj);

@@ -25,7 +25,7 @@ namespace tasker {
 
 		TaskerUpgrade();
 
-		int run();
+		int run(int &removedTags, int &removedTasks);
 		
 		//Procedures:
 		bool check_name();

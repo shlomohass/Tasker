@@ -15,10 +15,8 @@ namespace tasker {
 
 	}
 
-	int TaskerUpgrade::run()
+	int TaskerUpgrade::run(int &removedTags, int &removedTasks)
 	{
-		int removedTags;
-		int removedTasks;
 
 		/*************************** version 1.0.3 ****************************/
 		std::cout << "1. Checking Project Name:" << std::endl;
@@ -50,6 +48,9 @@ namespace tasker {
 
 		std::cout << std::endl << "10. Checking Tasks Metadata:" << std::endl;
 		this->check_tasks_meta();
+
+		std::cout << std::endl << "11. Saving upgraded object..." << std::endl;
+		TaskerBase::thestruct["tasker"]["version"] = TASKER_VERSION;
 
 		return 0;
 	}
@@ -311,7 +312,10 @@ namespace tasker {
 		if (TaskerBase::thestruct.count("types") == 1 || !TaskerBase::thestruct["types"].is_array()) {
 			if (this->promptUser("  >>> Project TYPES is not set correctly. Type yes to fix it: ")) {
 				TaskerBase::thestruct["types"] = json::array();
-				TaskerBase::thestruct["types"].push_back({ TASKER_BASIC_TYPE_NAME ,{ "desc", TASKER_BASIC_TYPE_DESC } });
+				json newtype = json::object();
+				newtype.emplace("name", TASKER_BASIC_TYPE_NAME);
+				newtype.emplace("desc", TASKER_BASIC_TYPE_DESC);
+				TaskerBase::thestruct["types"].push_back(newtype);
 				std::cout << "  >>> Project TYPES fixed." << std::endl;
 			}
 			else {
@@ -406,8 +410,9 @@ namespace tasker {
 				}
 				else if (ite.key() == "plan") {
 					f_plan = true;
-					if (!ite.value().is_array()) {
+					if (!ite.value().is_array() || ite.value().empty()) {
 						ite.value() = json::array();
+						ite.value().push_back(this->getBaseTaskPlan());
 					}
 				}
 				else if (ite.key() == "report") {
@@ -448,7 +453,6 @@ namespace tasker {
 				else {
 					//unknown property delete it.
 					remove_keys.push_back(ite.key());
-					//it.value().erase(it.value().find(ite.key()));
 				}
 			}
 
@@ -469,6 +473,7 @@ namespace tasker {
 			}
 			if (!f_plan) {
 				it.value()["plan"] = json::array();
+				it.value()["plan"].push_back(this->getBaseTaskPlan());
 			}
 			if (!f_report) {
 				it.value()["report"] = json::array();
@@ -485,8 +490,7 @@ namespace tasker {
 			if (!f_updated) {
 				it.value()["updated"] = this->getcurdatetime();
 			}
-
-			std::cout << std::endl << it.value() << std::endl;
+			//std::cout << std::endl << it.value() << std::endl;
 		}
 
 		return true;

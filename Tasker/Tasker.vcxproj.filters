@@ -56,5 +56,8 @@
     <ClInclude Include="TaskerBase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="json3.6.1.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

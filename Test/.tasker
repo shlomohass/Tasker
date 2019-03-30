@@ -1,21 +1,16 @@
 {
-    "name": [],
-    "note": "corrupt notes container",
+    "desc": "teh best try we can do right now",
+    "name": "Fixing a project",
+    "note": [],
     "tags": [
         {
             "parser": {
                 "desc": "the c++ parser of the exams"
             }
         },
-		"test tag",
         {
             "frontend": {
                 "desc": "the web frontend dev"
-            }
-        },
-        {
-            "default": {
-                "desc": "all the web base backend"
             }
         },
         {
@@ -28,17 +23,30 @@
         "allowdelete": true,
         "enableloads": true,
         "usecolors": true,
-        "version": "1.0.1"
+        "version": "1.0.3"
     },
     "tasks": [
-		{
-			"statusy" : "cancel"
-		},
-		[ "shlomi" ],
-		{
-            "cancel": "test",
+        {
+            "cancel": false,
+            "created": "30-03-2019 17:47:14",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [],
+                    "v": ""
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [],
+            "task": "missing task description",
+            "updated": "30-03-2019 17:47:14"
+        },
+        {
+            "cancel": false,
             "created": "09-12-2017 21:05:32",
-            "load": "shlomi",
+            "load": 1,
             "plan": [
                 {
                     "date": "09-12-2017 23:59:00",
@@ -57,17 +65,45 @@
                 }
             ],
             "status": 0.379999995231628,
-            "tagged": "future",
+            "tagged": [
+                "future"
+            ],
             "task": "design logo",
-            "updated": "09-12-2017 21:05:32"
+            "updated": "30-03-2019 17:47:14"
+        },
+        {
+            "cancel": false,
+            "created": "30-03-2019 18:09:20",
+            "load": 1,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [],
+                    "v": "1.1.9"
+                }
+            ],
+            "report": [
+                {
+                    "by": [
+                        "shlomi"
+                    ],
+                    "date": "30-03-2019 18:10:40",
+                    "note": "a simple report made",
+                    "status": 0.15000000596046448
+                }
+            ],
+            "status": 0.15000000596046448,
+            "tagged": [],
+            "task": "task 1",
+            "updated": "30-03-2019 18:09:20"
         }
-	],
-    "types": {
-        "task": [
-            "desc",
-            "simple task"
-        ]
-    },
+    ],
+    "types": [
+        {
+            "desc": "basic task",
+            "name": "task"
+        }
+    ],
     "users": [
         {
             "shlomi": {
@@ -77,6 +113,6 @@
         }
     ],
     "version": [
-        "1.0.1"
+        "1.1.9"
     ]
 }

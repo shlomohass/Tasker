@@ -494,9 +494,18 @@ namespace tasker {
 		//Create vector of tags:
 		return tagStr.length() > 0 ? this->splitString(tagStr, TASKER_SPLIT_DELI_CHAR) : std::vector<std::string>();
 	}
+	
+	bool TaskerBase::promptUser(const std::string& mes) {
+		std::string buffer = "";
+		std::cout << mes;
+		std::getline(std::cin, buffer);
+		return buffer == "y" || buffer == "yes" || buffer == "ok" || buffer == "go";
+	}
+
+	//Base elements builds and get:
 	std::string TaskerBase::getStrVersion(bool& push_plan, bool allowskip, const std::string& versionForSkip) {
 		std::string version;
-		std::string currentversion = TaskerBase::thestruct["version"];
+		std::string currentversion = TaskerBase::thestruct["version"].back();
 		std::getline(std::cin, version);
 		if (version == "skip" && allowskip) {
 			version = versionForSkip;
@@ -507,11 +516,18 @@ namespace tasker {
 		}
 		return version;
 	}
-	bool TaskerBase::promptUser(const std::string& mes) {
-		std::string buffer = "";
-		std::cout << mes;
-		std::getline(std::cin, buffer);
-		return buffer == "y" || buffer == "yes" || buffer == "ok" || buffer == "go";
+	json::object_t TaskerBase::getBaseTaskPlan() {
+		return this->getBaseTaskPlan(std::string(""), std::string(""));
+	}
+	json::object_t TaskerBase::getBaseTaskPlan(std::string& date) {
+		return this->getBaseTaskPlan(date, std::string(""));
+	}
+	json::object_t TaskerBase::getBaseTaskPlan(std::string& date, std::string& version) {
+		json::object_t basePlan = json::object();
+		basePlan.emplace("date", date);
+		basePlan.emplace("user", json::array());
+		basePlan.emplace("v", version);
+		return basePlan;
 	}
 
 	//Basic op

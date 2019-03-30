@@ -250,7 +250,18 @@ int main(int argc, char** argv) {
 		}
 		else if (run_upgrade) {
 			tasker::TaskerUpgrade TaskerUp = tasker::TaskerUpgrade();
-			int upgradeCode = TaskerUp.run();
+			int removedTags = 0;
+			int removedTasks = 0;
+			int upgradeCode = TaskerUp.run(removedTags, removedTasks);
+			if (!Task->writeObj(true)) {
+				Task->printTaskerNotify("Oups!");
+				Task->printTaskerInfo("Error", "Could not write to Tasker object.");
+				exit(exitCodeError);
+			} else {
+				Task->printTaskerNotify("Finished!");
+				Task->printTaskerInfo("Info", "Tasker had to remove ->" + std::to_string(removedTasks) + " Tasks.");
+				Task->printTaskerInfo("Info", "Tasker had to remove ->" + std::to_string(removedTags) + " Tags.");
+			}
 			exit(exitCodeOk);
 		}
 		else if (loadParse == 2) { //Version mismatch

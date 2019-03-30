@@ -127,6 +127,7 @@
     <ClInclude Include="argvparser.hpp" />
     <ClInclude Include="json3.4.0.hpp" />
     <ClInclude Include="json2.1.1.hpp" />
+    <ClInclude Include="json3.6.1.hpp" />
     <ClInclude Include="SETTASKER.hpp" />
     <ClInclude Include="TaskerBase.hpp" />
     <ClInclude Include="TaskerMain.hpp" />

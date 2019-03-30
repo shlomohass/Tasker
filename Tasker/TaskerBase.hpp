@@ -11,7 +11,7 @@
 
 #include "SETTASKER.hpp"
 #include "TaskerAdd.hpp"
-#include "json3.4.0.hpp"
+#include "json3.6.1.hpp"
 
 #include <string>
 #include <vector>
@@ -96,8 +96,13 @@ namespace tasker {
 			std::string getStrDate(const std::string& err, bool allowSkip);
 			int         getLoad(const std::string& err);
 			std::vector<std::string> getTags(const std::string& err);
-			std::string getStrVersion(bool& push_plan, bool allowskip, const std::string& versionForSkip);
 			bool promptUser(const std::string& mes);
+
+			//Base elements builds and get:
+			std::string getStrVersion(bool& push_plan, bool allowskip, const std::string& versionForSkip);
+			json::object_t getBaseTaskPlan();
+			json::object_t getBaseTaskPlan(std::string& date);
+			json::object_t getBaseTaskPlan(std::string& date, std::string& version);
 
 			//Basic Op:
 			exists findRow(const std::string& strId);
