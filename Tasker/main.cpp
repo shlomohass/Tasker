@@ -116,7 +116,7 @@ int main(int argc, char** argv) {
 	cmd.defineOption("deltask", "Delete a task -> Will completely delete from records.", cm::ArgvParser::OptionRequiresValue);
 
 	cmd.defineOption("tags",		"Show all defined tags", cm::ArgvParser::NoOptionAttribute);
-	cmd.defineOption("addtag",		"Tag a task -> Expect a defined tag name, Optional add --taskid {integer}.", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("tag",			"Tag a task -> Expect a defined tag name, Optional add --taskid {integer}.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("remtag",		"Tag a task -> Expect a defined tag name, Optional add --taskid {integer}.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("newtag",		"Add a new tag -> Will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("deltag",		"Delete a tag -> Will remove the tag from tasks also.", cm::ArgvParser::OptionRequiresValue);
@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
 
 
 	cmd.defineOption("users",		"Show all defined users", cm::ArgvParser::NoOptionAttribute);
-	cmd.defineOption("adduser",		"Add a new user -> Will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
+	cmd.defineOption("newuser",		"Add a new user -> Will ask for more options interactivly", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("deluser",		"Delete a user -> Will remove the user from tasks also.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("updateuser",	"Update a user credentials -> Will ask for more options interactivly.", cm::ArgvParser::OptionRequiresValue);
 
@@ -366,9 +366,9 @@ int main(int argc, char** argv) {
 			Task->showtags();
 		}
 		//Handle add tag to a task:
-		if (cmd.foundOption("addtag")) {
+		if (cmd.foundOption("tag")) {
 			// Add a tag to task:
-			std::string tag = cmd.optionValue("addtag");
+			std::string tag = cmd.optionValue("tag");
 			if (!Task->addtag(tag, moreopt.taskIdStr)) {
 				Task->printTaskerNotify("Oups!");
 				Task->printTaskerInfo("Error", "Tag could not be found or input is invalid.");
@@ -451,9 +451,9 @@ int main(int argc, char** argv) {
 			Task->showstats(statstype);
 		}
 		//Handle add user:
-		if (cmd.foundOption("adduser")) {
+		if (cmd.foundOption("newuser")) {
 			// Add new user:
-			std::string user = cmd.optionValue("adduser");
+			std::string user = cmd.optionValue("newuser");
 			if (!Task->adduser(user)) {
 				Task->printTaskerNotify("Oups!");
 				Task->printTaskerInfo("Error", "User name must be at least 2 chars long without spaces and not a reserved name.");

@@ -1,21 +1,26 @@
 {
-    "desc": "teh best try we can do right now",
-    "name": "Fixing a project",
+    "desc": "the basic new project",
+    "name": "Base project",
     "note": [],
     "tags": [
         {
-            "parser": {
-                "desc": "the c++ parser of the exams"
+            "bug": {
+                "desc": "for all the bug fixes we need."
             }
         },
         {
-            "frontend": {
-                "desc": "the web frontend dev"
+            "feature": {
+                "desc": "only tasks regarding new features needed"
             }
         },
         {
-            "admin": {
-                "desc": "administration tools development"
+            "design": {
+                "desc": "design work needed to be done"
+            }
+        },
+        {
+            "c++": {
+                "desc": "c++ stuff"
             }
         }
     ],
@@ -28,91 +33,81 @@
     "tasks": [
         {
             "cancel": false,
-            "created": "30-03-2019 17:47:14",
-            "load": 1,
+            "created": "30-03-2019 18:28:16",
+            "load": 4,
             "plan": [
                 {
-                    "date": "",
-                    "user": [],
-                    "v": ""
+                    "date": "30-03-2019 23:59:00",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.0"
                 }
             ],
             "report": [],
             "status": 0.0,
-            "tagged": [],
-            "task": "missing task description",
-            "updated": "30-03-2019 17:47:14"
-        },
-        {
-            "cancel": false,
-            "created": "09-12-2017 21:05:32",
-            "load": 1,
-            "plan": [
-                {
-                    "date": "09-12-2017 23:59:00",
-                    "user": [],
-                    "v": "1.0.0"
-                }
-            ],
-            "report": [
-                {
-                    "by": [
-                        "shlomi"
-                    ],
-                    "date": "09-12-2017 22:05:41",
-                    "note": "created basic color template",
-                    "status": 0.379999995231628
-                }
-            ],
-            "status": 0.379999995231628,
             "tagged": [
-                "future"
+                "bug",
+                "feature",
+                "c++"
             ],
-            "task": "design logo",
-            "updated": "30-03-2019 17:47:14"
+            "task": "first basic task added",
+            "updated": "30-03-2019 18:28:16"
         },
         {
             "cancel": false,
-            "created": "30-03-2019 18:09:20",
-            "load": 1,
+            "created": "30-03-2019 18:37:59",
+            "load": 5,
             "plan": [
                 {
                     "date": "",
-                    "user": [],
-                    "v": "1.1.9"
-                }
-            ],
-            "report": [
-                {
-                    "by": [
-                        "shlomi"
+                    "user": [
+                        "shlomi",
+                        "shira"
                     ],
-                    "date": "30-03-2019 18:10:40",
-                    "note": "a simple report made",
-                    "status": 0.15000000596046448
+                    "v": "1.0.0"
                 }
             ],
-            "status": 0.15000000596046448,
-            "tagged": [],
-            "task": "task 1",
-            "updated": "30-03-2019 18:09:20"
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "c++",
+                "bug"
+            ],
+            "task": "basic UI crop and prepared for our meeting",
+            "updated": "30-03-2019 18:37:59"
         }
     ],
     "types": [
-        {
-            "desc": "basic task",
-            "name": "task"
-        }
+        [
+            "task",
+            [
+                "desc",
+                "basic task"
+            ]
+        ]
     ],
     "users": [
         {
             "shlomi": {
-                "desc": "shlomi thae man",
-                "mail": "jgfsd@gsfd.com"
+                "desc": "shlomi is the man",
+                "mail": "shlomohassid@gmail.com"
+            }
+        },
+        {
+            "lior": {
+                "desc": "lior is a basic designer",
+                "mail": "lior@gmail.com"
+            }
+        },
+        {
+            "shira": {
+                "desc": "she is the c++ programmer",
+                "mail": "shira@gmail.com"
             }
         }
     ],
     "version": [
-        "1.1.9"
+        "1.0.0"
     ]
 }
