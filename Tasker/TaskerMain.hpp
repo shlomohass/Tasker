@@ -45,7 +45,7 @@ namespace tasker {
 		std::string getSerialized(int pretty_spaces);
 		bool checkWriteObj(bool dir);
 		bool checkWriteObj(std::string& path);
-		bool writeObj(bool newobj);
+		bool writeObj(bool newobj, bool addModified, bool addUsed);
 		int loadObj(std::string& version);
 
 		//Task Operations:

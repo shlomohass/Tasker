@@ -249,6 +249,28 @@ namespace tasker {
 					TaskerBase::thestruct["tasker"].emplace("created", this->getcurdatetime());
 					madeSysChanges = true;
 				}
+				//Check modified:
+				if (TaskerBase::thestruct["tasker"].count("modified") == 1) {
+					if (!TaskerBase::thestruct["tasker"].at("modified").is_string()) {
+						TaskerBase::thestruct["tasker"].emplace("modified", this->getcurdatetime());
+						madeSysChanges = true;
+					}
+				}
+				else {
+					TaskerBase::thestruct["tasker"].emplace("modified", this->getcurdatetime());
+					madeSysChanges = true;
+				}
+				//Check used:
+				if (TaskerBase::thestruct["tasker"].count("used") == 1) {
+					if (!TaskerBase::thestruct["tasker"].at("used").is_string()) {
+						TaskerBase::thestruct["tasker"].emplace("used", this->getcurdatetime());
+						madeSysChanges = true;
+					}
+				}
+				else {
+					TaskerBase::thestruct["tasker"].emplace("used", this->getcurdatetime());
+					madeSysChanges = true;
+				}
 				if (madeSysChanges) {
 					std::cout << "  >>> Project tasker SYSTEM object fixed." << std::endl;
 				}

@@ -207,9 +207,13 @@ bool TaskerMain::checkWriteObj(std::string& path)
 	#endif
 	return false;
 }
-bool TaskerMain::writeObj(bool newobj)
+bool TaskerMain::writeObj(bool newobj, bool addModified, bool addUsed)
 {
 	if (this->checkWriteObj(newobj)) {
+		//Update modified, used:
+		if (addUsed) TaskerMain::thestruct["tasker"]["used"] = this->getcurdatetime();
+		if (addModified) TaskerMain::thestruct["tasker"]["modified"] = this->getcurdatetime();
+
 		std::ofstream ofs;
 		ofs.open(this->fullpath, std::ofstream::out | std::ofstream::trunc);
 		ofs << this->getSerialized(4);
@@ -626,7 +630,9 @@ void TaskerMain::aboutObject() {
 	std::cout << std::endl << " > About Project: " << std::endl << std::endl;
 	std::string projectName			= TaskerBase::thestruct["name"];
 	std::string projectDescription	= TaskerBase::thestruct["desc"];
-	//std::string projectCreated;
+	std::string objectCreated		= TaskerBase::thestruct["tasker"]["created"];
+	std::string objectUsed			= TaskerBase::thestruct["tasker"]["used"];
+	std::string objectModified		= TaskerBase::thestruct["tasker"]["modified"];
 	std::string definedUsers		= this->getAllUsersStr(TASKER_USER_PREFIX);
 	std::string definedTags			= this->getAllTagsStr(TASKER_TAG_PREFIX);
 	std::string objectVersion		= TaskerBase::thestruct["tasker"]["version"];
@@ -646,16 +652,22 @@ void TaskerMain::aboutObject() {
 			countClosedTasks++;
 		}
 	}
-	this->printTaskerBasic("Info", "Project Name",			projectName, " -> ");
-	this->printTaskerBasic("Info", "Project Description",	projectDescription, " -> ");
-	this->printTaskerBasic("Info", "Tasker object version", objectVersion, " -> ");
-	this->printTaskerBasic("Info", "Project current version", objectVersion, " -> ");
-	this->printTaskerBasic("Info", "Defined Users", definedUsers, " -> ");
-	this->printTaskerBasic("Info", "Defined Tags", definedTags, " -> ");
-	this->printTaskerBasic("Info", "Total Tasks", std::to_string(countOpenTasks + countClosedTasks + countCanceledTasks), " -> ");
-	this->printTaskerBasic("Info", "Open Tasks", std::to_string(countOpenTasks), " -> ");
-	this->printTaskerBasic("Info", "Closed Tasks", std::to_string(countClosedTasks), " -> ");
-	this->printTaskerBasic("Info", "Canceled Tasks", std::to_string(countCanceledTasks), " -> ");
+	std::string sep1 = "\t\t->  ";
+	std::string sep2 = "\t->  ";
+	std::string sep3 = "\t\t\t->  ";
+	this->printTaskerBasic("Info", "Project Name",				projectName, sep1);
+	this->printTaskerBasic("Info", "Project Description",		projectDescription, sep2);
+	this->printTaskerBasic("Info", "Tasker object version",		objectVersion, sep2);
+	this->printTaskerBasic("Info", "Tasker object created",		objectCreated, sep2);
+	this->printTaskerBasic("Info", "Last used",					objectUsed, sep3);
+	this->printTaskerBasic("Info", "Last modified",				objectModified, sep1);
+	this->printTaskerBasic("Info", "Project current version",	objectVersion, sep2);
+	this->printTaskerBasic("Info", "Defined Users",		definedUsers, sep1);
+	this->printTaskerBasic("Info", "Defined Tags",		definedTags, sep1);
+	this->printTaskerBasic("Info", "Total Tasks",		std::to_string(countOpenTasks + countClosedTasks + countCanceledTasks), sep1);
+	this->printTaskerBasic("Info", "Open Tasks",		std::to_string(countOpenTasks), sep3);
+	this->printTaskerBasic("Info", "Closed Tasks",		std::to_string(countClosedTasks), sep1);
+	this->printTaskerBasic("Info", "Canceled Tasks",	std::to_string(countCanceledTasks), sep1);
 }
 bool TaskerMain::addtag(const std::string& _tag, const std::string& strTask) {
 

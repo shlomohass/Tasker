@@ -21,9 +21,12 @@
     ],
     "tasker": {
         "allowdelete": true,
+        "created": "13-04-2019 00:50:18",
         "enableloads": true,
+        "modified": "13-04-2019 00:51:21",
         "usecolors": true,
-        "version": "1.0.3"
+        "used": "13-04-2019 00:53:06",
+        "version": "1.0.4"
     },
     "tasks": [
         {
@@ -69,13 +72,51 @@
                     "v": "1.0.3"
                 }
             ],
-            "report": [],
-            "status": 0.0,
+            "report": [
+                {
+                    "by": [
+                        "shlomi"
+                    ],
+                    "date": "12-04-2019 22:05:37",
+                    "note": "added the basic containers to the `tasker` container -> called `modified`, `used`",
+                    "status": 0.5
+                },
+                {
+                    "by": [
+                        "shlomi"
+                    ],
+                    "date": "13-04-2019 00:50:49",
+                    "note": "Added and also created the upgrade needed for this.",
+                    "status": 1.0
+                }
+            ],
+            "status": 1.0,
             "tagged": [
                 "core"
             ],
             "task": "add a global last modified and last used container and hook it to the about feature",
             "updated": "12-04-2019 19:36:05"
+        },
+        {
+            "cancel": false,
+            "created": "12-04-2019 23:59:11",
+            "load": 4,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.3"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "core"
+            ],
+            "task": "Improve messages to be all organized in the main procedure -> switch to int return type",
+            "updated": "12-04-2019 23:59:11"
         }
     ],
     "types": [

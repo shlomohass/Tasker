@@ -26,9 +26,12 @@
     ],
     "tasker": {
         "allowdelete": true,
+        "created": "13-04-2019 00:13:54",
         "enableloads": true,
+        "modified": "13-04-2019 00:16:11",
         "usecolors": true,
-        "version": "1.0.3"
+        "used": "13-04-2019 00:27:13",
+        "version": "1.0.4"
     },
     "tasks": [
         {
@@ -44,8 +47,17 @@
                     "v": "1.0.0"
                 }
             ],
-            "report": [],
-            "status": 0.0,
+            "report": [
+                {
+                    "by": [
+                        "shlomi"
+                    ],
+                    "date": "13-04-2019 00:15:50",
+                    "note": "A quick progress report to the task",
+                    "status": 0.7599999904632568
+                }
+            ],
+            "status": 0.7599999904632568,
             "tagged": [
                 "bug",
                 "feature",

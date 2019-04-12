@@ -533,7 +533,9 @@ namespace tasker {
 				{ "usecolors",			true },
 				{ "enableloads",		true },
 				{ "allowdelete",		true },
-				{ "created",			this->getcurdatetime() }
+				{ "created",			this->getcurdatetime() },
+				{ "modified",			this->getcurdatetime() },
+				{ "used",				this->getcurdatetime() }
 			}
 		);
 		return ret;

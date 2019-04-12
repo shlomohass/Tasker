@@ -24,6 +24,7 @@ namespace tasker
 
 	const std::vector<std::string> OBJECT_ATTR = { "name", "description", "note", "system", "users", "tags", "version", "types", "tasks" };
 
+	//Taser Option struct:
 	struct moreOpt {
 		std::string taskIdStr;
 		bool showclosed;
@@ -39,6 +40,22 @@ namespace tasker
 		float id;
 		int taskId;
 		int reportId;
+	};
+
+	//Finalize struct:
+	struct finalOp {
+		std::vector<std::string> infoMesNotify;
+		std::vector<std::string> infoMesFinal;
+		std::vector<std::string> infoMesAdvice;
+		std::vector<std::string> infoMesError;
+		bool setModified;
+		bool setUsed;
+		int exitCodeError;
+		int exitCodeOk;
+		int exitCode;
+		//constructor
+		finalOp() : setModified(false), setUsed(false), exitCodeError(1), exitCodeOk(1), exitCode(1) {}
+		void set(bool mod, bool used) { this->setModified = mod; this->setUsed = used; }
 	};
 }
 
