@@ -66,9 +66,17 @@
                     "date": "09-12-2017 21:01:36",
                     "note": "new buttons with shades",
                     "status": 0.28999999165535
+                },
+                {
+                    "by": [
+                        "shlomi"
+                    ],
+                    "date": "12-04-2019 20:11:38",
+                    "note": "the end of this",
+                    "status": 1.0
                 }
             ],
-            "status": 0.28999999165535,
+            "status": 1.0,
             "tagged": [
                 "bug",
                 "future"
@@ -105,7 +113,7 @@
             "updated": "09-12-2017 21:05:32"
         },
         {
-            "cancel": false,
+            "cancel": true,
             "created": "22-12-2017 16:11:47",
             "load": 2,
             "plan": [

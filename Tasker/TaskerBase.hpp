@@ -87,6 +87,7 @@ namespace tasker {
 			//Printing:
 			void printTaskerNotify(const std::string& mes);
 			void printTaskerInfo(const std::string& type, const std::string& mes);
+			void printTaskerBasic(const std::string& type, const std::string& head, const std::string& mes, const std::string& sep);
 			void printTaskerHighlighted(const std::string& mes, const std::string& value, std::size_t startneedle, bool loopall);
 
 			//Console get:
@@ -114,7 +115,9 @@ namespace tasker {
 			
 			std::string getAssignedUserString(std::vector<std::string>& users, std::string prefix, bool addNotAssigned);
 			std::string getAllTagsStr();
+			std::string getAllTagsStr(const std::string& prefix);
 			std::string getAllUsersStr();
+			std::string getAllUsersStr(const std::string& prefix);
 
 			bool findDefinedUser(const std::string& user, bool multi);
 			int findDefinedUser(const std::string& user);

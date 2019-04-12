@@ -1,0 +1,89 @@
+{
+    "desc": "The main project develop tasks",
+    "name": "Tasker Dev",
+    "note": [],
+    "tags": [
+        {
+            "bug": {
+                "desc": "a known bug that we need to kill"
+            }
+        },
+        {
+            "feature": {
+                "desc": "a feature that need some work or that is new"
+            }
+        },
+        {
+            "core": {
+                "desc": "a core related task"
+            }
+        }
+    ],
+    "tasker": {
+        "allowdelete": true,
+        "enableloads": true,
+        "usecolors": true,
+        "version": "1.0.3"
+    },
+    "tasks": [
+        {
+            "cancel": false,
+            "created": "12-04-2019 19:23:26",
+            "load": 6,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.3"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "feature"
+            ],
+            "task": "Create an `about` option to see the tasker project info and the object credentials",
+            "updated": "12-04-2019 19:23:26"
+        },
+        {
+            "cancel": false,
+            "created": "12-04-2019 19:36:05",
+            "load": 4,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.3"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "core"
+            ],
+            "task": "add a global last modified and last used container and hook it to the about feature",
+            "updated": "12-04-2019 19:36:05"
+        }
+    ],
+    "types": [
+        {
+            "desc": "basic task",
+            "name": "task"
+        }
+    ],
+    "users": [
+        {
+            "shlomi": {
+                "desc": "Developer",
+                "mail": "*****@*****.com"
+            }
+        }
+    ],
+    "version": [
+        "1.0.3"
+    ]
+}

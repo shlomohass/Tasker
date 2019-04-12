@@ -100,7 +100,8 @@ int main(int argc, char** argv) {
 	cmd.defineOption("upgrade", "Try upgrade a Tasker object to current version", cm::ArgvParser::NoOptionAttribute);
 	cmd.defineOption("fix",		"Fix a specific object container -> ''|correct attribute", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("debug",	"Enable debug mode.", cm::ArgvParser::NoOptionAttribute);
-	
+	cmd.defineOption("about",	"Display the project details", cm::ArgvParser::NoOptionAttribute);
+
 	cmd.defineOption("task",	"Add a new task -> Will ask for more options interactivly.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("taskid",  "Defines a task id to target -> is used with several procedures.", cm::ArgvParser::OptionRequiresValue);
 	cmd.defineOption("report",	"Report progress to a task -> Will ask for more options and settings interactivly", cm::ArgvParser::OptionRequiresValue);
@@ -288,6 +289,10 @@ int main(int argc, char** argv) {
 			} else {
 				Task->printTaskerNotify("Finished!");
 			}
+		}
+		//Display the project details:
+		if (cmd.foundOption("about")) {
+			Task->aboutObject();
 		}
 		//Handle set tasks:
 		if (cmd.foundOption("task")) {

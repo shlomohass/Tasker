@@ -621,6 +621,42 @@ void TaskerMain::showtags()
 		this->printTaskerInfo("Advice", "You can use `--addtag {tagname}` to define a tag.");
 	}
 }
+void TaskerMain::aboutObject() {
+	//Print main
+	std::cout << std::endl << " > About Project: " << std::endl << std::endl;
+	std::string projectName			= TaskerBase::thestruct["name"];
+	std::string projectDescription	= TaskerBase::thestruct["desc"];
+	//std::string projectCreated;
+	std::string definedUsers		= this->getAllUsersStr(TASKER_USER_PREFIX);
+	std::string definedTags			= this->getAllTagsStr(TASKER_TAG_PREFIX);
+	std::string objectVersion		= TaskerBase::thestruct["tasker"]["version"];
+	std::string projectVersion		= TaskerBase::thestruct["version"].back();
+	int countOpenTasks		= 0;
+	int countClosedTasks	= 0;
+	int countCanceledTasks	= 0;
+	//count tasks:
+	for (unsigned i = 0; i < TaskerBase::thestruct["tasks"].size(); i++) {
+		if (TaskerBase::thestruct["tasks"].at(i).at("cancel") == true) {
+			countCanceledTasks++;
+		}
+		else if (TaskerBase::thestruct["tasks"].at(i).at("status") < 1.0) {
+			countOpenTasks++;
+		}
+		else if (TaskerBase::thestruct["tasks"].at(i).at("status") >= 1.0) {
+			countClosedTasks++;
+		}
+	}
+	this->printTaskerBasic("Info", "Project Name",			projectName, " -> ");
+	this->printTaskerBasic("Info", "Project Description",	projectDescription, " -> ");
+	this->printTaskerBasic("Info", "Tasker object version", objectVersion, " -> ");
+	this->printTaskerBasic("Info", "Project current version", objectVersion, " -> ");
+	this->printTaskerBasic("Info", "Defined Users", definedUsers, " -> ");
+	this->printTaskerBasic("Info", "Defined Tags", definedTags, " -> ");
+	this->printTaskerBasic("Info", "Total Tasks", std::to_string(countOpenTasks + countClosedTasks + countCanceledTasks), " -> ");
+	this->printTaskerBasic("Info", "Open Tasks", std::to_string(countOpenTasks), " -> ");
+	this->printTaskerBasic("Info", "Closed Tasks", std::to_string(countClosedTasks), " -> ");
+	this->printTaskerBasic("Info", "Canceled Tasks", std::to_string(countCanceledTasks), " -> ");
+}
 bool TaskerMain::addtag(const std::string& _tag, const std::string& strTask) {
 
 	std::string tag = this->trim_gen(trim_copy(_tag), '"');

@@ -57,6 +57,7 @@ namespace tasker {
 
 		//Tasker Operations:
 		void showtags();
+		void aboutObject();
 		bool addtag(const std::string& _tag, const std::string& strTask);
 		bool remtag(const std::string& _tag, const std::string& strTask);
 		bool newtag(const std::string& _tag);

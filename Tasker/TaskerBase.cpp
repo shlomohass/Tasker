@@ -243,6 +243,23 @@ namespace tasker {
 			<< this->usecolor() << this->getcolor("reset")
 			<< trim_copy(mes) << std::endl;
 	}
+	void TaskerBase::printTaskerBasic(const std::string& type, const std::string& head ,const std::string& mes, const std::string& sep) // Types Error, Advice, Note
+	{
+		std::string useColor = "note";
+		if (type == "Error") {
+			useColor = "error";
+		}
+		else if (type == "Advice") {
+			useColor = "advice";
+		}
+		std::cout
+			<< "     "
+			<< this->usecolor() << this->getcolor(useColor)
+			<< head
+			<< sep
+			<< this->usecolor() << this->getcolor("reset")
+			<< trim_copy(mes) << std::endl;
+	}
 	void TaskerBase::printTaskerHighlighted(const std::string& mes, const std::string& value, std::size_t startneedle, bool loopall)
 	{
 		std::string print = mes;
@@ -597,6 +614,9 @@ namespace tasker {
 		return return_string;
 	}
 	std::string TaskerBase::getAllTagsStr() {
+		return this->getAllTagsStr("");
+	}
+	std::string TaskerBase::getAllTagsStr(const std::string& prefix) {
 		int i = 0;
 		std::stringstream sstr;
 
@@ -606,13 +626,16 @@ namespace tasker {
 		for (json::iterator it = TaskerBase::thestruct["tags"].begin(); it != TaskerBase::thestruct["tags"].end(); ++it) {
 			for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
 				i++;
-				sstr << ite.key();
+				sstr << prefix << ite.key();
 				if (i < tot) sstr << ", ";
 			}
 		}
 		return std::string(sstr.str());
 	}
 	std::string TaskerBase::getAllUsersStr() {
+		return this->getAllUsersStr("");
+	}
+	std::string TaskerBase::getAllUsersStr(const std::string& prefix) {
 		int i = 0;
 		std::stringstream sstr;
 		int tot = (int)TaskerBase::thestruct["users"].size();
@@ -620,7 +643,7 @@ namespace tasker {
 		for (json::iterator it = TaskerBase::thestruct["users"].begin(); it != TaskerBase::thestruct["users"].end(); ++it) {
 			for (json::iterator ite = it.value().begin(); ite != it.value().end(); ++ite) {
 				i++;
-				sstr << ite.key();
+				sstr << prefix << ite.key();
 				if (i < tot) sstr << ", ";
 			}
 		}
