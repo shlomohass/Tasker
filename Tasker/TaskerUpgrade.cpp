@@ -238,6 +238,17 @@ namespace tasker {
 					TaskerBase::thestruct["tasker"].emplace("allowdelete", true);
 					madeSysChanges = true;
 				}
+				//Check created:
+				if (TaskerBase::thestruct["tasker"].count("created") == 1) {
+					if (!TaskerBase::thestruct["tasker"].at("created").is_string()) {
+						TaskerBase::thestruct["tasker"].emplace("created", this->getcurdatetime());
+						madeSysChanges = true;
+					}
+				}
+				else {
+					TaskerBase::thestruct["tasker"].emplace("created", this->getcurdatetime());
+					madeSysChanges = true;
+				}
 				if (madeSysChanges) {
 					std::cout << "  >>> Project tasker SYSTEM object fixed." << std::endl;
 				}
@@ -255,14 +266,7 @@ namespace tasker {
 		}
 		if (newCreateTaskerSys) {
 			//create system container:
-			TaskerBase::thestruct.emplace("note", json::object(
-				{
-					{ "version",			TASKER_VERSION },
-					{ "usecolors",			true },
-					{ "enableloads",		true },
-					{ "allowdelete",		true }
-				}
-			));
+			TaskerBase::thestruct.emplace("tasker", this->getBaseSystemContainer());
 			std::cout << "  >>> Project tasker SYSTEM is missing -> created default container." << std::endl;
 		}
 		return true;

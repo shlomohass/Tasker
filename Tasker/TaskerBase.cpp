@@ -526,11 +526,16 @@ namespace tasker {
 		return ret;
 	}
 	json::object_t TaskerBase::getBaseSystemContainer() {
-		json::object_t ret = json::object();
-		ret.emplace("version", TASKER_VERSION); 
-		ret.emplace("usecolors", true);
-		ret.emplace("enableloads", true);
-		ret.emplace("allowdelete", true);
+		//create system container:
+		json::object_t ret = json::object(
+			{
+				{ "version",			TASKER_VERSION },
+				{ "usecolors",			true },
+				{ "enableloads",		true },
+				{ "allowdelete",		true },
+				{ "created",			this->getcurdatetime() }
+			}
+		);
 		return ret;
 	}
 	//Basic op

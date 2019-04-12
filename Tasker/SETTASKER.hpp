@@ -18,7 +18,7 @@
     #define PLATOTHER
 #endif
 
-#define TASKER_VERSION "1.0.3"
+#define TASKER_VERSION "1.0.4"
 #define TASKER_AUTHOR "Shlomi Hassid"
 
 #ifndef TASKER_DEBUG
