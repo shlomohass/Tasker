@@ -135,7 +135,9 @@ namespace tasker {
 			std::string rtrim_copy(std::string s);
 			std::string trim_copy(std::string s);
 
+			std::string keepInString(const std::string& strin, const std::string& filter);
 			void cleanString(std::string& str, const std::vector<char>& rem);
+			std::vector<std::string> splitString(const std::string &text, const std::string& sep);
 			std::vector<std::string> splitString(const std::string &text, char sep);
 			std::string implodeVecStr(const std::vector<std::string>& vec, const std::string& delim);
 			std::string implodeVecStr(const std::vector<std::string>& vec, const char delim);

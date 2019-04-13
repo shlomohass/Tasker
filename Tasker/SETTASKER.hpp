@@ -68,6 +68,7 @@
 #define TASKER_SPLIT_DELI ","
 #define TASKER_SPLIT_DELI_CHAR ','
 #define TASKER_SPLIT_DELI_CHAR_SPACE ", "
+#define TASKER_DELI_OF_CHAINED_DETAILS ":"
 #endif
 
 #ifndef TASKER_BASIC_ELE

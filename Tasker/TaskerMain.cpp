@@ -1424,45 +1424,85 @@ int TaskerMain::searchAndPrint(const std::string& str, const std::string& value,
 	}
 	return 1;
 }
+intret TaskerMain::showtasks(const std::string& _value) {
+	// {id,id,id:level}
+	// 0 - ok
+	// 1 - invalid input.
+	// 2 - invalid details part
+	// 3 - no ids suplied
+	//Clean and prepare:
+	std::string base = this->keepInString(_value, "0123456789,:");
+	if (base == "") 
+		return intret(1);
+
+	int details = std::stoi(TASKER_BASELIST_LEVEL);
+	std::vector<std::string> detailsParts;
+	std::vector<std::string> idsParts;
+	std::vector<std::string> finalIds;
+	std::stringstream sstr;
+	//Find Optional details:
+	if (base.find(TASKER_DELI_OF_CHAINED_DETAILS) != std::string::npos || this->opt.detailsLevel != "") {
+		if (this->opt.detailsLevel != "") {
+			if (!this->isInteger(this->opt.detailsLevel))
+				return intret(2, base);
+			else
+				details = std::stoi(this->opt.detailsLevel);
+		} else {
+			detailsParts = this->splitString(base, TASKER_DELI_OF_CHAINED_DETAILS);
+			if (detailsParts.size() < 2 || !this->isInteger(detailsParts[1]))
+				return intret(2, base);
+			details = std::stoi(detailsParts[1]);
+			base = detailsParts[0];
+		}
+	}
+	//find id parts:
+	idsParts = this->splitString(base, TASKER_SPLIT_DELI);
+	if (idsParts.empty()) 
+		return intret(3, base);
+	for (auto &id : idsParts) {
+		if (this->isInteger(id))
+			finalIds.push_back(id);
+	}
+	//Execute:
+	if (finalIds.empty()) 
+		return intret(3, base);
+	bool result = this->list(details, "task", this->implodeVecStr(finalIds, TASKER_SPLIT_DELI));
+	return  intret(0);
+}
+bool TaskerMain::list(int _level, const std::string& which) {
+	return this->list(_level, which, "");
+}
 bool TaskerMain::list(const std::string& _level, const std::string& which) {
 	return this->list(_level, which, "");
 }
 bool TaskerMain::list(const std::string& _level, const std::string& which, const std::string& _filter) {
+	//Set the level: 
+	int level = 0;
+	if (_level == "" || !this->onlyDigits(_level))
+		level = stoi(std::string(TASKER_BASELIST_LEVEL));
+	else
+		level = stoi(_level);
+	if (level < 0 || level > 2)
+		level = stoi(std::string(TASKER_BASELIST_LEVEL));
+	return this->list(level, which, _filter);
+}
+bool TaskerMain::list(int _level, const std::string& which, const std::string& _filter) {
 
-	int theLevel = -1;
+	int level = _level;
 	std::vector<std::string> filterCon;
-	std::string filter = trim_copy(_filter);
-	std::string level = trim_copy(_level);
+	std::string filter = _filter;
+	//this->cleanString(filter, { ' ','"','\'','@','#', '_', '-' });
+	filter = this->keepInString(filter, "0123456789abcdefghijklmnopqrstuvwxyz" + std::string(TASKER_SPLIT_DELI));
 	int counter_found = 0;
-
-	//Set the default level: 
-	if (level == "" || !this->onlyDigits(level)) {
-		level = TASKER_BASELIST_LEVEL;
-	}
-
-	//Parse the level:
-	theLevel = stoi(level);
-	if (theLevel < 0 || theLevel > 2) {
-		theLevel = stoi(std::string(TASKER_BASELIST_LEVEL));
-	}
 
 	//Print main
 	std::cout << std::endl << " > Listing matched tasks: " << std::endl;
 
 	//Before start check if we want to parse a filter first:
 	if (which == "task" || which == "user" || which == "tag") {
-		std::string filterstr = filter;
-		std::string filterdeli = TASKER_SPLIT_DELI;
-		size_t		filterstrpos = 0;
-		std::string tokenfound;
-		while ((filterstrpos = filterstr.find(filterdeli)) != std::string::npos) {
-			tokenfound = filterstr.substr(0, filterstrpos);
-			filterstr.erase(0, filterstrpos + filterdeli.length());
-			filterCon.push_back(tokenfound);
-		}
-		if (filterCon.size() == 0 || filterstr.length() > 0)
-			filterCon.push_back(filterstr);
+		filterCon = this->splitString(filter, TASKER_SPLIT_DELI);
 	}
+
 	//Print tasks
 	for (unsigned i = 0; i < TaskerBase::thestruct["tasks"].size(); i++) {
 
@@ -1578,7 +1618,7 @@ bool TaskerMain::list(const std::string& _level, const std::string& which, const
 			<< std::endl;
 
 			
-		if (theLevel > 0) {
+		if (level > 0) {
 			std::cout << this->usecolor() << this->getcolor("faded")
 				<< "\t* Due Date: "
 				<< this->usecolor() << this->getcolor("target")
@@ -1600,7 +1640,7 @@ bool TaskerMain::list(const std::string& _level, const std::string& which, const
 				<< this->usecolor() << this->getcolor("reset")
 				<< std::endl;
 		}
-		if (theLevel > 1) {
+		if (level > 1) {
 			//Will print task notes
 			for (unsigned j = 0; j < TaskerBase::thestruct["tasks"].at(i).at("report").size(); j++) {
 

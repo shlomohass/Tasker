@@ -23,9 +23,9 @@
         "allowdelete": true,
         "created": "13-04-2019 00:50:18",
         "enableloads": true,
-        "modified": "13-04-2019 00:51:21",
+        "modified": "13-04-2019 03:26:45",
         "usecolors": true,
-        "used": "13-04-2019 00:53:06",
+        "used": "13-04-2019 03:26:49",
         "version": "1.0.4"
     },
     "tasks": [
@@ -117,6 +117,160 @@
             ],
             "task": "Improve messages to be all organized in the main procedure -> switch to int return type",
             "updated": "12-04-2019 23:59:11"
+        },
+        {
+            "cancel": false,
+            "created": "13-04-2019 01:10:44",
+            "load": 5,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.3"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "core"
+            ],
+            "task": "Improve list levels as follow (0 - min, 1 - with meta, 2 - meta + latest report, 3 - with all the data)",
+            "updated": "13-04-2019 01:10:44"
+        },
+        {
+            "cancel": false,
+            "created": "13-04-2019 01:21:03",
+            "load": 5,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.3"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "core"
+            ],
+            "task": "Add a lock system to prevent and notify while the tasker object is being used",
+            "updated": "13-04-2019 01:21:03"
+        },
+        {
+            "cancel": false,
+            "created": "13-04-2019 01:27:07",
+            "load": 6,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.3"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "feature",
+                "core"
+            ],
+            "task": "Add a `--filter users:shlomi` to use in `search`,`list` etc",
+            "updated": "13-04-2019 01:27:07"
+        },
+        {
+            "cancel": false,
+            "created": "13-04-2019 01:31:19",
+            "load": 7,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.3"
+                }
+            ],
+            "report": [],
+            "status": 0.0,
+            "tagged": [
+                "feature"
+            ],
+            "task": "Add a `--page {number of results}` option to loop through long results in: search, lists, show",
+            "updated": "13-04-2019 01:31:19"
+        },
+        {
+            "cancel": false,
+            "created": "13-04-2019 01:36:19",
+            "load": 5,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.3"
+                }
+            ],
+            "report": [
+                {
+                    "by": [
+                        "shlomi"
+                    ],
+                    "date": "13-04-2019 03:06:58",
+                    "note": "creted basic behavior needs to respect `--details` too.",
+                    "status": 0.8500000238418579
+                },
+                {
+                    "by": [
+                        "shlomi"
+                    ],
+                    "date": "13-04-2019 03:13:18",
+                    "note": "Added the priority of `--details`.",
+                    "status": 1.0
+                }
+            ],
+            "status": 1.0,
+            "tagged": [
+                "feature",
+                "core"
+            ],
+            "task": "Add `--show {tasksid,taskid}[optional:details]` should be as `--listtask {taskid's} --details [level]`",
+            "updated": "13-04-2019 01:36:19"
+        },
+        {
+            "cancel": false,
+            "created": "13-04-2019 03:14:35",
+            "load": 2,
+            "plan": [
+                {
+                    "date": "",
+                    "user": [
+                        "shlomi"
+                    ],
+                    "v": "1.0.3"
+                }
+            ],
+            "report": [
+                {
+                    "by": [
+                        "shlomi"
+                    ],
+                    "date": "13-04-2019 03:26:23",
+                    "note": "Improved synth of filter used generic procedures.",
+                    "status": 1.0
+                }
+            ],
+            "status": 1.0,
+            "tagged": [
+                "core"
+            ],
+            "task": "Improve list -> remove synth and unneded loops",
+            "updated": "13-04-2019 03:14:35"
         }
     ],
     "types": [

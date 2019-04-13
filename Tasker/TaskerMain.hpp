@@ -69,9 +69,12 @@ namespace tasker {
 		bool deluser(const std::string& _user);
 		bool updateuser(const std::string& _user);
 		bool searchvalue(const std::string& _value);
-		int searchAndPrint(const std::string& str, const std::string& value, const std::string& rowindex, int searchtype);
+		int  searchAndPrint(const std::string& str, const std::string& value, const std::string& rowindex, int searchtype);
+		intret showtasks(const std::string& _value);
+		bool list(int _level, const std::string& which);
 		bool list(const std::string& _level, const std::string& which);
-		bool list(const std::string& _level, const std::string& which, const std::string& filter);
+		bool list(const std::string& _level, const std::string& which, const std::string& _filter);
+		bool list(int _level, const std::string& which, const std::string& _filter);
 
 		virtual ~TaskerMain();
 	};

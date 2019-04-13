@@ -773,7 +773,16 @@ namespace tasker {
 			str.erase(std::remove(str.begin(), str.end(), i), str.end());
 		}
 	}
-	std::vector<std::string> TaskerBase::splitString(const std::string &text, char sep) {
+	std::string TaskerBase::keepInString(const std::string& strin,const std::string& filter)
+	{
+		std::stringstream strout;
+		for (auto &c : strin) {
+			if (filter.find(c) != std::string::npos)
+				strout << c;
+		}
+		return strout.str();
+	}
+	std::vector<std::string> TaskerBase::splitString(const std::string &text, const std::string& sep) {
 		std::vector<std::string> tokens;
 		std::size_t start = 0, end = 0;
 		if (text == "") return tokens;
@@ -787,6 +796,9 @@ namespace tasker {
 			tokens.push_back(text.substr(start));
 		}
 		return tokens;
+	}
+	std::vector<std::string> TaskerBase::splitString(const std::string &text, char sep) {
+		return this->splitString(text, std::to_string(sep));
 	}
 	std::string TaskerBase::implodeVecStr(const std::vector<std::string>& vec, const std::string& delim) {
 		std::stringstream sstr;

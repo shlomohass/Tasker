@@ -57,6 +57,18 @@ namespace tasker
 		finalOp() : setModified(false), setUsed(false), exitCodeError(1), exitCodeOk(1), exitCode(1) {}
 		void set(bool mod, bool used) { this->setModified = mod; this->setUsed = used; }
 	};
+
+	struct intret {
+		int code;
+		int result;
+		std::string str;
+		intret() : code(0), result(0) {}
+		intret(int _code) : code(_code), result(0) {}
+		intret(const std::string& _str) : code(0), result(0), str(_str) {}
+		intret(int _code, const std::string& _str) : code(_code), result(0), str(_str) {}
+		intret(int _code, int _result) : code(_code), result(_result) {}
+		intret(int _code, int _result, const std::string& _str) : code(_code), result(_result), str(_str) {}
+	};
 }
 
 #endif /* TaskerAdd_hpp */

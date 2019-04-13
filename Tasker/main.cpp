@@ -501,6 +501,24 @@ int main(int argc, char** argv) {
 				}
 				goto Finalize;
 			}
+			//The show option -> shows only task ids with detail filter:
+			if (cmd.foundOption("show")) {
+				std::string baseshowstring = cmd.optionValue("show");
+				tasker::intret resultShow = Task->showtasks(baseshowstring);
+				finalOp.set(false, true);
+				if (resultShow.code != 0) {
+					finalOp.infoMesNotify.push_back("Oups!");
+					finalOp.infoMesAdvice.push_back("Use this pattern -> `--show [Id's list]:[optional integer level]`.");
+					if (resultShow.code == 1) 
+						finalOp.infoMesError.push_back("Invalid input given.");
+					if (resultShow.code == 2) 
+						finalOp.infoMesError.push_back("Invalid list detail number -> retry with valid input please.");
+					if (resultShow.code == 3)
+						finalOp.infoMesError.push_back("Invalid Id's list given.");
+					finalOp.exitCode = finalOp.exitCodeError;
+				}
+				goto Finalize;
+			}
 			//Handle lists:
 			if (cmd.foundOption("listtask") ||
 				cmd.foundOption("listall") ||
